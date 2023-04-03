@@ -1,16 +1,28 @@
 plugins {
     id 'java'
+    id 'application'
+}
+
+allprojects {
+    ext.gdxVersion = "1.11.0"
 }
 
 sourceCompatibility = 17
+applicationDefaultJvmArgs = ["-XstartOnFirstThread"]
 
 repositories {
     mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    mavenLocal()
 }
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.+'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.+'
+
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
 test {
@@ -19,3 +31,5 @@ test {
         events "passed", "skipped", "failed"
     }
 }
+
+mainClassName = 'Program'
