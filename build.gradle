@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     id 'java'
     id 'application'
@@ -8,7 +10,10 @@ allprojects {
 }
 
 sourceCompatibility = 17
-applicationDefaultJvmArgs = ["-XstartOnFirstThread"]
+
+if (OperatingSystem.current().isMacOsX()) {
+  applicationDefaultJvmArgs = ["-XstartOnFirstThread"]
+}
 
 repositories {
     mavenCentral()
