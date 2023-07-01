@@ -96,7 +96,6 @@ public class GdxGameUI implements ApplicationListener, Drawer {
 
     @Override
     public float getAspectRatio() {
-        System.out.println(Gdx.graphics.getWidth() +" " + Gdx.graphics.getHeight());
         return (float) Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
     }
 }

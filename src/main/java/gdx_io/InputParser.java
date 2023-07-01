@@ -1,5 +1,6 @@
 package gdx_io;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import io.GameUI;
 import io.ScreenPosition;
@@ -42,6 +43,7 @@ public class InputParser implements InputProcessor {
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if(!mouse_moved)
             gameUI.mouseClick(translator.translate(screenX, screenY));
+        gameUI.mouseRelease(translator.translate(screenX, screenY));
         return true;
     }
 
@@ -63,6 +65,7 @@ public class InputParser implements InputProcessor {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        return false;
+        gameUI.mouseScroll(amountY, translator.translate(Gdx.input.getX(), Gdx.input.getY()));
+        return true;
     }
 }
