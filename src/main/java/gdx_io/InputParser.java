@@ -59,6 +59,7 @@ public class InputParser implements InputProcessor {
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         lastMousePosition = translator.translate(screenX, screenY);
+        gameUI.mouseMove(lastMousePosition);
         mouse_moved = true;
         return true;
     }

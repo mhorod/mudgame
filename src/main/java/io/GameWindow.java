@@ -9,6 +9,8 @@ public class GameWindow implements GameUI {
     float targetScale = mapView.scale;
     ScreenPosition pivot;
 
+    ScreenPosition mouse = new ScreenPosition(0, 0);
+
     @Override
     public void draw(Drawer d) {
         mapView.draw(d);
@@ -36,6 +38,8 @@ public class GameWindow implements GameUI {
             scrollVelocityX = 0;
             scrollVelocityY = 0;
         }
+
+        mapView.update(mouse);
     }
 
     @Override
@@ -50,6 +54,11 @@ public class GameWindow implements GameUI {
     }
 
     @Override
+    public void mouseMove(ScreenPosition pos) {
+        mouse = pos;
+    }
+
+    @Override
     public void mouseRelease(ScreenPosition pos) {
         mouseDown = false;
     }
@@ -58,6 +67,7 @@ public class GameWindow implements GameUI {
     public void mouseDragged(ScreenPosition pos1, ScreenPosition pos2) {
         scrollVelocityX = pos2.x() - pos1.x();
         scrollVelocityY = pos2.y() - pos1.y();
+        mouse = pos2;
         mapView.offset = new ScreenPosition(
                 mapView.offset.x() + pos2.x() - pos1.x(),
                 mapView.offset.y() + pos2.y() - pos1.y()
