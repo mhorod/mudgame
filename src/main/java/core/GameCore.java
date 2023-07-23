@@ -3,20 +3,21 @@ package core;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class Game
+public class GameCore
 {
     private final int playerCount;
     private final List<PlayerID> playerIDs;
     private int currentTurn;
 
-
-    public Game(int playerCount)
+    public GameCore(int playerCount)
     {
+        if (playerCount <= 0)
+            throw new IllegalArgumentException("playerCount must be positive");
+
         this.playerCount = playerCount;
         this.playerIDs = IntStream.range(0, playerCount)
                 .mapToObj(PlayerID::new)
                 .toList();
-
         currentTurn = 0;
     }
 
@@ -27,42 +28,15 @@ public class Game
 
     public PlayerID getCurrentPlayer() { return playerIDs.get(currentTurn); }
 
-    public void setCurrentPlayer(
-            PlayerID player
-    )
+    public void setCurrentPlayer(PlayerID player)
     {
         currentTurn = playerIDs.indexOf(player);
     }
 
-
-    public List<Event> completeTurn(PlayerID player)
+    public void completeTurn()
     {
         currentTurn = nextTurn();
-        return List.of();
     }
-
-    public List<Event> placeUnit(
-            PlayerID player, Position position, Unit unit
-    )
-    {
-        return List.of();
-    }
-
 
     private int nextTurn() { return (currentTurn + 1) % playerCount; }
-
-    public static class PlayerID
-    {
-        private int id;
-
-        private PlayerID(int id) { this.id = id; }
-    }
-
-    public static class UnitID
-    {
-        private int id;
-
-        private UnitID(int id) { this.id = id; }
-    }
-
 }
