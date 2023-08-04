@@ -1,6 +1,6 @@
 package core;
 
-public interface Unit
+public interface Entity
 {
     int getSpeed();
     int getHealth();
