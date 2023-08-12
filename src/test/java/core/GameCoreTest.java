@@ -2,12 +2,11 @@ package core;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 class GameCoreTest
@@ -22,14 +21,14 @@ class GameCoreTest
         List<PlayerID> playerIDs = core.getPlayerIDs();
 
         // then
-        assertEquals(4, playerIDs.size());
+        assertThat(playerIDs).hasSize(4);
     }
 
     @Test
     void core_throws_exception_when_created_with_non_positive_player_count()
     {
-        assertThrows(IllegalArgumentException.class, () -> new GameCore(0));
-        assertThrows(IllegalArgumentException.class, () -> new GameCore(-1));
+        assertThatThrownBy(() -> new GameCore(0)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new GameCore(-1)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -42,8 +41,7 @@ class GameCoreTest
         List<PlayerID> playerIDs = core.getPlayerIDs();
 
         // then
-        Set<PlayerID> uniquePlayerIDs = new HashSet<>(playerIDs);
-        assertEquals(4, uniquePlayerIDs.size());
+        assertThat(playerIDs).doesNotHaveDuplicates();
     }
 
     @Test
@@ -57,8 +55,7 @@ class GameCoreTest
         core.completeTurn();
 
         // then
-        PlayerID current = core.getCurrentPlayer();
-        assertNotEquals(first, current);
+        assertThat(core.getCurrentPlayer()).isNotEqualTo(first);
     }
 
     @Test
@@ -73,8 +70,7 @@ class GameCoreTest
             core.completeTurn();
 
         // then
-        PlayerID current = core.getCurrentPlayer();
-        assertEquals(first, current);
+        assertThat(core.getCurrentPlayer()).isEqualTo(first);
     }
 
     @Test
@@ -94,7 +90,7 @@ class GameCoreTest
         }
 
         // then
-        assertTrue(turns.containsAll(playerIDs));
+        assertThat(turns).containsAll(playerIDs);
     }
 
 }
