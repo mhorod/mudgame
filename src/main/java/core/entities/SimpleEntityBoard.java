@@ -1,7 +1,6 @@
-package core;
+package core.entities;
 
-import core.entities.Entity;
-import core.entities.EntityData;
+import core.Position;
 import core.id.EntityID;
 import core.id.PlayerID;
 
@@ -10,29 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EntityBoard
+public class SimpleEntityBoard implements EntityBoard
 {
-    public static class EntityIsAlreadyPlaced extends RuntimeException
-    {
-        public EntityIsAlreadyPlaced(Entity entity)
-        {
-            super("Entity with id " + entity.id() + " is already placed.");
-        }
-    }
-
-    public static class EntityDoesNotExist extends RuntimeException
-    {
-        public EntityDoesNotExist(EntityID entityID)
-        {
-            super("Entity with id " + entityID + " does not exist.");
-        }
-    }
-
     private final Map<Position, List<EntityID>> board = new HashMap<>();
     private final Map<EntityID, Position> entityPositions = new HashMap<>();
     private final Map<EntityID, Entity> entitiesById = new HashMap<>();
     private long nextEntityID = 0;
 
+    @Override
     public Entity createEntity(EntityData data, PlayerID owner, Position position)
     {
         EntityID entityID = newEntityID();
@@ -41,16 +25,19 @@ public class EntityBoard
         return entity;
     }
 
+    @Override
     public List<Entity> allEntities()
     {
         return entitiesById.values().stream().toList();
     }
 
+    @Override
     public List<Entity> entitiesAt(Position position)
     {
         return mutableEntitiesAt(position).stream().map(entitiesById::get).toList();
     }
 
+    @Override
     public Position entityPosition(EntityID entityID)
     {
         if (!containsEntity(entityID))
@@ -58,6 +45,7 @@ public class EntityBoard
         return entityPositions.get(entityID);
     }
 
+    @Override
     public void removeEntity(EntityID entityID)
     {
         if (!containsEntity(entityID))
@@ -69,11 +57,13 @@ public class EntityBoard
         entitiesById.remove(entityID);
     }
 
+    @Override
     public boolean containsEntity(EntityID entityID)
     {
         return entityPositions.containsKey(entityID);
     }
 
+    @Override
     public void placeEntity(Entity entity, Position position)
     {
         if (containsEntity(entity.id()))
@@ -84,6 +74,7 @@ public class EntityBoard
         entityPositions.put(entity.id(), position);
     }
 
+    @Override
     public void moveEntity(EntityID entityID, Position targetPosition)
     {
         if (!containsEntity(entityID))

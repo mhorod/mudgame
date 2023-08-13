@@ -3,6 +3,9 @@ package core;
 
 import core.entities.Entity;
 import core.entities.EntityData;
+import core.entities.EntityDoesNotExist;
+import core.entities.EntityIsAlreadyPlaced;
+import core.entities.SimpleEntityBoard;
 import core.id.EntityID;
 import core.id.PlayerID;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,19 +17,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 
-class EntityBoardTest
+class SimpleEntityBoardTest
 {
     static final EntityData DATA = mock(EntityData.class);
     static final PlayerID OWNER = new PlayerID(0);
     static final Position POSITION_0 = new Position(0, 0);
     static final Position POSITION_1 = new Position(0, 1);
 
-    EntityBoard board;
+    SimpleEntityBoard board;
 
     @BeforeEach
     void init()
     {
-        board = new EntityBoard();
+        board = new SimpleEntityBoard();
     }
 
     @Test
@@ -107,7 +110,7 @@ class EntityBoardTest
 
             // then
             assertThatThrownBy(() -> board.placeEntity(entity, POSITION_0)).isInstanceOf(
-                    EntityBoard.EntityIsAlreadyPlaced.class);
+                    EntityIsAlreadyPlaced.class);
         }
     }
 
@@ -141,7 +144,7 @@ class EntityBoardTest
 
             // then
             assertThatThrownBy(() -> board.removeEntity(entity.id())).isInstanceOf(
-                    EntityBoard.EntityDoesNotExist.class);
+                    EntityDoesNotExist.class);
         }
     }
 
@@ -182,7 +185,7 @@ class EntityBoardTest
         void moving_nonexistent_entity_throws_exception()
         {
             assertThatThrownBy(() -> board.moveEntity(new EntityID(0), POSITION_0)).isInstanceOf(
-                    EntityBoard.EntityDoesNotExist.class);
+                    EntityDoesNotExist.class);
         }
     }
 }
