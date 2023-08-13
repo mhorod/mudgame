@@ -5,13 +5,13 @@ import core.id.PlayerID;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class GameCore
+public class PlayerManager
 {
     private final int playerCount;
     private final List<PlayerID> playerIDs;
     private int currentTurn;
 
-    public GameCore(int playerCount)
+    public PlayerManager(int playerCount)
     {
         if (playerCount <= 0)
             throw new IllegalArgumentException("playerCount must be positive");
