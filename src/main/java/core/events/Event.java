@@ -1,18 +1,26 @@
 package core.events;
 
-import core.*;
+import core.Position;
+import core.entities.EntityData;
+import core.id.EntityID;
+import core.id.PlayerID;
+
+import javax.swing.text.html.parser.Entity;
 
 /**
  * Event is something that can happen and cause changes to the game
  */
 public sealed interface Event
 {
+    /**
+     * Action is an event that can be caused directly by a player
+     */
     sealed interface Action extends Event { }
 
-    record PlaceEntity(Entity unit, PlayerID owner, Position position) implements Action { }
+    record CreateEntity(EntityData entityData, PlayerID owner, Position position)
+            implements Action { }
 
-    record EntityPlacement(Entity entity, EntityID entityID, PlayerID owner, Position position)
-            implements Event { }
+    record PlaceEntity(Entity entity, Position position) implements Event { }
 
     record RemoveEntity(EntityID entityID) implements Action { }
 

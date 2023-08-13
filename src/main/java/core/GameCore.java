@@ -1,5 +1,7 @@
 package core;
 
+import core.id.PlayerID;
+
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -15,9 +17,7 @@ public class GameCore
             throw new IllegalArgumentException("playerCount must be positive");
 
         this.playerCount = playerCount;
-        this.playerIDs = IntStream.range(0, playerCount)
-                .mapToObj(PlayerID::new)
-                .toList();
+        this.playerIDs = IntStream.range(0, playerCount).mapToObj(PlayerID::new).toList();
         currentTurn = 0;
     }
 
