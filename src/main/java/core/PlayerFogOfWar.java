@@ -1,8 +1,11 @@
 package core;
 
+import lombok.EqualsAndHashCode;
+
 import java.util.HashSet;
 import java.util.Set;
 
+@EqualsAndHashCode
 public class PlayerFogOfWar implements PlayerFogOfWarView
 {
     private final Set<Position> visiblePositions = new HashSet<>();

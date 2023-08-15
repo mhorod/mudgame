@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class SimpleEntityBoard implements EntityBoard
 {
@@ -100,5 +101,23 @@ public class SimpleEntityBoard implements EntityBoard
     private List<EntityID> mutableEntitiesAt(Position position)
     {
         return board.computeIfAbsent(position, key -> new ArrayList<>());
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        SimpleEntityBoard that = (SimpleEntityBoard) o;
+        return board.equals(that.board) && entityPositions.equals(that.entityPositions) &&
+               entitiesById.equals(that.entitiesById);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(board, entityPositions, entitiesById);
     }
 }

@@ -1,11 +1,13 @@
 package core;
 
 import core.id.PlayerID;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@EqualsAndHashCode
 public class FogOfWar implements FogOfWarView
 {
     private final Map<PlayerID, PlayerFogOfWar> fows;
