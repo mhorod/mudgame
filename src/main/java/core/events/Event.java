@@ -1,11 +1,11 @@
 package core.events;
 
 import core.Position;
+import core.entities.Entity;
 import core.entities.EntityData;
 import core.id.EntityID;
 import core.id.PlayerID;
 
-import javax.swing.text.html.parser.Entity;
 
 /**
  * Event is something that can happen and cause changes to the game

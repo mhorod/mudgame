@@ -3,11 +3,10 @@ package core;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SimpleFogOfWar implements FogOfWar
+public class PlayerFogOfWar implements FogOfWarView
 {
     private final Set<Position> visiblePositions = new HashSet<>();
 
-    @Override
     public void setVisibility(Position position, boolean isVisible)
     {
         if (isVisible)

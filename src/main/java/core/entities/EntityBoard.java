@@ -11,5 +11,4 @@ public interface EntityBoard extends EntityBoardView
     void removeEntity(EntityID entityID);
     void moveEntity(EntityID entityID, Position targetPosition);
 
-
 }
