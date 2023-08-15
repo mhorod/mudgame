@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 public class EventEntityBoard extends EventSourceBase implements EventObserver
 {
     private final EntityBoard board;
-    private final FogOfWar fows;
+    private final FogOfWarView fow;
 
     @Override
     public void receive(Event event)
@@ -73,11 +73,11 @@ public class EventEntityBoard extends EventSourceBase implements EventObserver
 
     private Predicate<PlayerID> isVisible(Position position)
     {
-        return id -> fows.isVisible(position, id);
+        return id -> fow.isVisible(position, id);
     }
 
     private Predicate<PlayerID> isMoveVisible(Position from, Position to)
     {
-        return id -> fows.isVisible(from, id) || fows.isVisible(to, id);
+        return id -> fow.isVisible(from, id) || fow.isVisible(to, id);
     }
 }

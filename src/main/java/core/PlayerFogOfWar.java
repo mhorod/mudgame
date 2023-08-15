@@ -3,7 +3,7 @@ package core;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PlayerFogOfWar implements FogOfWarView
+public class PlayerFogOfWar implements PlayerFogOfWarView
 {
     private final Set<Position> visiblePositions = new HashSet<>();
 
