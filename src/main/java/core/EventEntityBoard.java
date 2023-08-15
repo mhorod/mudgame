@@ -8,7 +8,7 @@ import core.events.Event.MoveEntity;
 import core.events.Event.PlaceEntity;
 import core.events.Event.RemoveEntity;
 import core.events.EventObserver;
-import core.events.EventSourceBase;
+import core.events.EventSender;
 import core.id.PlayerID;
 import lombok.RequiredArgsConstructor;
 
@@ -16,10 +16,11 @@ import java.util.function.Predicate;
 
 
 @RequiredArgsConstructor
-public class EventEntityBoard extends EventSourceBase implements EventObserver
+public class EventEntityBoard implements EventObserver
 {
     private final EntityBoard board;
     private final FogOfWarView fow;
+    private final EventSender eventSender;
 
     @Override
     public void receive(Event event)
@@ -41,7 +42,7 @@ public class EventEntityBoard extends EventSourceBase implements EventObserver
 
         Position position = board.entityPosition(event.entityID());
         board.removeEntity(event.entityID());
-        send(event, isVisible(position));
+        eventSender.send(event, isVisible(position));
     }
 
     private void moveEntity(MoveEntity event)
@@ -50,9 +51,9 @@ public class EventEntityBoard extends EventSourceBase implements EventObserver
             return;
 
         Position from = board.entityPosition(event.entityID());
-        Position to = event.position();
+        Position to = event.destination();
         board.moveEntity(event.entityID(), to);
-        send(event, isMoveVisible(from, to));
+        eventSender.send(event, isMoveVisible(from, to));
     }
 
     private void placeEntity(PlaceEntity event)
@@ -61,14 +62,14 @@ public class EventEntityBoard extends EventSourceBase implements EventObserver
             return;
 
         board.placeEntity(event.entity(), event.position());
-        send(event, isVisible(event.position()));
+        eventSender.send(event, isVisible(event.position()));
     }
 
     private void createEntity(CreateEntity event)
     {
         Entity entity = board.createEntity(event.entityData(), event.owner(), event.position());
         PlaceEntity resultEvent = new Event.PlaceEntity(entity, event.position());
-        send(resultEvent, isVisible(event.position()));
+        eventSender.send(resultEvent, isVisible(event.position()));
     }
 
     private Predicate<PlayerID> isVisible(Position position)

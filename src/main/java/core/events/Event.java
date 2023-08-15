@@ -24,6 +24,6 @@ public sealed interface Event
 
     record RemoveEntity(EntityID entityID) implements Action { }
 
-    record MoveEntity(EntityID entityID, Position position) implements Action { }
+    record MoveEntity(EntityID entityID, Position destination) implements Action { }
 }
 

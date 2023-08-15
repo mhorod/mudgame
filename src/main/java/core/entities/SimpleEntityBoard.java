@@ -85,6 +85,11 @@ public class SimpleEntityBoard implements EntityBoard
         placeEntity(entity, targetPosition);
     }
 
+    @Override
+    public Entity findEntityByID(EntityID entityID)
+    {
+        return entitiesById.get(entityID);
+    }
 
     private EntityID newEntityID()
     {

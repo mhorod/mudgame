@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public abstract class EventSourceBase implements EventSource
+public class EventSender implements EventSource
 {
-    protected final List<EventObserver> observers = new ArrayList<>();
-    protected final List<PlayerEventObserver> playerObservers = new ArrayList<>();
+    private final List<EventObserver> observers = new ArrayList<>();
+    private final List<PlayerEventObserver> playerObservers = new ArrayList<>();
 
     @Override
     public void addObserver(EventObserver observer)
@@ -23,7 +23,7 @@ public abstract class EventSourceBase implements EventSource
         playerObservers.add(observer);
     }
 
-    protected void send(Event event, Predicate<PlayerID> shouldPlayerReceive)
+    public void send(Event event, Predicate<PlayerID> shouldPlayerReceive)
     {
         Predicate<PlayerEventObserver> shouldReceive = o -> shouldPlayerReceive.test(
                 o.getPlayerID());

@@ -4,16 +4,15 @@ import core.id.PlayerID;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class FogOfWar implements FogOfWarView
 {
     private final Map<PlayerID, PlayerFogOfWar> fows;
 
-    public FogOfWar(List<PlayerID> players, Supplier<PlayerFogOfWar> fogOfWarSupplier)
+    public FogOfWar(List<PlayerID> players)
     {
-        fows = players.stream().collect(Collectors.toMap(p -> p, p -> fogOfWarSupplier.get()));
+        fows = players.stream().collect(Collectors.toMap(p -> p, p -> new PlayerFogOfWar()));
     }
 
     @Override

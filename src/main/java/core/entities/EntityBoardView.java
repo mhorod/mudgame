@@ -11,4 +11,5 @@ public interface EntityBoardView
     List<Entity> entitiesAt(Position position);
     Position entityPosition(EntityID entityID);
     boolean containsEntity(EntityID entityID);
+    Entity findEntityByID(EntityID entityID);
 }
