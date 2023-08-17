@@ -1,7 +1,7 @@
 package core.rules;
 
+import core.entities.events.MoveEntity;
 import core.events.Event.Action;
-import core.events.Event.MoveEntity;
 import core.fogofwar.FogOfWarView;
 import core.id.PlayerID;
 import lombok.RequiredArgsConstructor;

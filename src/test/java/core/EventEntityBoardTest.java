@@ -4,13 +4,13 @@ import core.entities.Entity;
 import core.entities.EntityBoard;
 import core.entities.EntityData;
 import core.entities.SimpleEntityBoard;
+import core.entities.events.CreateEntity;
+import core.entities.events.MoveEntity;
+import core.entities.events.PlaceEntity;
+import core.entities.events.RemoveEntity;
 import core.events.Event;
-import core.events.Event.CreateEntity;
-import core.events.Event.MoveEntity;
-import core.events.Event.PlaceEntity;
-import core.events.Event.RemoveEntity;
 import core.events.EventObserver;
-import core.events.EventSender;
+import core.events.ObserverEventSender;
 import core.events.PlayerEventObserver;
 import core.fogofwar.FogOfWar;
 import core.id.EntityID;
@@ -42,7 +42,7 @@ class EventEntityBoardTest
     List<PlayerID> players;
     EntityBoard entityBoard;
     FogOfWar fow;
-    EventSender eventSender;
+    ObserverEventSender eventSender;
     EventEntityBoard testee;
 
     @BeforeEach
@@ -51,7 +51,7 @@ class EventEntityBoardTest
         players = IntStream.range(0, 3).mapToObj(PlayerID::new).toList();
         entityBoard = new SimpleEntityBoard();
         fow = new FogOfWar(players);
-        eventSender = new EventSender();
+        eventSender = new ObserverEventSender();
         testee = new EventEntityBoard(entityBoard, fow, eventSender);
     }
 

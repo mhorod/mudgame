@@ -1,8 +1,8 @@
 package core.rules;
 
 import core.entities.EntityBoardView;
+import core.entities.events.MoveEntity;
 import core.events.Event.Action;
-import core.events.Event.MoveEntity;
 import core.id.EntityID;
 import core.id.PlayerID;
 import lombok.RequiredArgsConstructor;

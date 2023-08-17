@@ -1,8 +1,8 @@
 package core.rules;
 
 import core.entities.EntityBoardView;
+import core.entities.events.CreateEntity;
 import core.events.Event.Action;
-import core.events.Event.CreateEntity;
 import core.id.PlayerID;
 import lombok.RequiredArgsConstructor;
 

@@ -2,13 +2,13 @@ package core;
 
 import core.entities.Entity;
 import core.entities.EntityBoard;
+import core.entities.events.CreateEntity;
+import core.entities.events.MoveEntity;
+import core.entities.events.PlaceEntity;
+import core.entities.events.RemoveEntity;
 import core.events.Event;
-import core.events.Event.CreateEntity;
-import core.events.Event.MoveEntity;
-import core.events.Event.PlaceEntity;
-import core.events.Event.RemoveEntity;
 import core.events.EventObserver;
-import core.events.EventSender;
+import core.events.ObserverEventSender;
 import core.fogofwar.FogOfWarView;
 import core.id.PlayerID;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class EventEntityBoard implements EventObserver
 {
     private final EntityBoard board;
     private final FogOfWarView fow;
-    private final EventSender eventSender;
+    private final ObserverEventSender eventSender;
 
     @Override
     public void receive(Event event)
@@ -69,7 +69,7 @@ public class EventEntityBoard implements EventObserver
     private void createEntity(CreateEntity event)
     {
         Entity entity = board.createEntity(event.entityData(), event.owner(), event.position());
-        PlaceEntity resultEvent = new Event.PlaceEntity(entity, event.position());
+        PlaceEntity resultEvent = new PlaceEntity(entity, event.position());
         eventSender.send(resultEvent, isVisible(event.position()));
     }
 
