@@ -5,7 +5,7 @@ import core.entities.SimpleEntityBoard;
 import core.events.Event;
 import core.events.Event.Action;
 import core.events.EventObserver;
-import core.events.ObserverEventSender;
+import core.events.EventSender;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.rules.ActionRule;
@@ -26,7 +26,7 @@ public class GameCore implements ActionProcessor, EventObserver
     public final List<ActionRule> rules;
     private final RuleBasedActionProcessor actionProcessor;
 
-    GameCore(int playerCount, ObserverEventSender eventSender)
+    GameCore(int playerCount, EventSender eventSender)
     {
         playerManager = new PlayerManager(playerCount);
         entityBoard = new SimpleEntityBoard();

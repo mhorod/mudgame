@@ -1,14 +1,14 @@
 package core;
 
-import core.entities.model.Entity;
 import core.entities.EntityBoard;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
+import core.entities.model.Entity;
 import core.events.Event;
 import core.events.EventObserver;
-import core.events.ObserverEventSender;
+import core.events.EventSender;
 import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.model.Position;
@@ -22,7 +22,7 @@ public class EventEntityBoard implements EventObserver
 {
     private final EntityBoard board;
     private final FogOfWarView fow;
-    private final ObserverEventSender eventSender;
+    private final EventSender eventSender;
 
     @Override
     public void receive(Event event)
