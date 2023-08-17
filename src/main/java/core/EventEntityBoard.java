@@ -1,6 +1,6 @@
 package core;
 
-import core.entities.Entity;
+import core.entities.model.Entity;
 import core.entities.EntityBoard;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
@@ -10,7 +10,8 @@ import core.events.Event;
 import core.events.EventObserver;
 import core.events.ObserverEventSender;
 import core.fogofwar.FogOfWarView;
-import core.id.PlayerID;
+import core.model.PlayerID;
+import core.model.Position;
 import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;

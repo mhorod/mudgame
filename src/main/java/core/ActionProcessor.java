@@ -1,7 +1,7 @@
 package core;
 
 import core.events.Event.Action;
-import core.id.PlayerID;
+import core.model.PlayerID;
 
 public interface ActionProcessor
 {

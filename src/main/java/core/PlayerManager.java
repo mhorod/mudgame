@@ -1,6 +1,6 @@
 package core;
 
-import core.id.PlayerID;
+import core.model.PlayerID;
 
 import java.util.List;
 import java.util.stream.IntStream;

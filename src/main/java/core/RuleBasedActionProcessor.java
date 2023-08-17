@@ -2,7 +2,7 @@ package core;
 
 import core.events.Event.Action;
 import core.events.EventObserver;
-import core.id.PlayerID;
+import core.model.PlayerID;
 import core.rules.ActionRule;
 import lombok.RequiredArgsConstructor;
 

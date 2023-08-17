@@ -1,4 +1,4 @@
-package core.id;
+package core.model;
 
 public record PlayerID(long id)
 { }

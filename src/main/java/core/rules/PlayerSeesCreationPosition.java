@@ -3,7 +3,7 @@ package core.rules;
 import core.entities.events.CreateEntity;
 import core.events.Event.Action;
 import core.fogofwar.FogOfWarView;
-import core.id.PlayerID;
+import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

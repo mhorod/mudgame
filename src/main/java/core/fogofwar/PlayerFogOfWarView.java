@@ -1,6 +1,6 @@
 package core.fogofwar;
 
-import core.Position;
+import core.model.Position;
 
 public interface PlayerFogOfWarView
 {

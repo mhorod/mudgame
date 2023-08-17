@@ -1,7 +1,7 @@
-package core.entities;
+package core.entities.model;
 
-import core.id.EntityID;
-import core.id.PlayerID;
+import core.model.EntityID;
+import core.model.PlayerID;
 
 /**
  * Represents an existing, individual entity instance that has id and owner

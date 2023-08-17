@@ -1,7 +1,7 @@
 package core.fogofwar;
 
-import core.Position;
-import core.id.PlayerID;
+import core.model.Position;
+import core.model.PlayerID;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;

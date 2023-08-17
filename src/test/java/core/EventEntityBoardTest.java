@@ -1,8 +1,8 @@
 package core;
 
-import core.entities.Entity;
+import core.entities.model.Entity;
 import core.entities.EntityBoard;
-import core.entities.EntityData;
+import core.entities.model.EntityData;
 import core.entities.SimpleEntityBoard;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
@@ -13,8 +13,9 @@ import core.events.EventObserver;
 import core.events.ObserverEventSender;
 import core.events.PlayerEventObserver;
 import core.fogofwar.FogOfWar;
-import core.id.EntityID;
-import core.id.PlayerID;
+import core.model.EntityID;
+import core.model.PlayerID;
+import core.model.Position;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

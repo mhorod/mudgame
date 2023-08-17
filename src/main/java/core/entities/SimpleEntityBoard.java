@@ -1,8 +1,10 @@
 package core.entities;
 
-import core.Position;
-import core.id.EntityID;
-import core.id.PlayerID;
+import core.model.Position;
+import core.entities.model.Entity;
+import core.entities.model.EntityData;
+import core.model.EntityID;
+import core.model.PlayerID;
 
 import java.util.ArrayList;
 import java.util.HashMap;

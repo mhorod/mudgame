@@ -1,4 +1,4 @@
-package core.id;
+package core.model;
 
 public record EntityID(long id)
 { }

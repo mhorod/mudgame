@@ -1,9 +1,9 @@
 package core.entities.events;
 
-import core.Position;
-import core.entities.EntityData;
+import core.model.Position;
+import core.entities.model.EntityData;
 import core.events.Event.Action;
-import core.id.PlayerID;
+import core.model.PlayerID;
 
 public record CreateEntity(EntityData entityData, PlayerID owner, Position position)
         implements Action { }

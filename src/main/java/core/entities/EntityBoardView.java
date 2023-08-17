@@ -1,7 +1,8 @@
 package core.entities;
 
-import core.Position;
-import core.id.EntityID;
+import core.model.Position;
+import core.entities.model.Entity;
+import core.model.EntityID;
 
 import java.util.List;
 

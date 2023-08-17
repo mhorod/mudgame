@@ -7,7 +7,7 @@ import core.events.Event.Action;
 import core.events.EventObserver;
 import core.events.ObserverEventSender;
 import core.fogofwar.FogOfWar;
-import core.id.PlayerID;
+import core.model.PlayerID;
 import core.rules.ActionRule;
 import core.rules.CreationPositionIsEmpty;
 import core.rules.MoveDestinationIsEmpty;

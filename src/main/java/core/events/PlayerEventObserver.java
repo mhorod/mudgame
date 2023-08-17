@@ -1,6 +1,6 @@
 package core.events;
 
-import core.id.PlayerID;
+import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

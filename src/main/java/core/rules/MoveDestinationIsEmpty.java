@@ -3,7 +3,7 @@ package core.rules;
 import core.entities.EntityBoardView;
 import core.entities.events.MoveEntity;
 import core.events.Event.Action;
-import core.id.PlayerID;
+import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

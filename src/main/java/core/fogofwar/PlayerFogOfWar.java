@@ -1,6 +1,6 @@
 package core.fogofwar;
 
-import core.Position;
+import core.model.Position;
 import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;

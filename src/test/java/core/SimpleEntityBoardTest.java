@@ -1,13 +1,14 @@
 package core;
 
 
-import core.entities.Entity;
-import core.entities.EntityData;
+import core.entities.model.Entity;
+import core.entities.model.EntityData;
 import core.entities.EntityDoesNotExist;
 import core.entities.EntityIsAlreadyPlaced;
 import core.entities.SimpleEntityBoard;
-import core.id.EntityID;
-import core.id.PlayerID;
+import core.model.EntityID;
+import core.model.PlayerID;
+import core.model.Position;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

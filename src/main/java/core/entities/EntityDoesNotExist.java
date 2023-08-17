@@ -1,6 +1,6 @@
 package core.entities;
 
-import core.id.EntityID;
+import core.model.EntityID;
 
 public class EntityDoesNotExist extends RuntimeException
 {
