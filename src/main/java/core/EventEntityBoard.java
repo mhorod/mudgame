@@ -9,6 +9,7 @@ import core.events.Event.PlaceEntity;
 import core.events.Event.RemoveEntity;
 import core.events.EventObserver;
 import core.events.EventSender;
+import core.fogofwar.FogOfWarView;
 import core.id.PlayerID;
 import lombok.RequiredArgsConstructor;
 

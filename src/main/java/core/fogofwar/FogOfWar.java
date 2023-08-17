@@ -1,5 +1,6 @@
-package core;
+package core.fogofwar;
 
+import core.Position;
 import core.id.PlayerID;
 import lombok.EqualsAndHashCode;
 

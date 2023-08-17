@@ -1,4 +1,6 @@
-package core;
+package core.fogofwar;
+
+import core.Position;
 
 public interface PlayerFogOfWarView
 {

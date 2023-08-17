@@ -1,21 +1,21 @@
 package core.rules;
 
 import core.events.Event.Action;
-import core.events.Event.MoveEntity;
+import core.events.Event.CreateEntity;
 import core.fogofwar.FogOfWarView;
 import core.id.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PlayerSeesMoveDestination implements ActionRule
+public class PlayerSeesCreationPosition implements ActionRule
 {
     private final FogOfWarView fow;
 
     @Override
     public boolean isSatisfied(Action action, PlayerID actor)
     {
-        if (action instanceof MoveEntity moveEntity)
-            return fow.isVisible(moveEntity.destination(), actor);
+        if (action instanceof CreateEntity moveEntity)
+            return fow.isVisible(moveEntity.position(), actor);
         else
             return true;
     }

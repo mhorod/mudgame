@@ -12,6 +12,7 @@ import core.events.Event.RemoveEntity;
 import core.events.EventObserver;
 import core.events.EventSender;
 import core.events.PlayerEventObserver;
+import core.fogofwar.FogOfWar;
 import core.id.EntityID;
 import core.id.PlayerID;
 import org.junit.jupiter.api.BeforeEach;

@@ -6,9 +6,13 @@ import core.events.Event;
 import core.events.Event.Action;
 import core.events.EventObserver;
 import core.events.EventSender;
+import core.fogofwar.FogOfWar;
 import core.id.PlayerID;
 import core.rules.ActionRule;
+import core.rules.CreationPositionIsEmpty;
+import core.rules.MoveDestinationIsEmpty;
 import core.rules.PlayerOwnsMovedEntity;
+import core.rules.PlayerSeesCreationPosition;
 import core.rules.PlayerSeesMoveDestination;
 
 import java.util.List;
@@ -30,7 +34,10 @@ public class GameCore implements ActionProcessor, EventObserver
         eventEntityBoard = new EventEntityBoard(entityBoard, fogOfWar, eventSender);
 
         rules = List.of(new PlayerOwnsMovedEntity(entityBoard),
-                        new PlayerSeesMoveDestination(fogOfWar));
+                        new PlayerSeesMoveDestination(fogOfWar),
+                        new PlayerSeesCreationPosition(fogOfWar),
+                        new CreationPositionIsEmpty(entityBoard),
+                        new MoveDestinationIsEmpty(entityBoard));
 
         actionProcessor = new RuleBasedActionProcessor(rules);
         actionProcessor.addObserver(eventEntityBoard);
