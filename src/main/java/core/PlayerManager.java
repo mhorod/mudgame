@@ -1,11 +1,12 @@
 package core;
 
 import core.model.PlayerID;
+import core.turns.TurnView;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class PlayerManager
+public class PlayerManager implements TurnView
 {
     private final int playerCount;
     private final List<PlayerID> playerIDs;

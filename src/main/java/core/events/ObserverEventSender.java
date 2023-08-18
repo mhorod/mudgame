@@ -26,8 +26,7 @@ public class ObserverEventSender implements EventSource, EventSender
     @Override
     public void send(Event event, Predicate<PlayerID> shouldPlayerReceive)
     {
-        Predicate<PlayerEventObserver> shouldReceive = o -> shouldPlayerReceive.test(
-                o.getPlayerID());
+        Predicate<PlayerEventObserver> shouldReceive = o -> shouldPlayerReceive.test(o.playerID());
 
         observers.forEach(o -> o.receive(event));
         playerObservers.stream().filter(shouldReceive).forEach(o -> o.receive(event));

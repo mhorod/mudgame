@@ -11,35 +11,49 @@ import core.model.PlayerID;
 import core.rules.ActionRule;
 import core.rules.CreationPositionIsEmpty;
 import core.rules.MoveDestinationIsEmpty;
+import core.rules.PlayerOwnsCreatedEntity;
 import core.rules.PlayerOwnsMovedEntity;
 import core.rules.PlayerSeesCreationPosition;
 import core.rules.PlayerSeesMoveDestination;
+import core.rules.PlayerTakesActionDuringOwnTurn;
 
 import java.util.List;
 
 public class GameCore implements ActionProcessor, EventObserver
 {
     public final PlayerManager playerManager;
+    private final EventPlayerManager eventPlayerManager;
+
     public final EntityBoard entityBoard;
     public final FogOfWar fogOfWar;
-    public final EventEntityBoard eventEntityBoard;
+    private final EventEntityBoard eventEntityBoard;
+
     public final List<ActionRule> rules;
     private final RuleBasedActionProcessor actionProcessor;
 
     GameCore(int playerCount, EventSender eventSender)
     {
         playerManager = new PlayerManager(playerCount);
+        eventPlayerManager = new EventPlayerManager(playerManager, eventSender);
+
         entityBoard = new SimpleEntityBoard();
         fogOfWar = new FogOfWar(playerManager.getPlayerIDs());
         eventEntityBoard = new EventEntityBoard(entityBoard, fogOfWar, eventSender);
 
-        rules = List.of(new PlayerOwnsMovedEntity(entityBoard),
-                        new PlayerSeesMoveDestination(fogOfWar),
-                        new PlayerSeesCreationPosition(fogOfWar),
-                        new CreationPositionIsEmpty(entityBoard),
-                        new MoveDestinationIsEmpty(entityBoard));
+        rules = List.of(
+                new PlayerTakesActionDuringOwnTurn(playerManager),
+
+                // entity rules
+                new PlayerOwnsMovedEntity(entityBoard),
+                new PlayerSeesMoveDestination(fogOfWar),
+                new PlayerSeesCreationPosition(fogOfWar),
+                new CreationPositionIsEmpty(entityBoard),
+                new PlayerOwnsCreatedEntity(),
+                new MoveDestinationIsEmpty(entityBoard)
+        );
 
         actionProcessor = new RuleBasedActionProcessor(rules);
+        actionProcessor.addObserver(eventPlayerManager);
         actionProcessor.addObserver(eventEntityBoard);
     }
 
@@ -52,6 +66,7 @@ public class GameCore implements ActionProcessor, EventObserver
     @Override
     public void receive(Event event)
     {
+        eventPlayerManager.receive(event);
         eventEntityBoard.receive(event);
     }
 }

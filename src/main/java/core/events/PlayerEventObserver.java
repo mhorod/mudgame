@@ -1,22 +1,13 @@
 package core.events;
 
 import core.model.PlayerID;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-public class PlayerEventObserver implements EventObserver
+public record PlayerEventObserver(PlayerID playerID, EventObserver observer)
+        implements EventObserver
 {
-    private final PlayerID playerID;
-    private final EventObserver observer;
-
     @Override
     public void receive(Event event)
     {
         observer.receive(event);
-    }
-
-    public PlayerID getPlayerID()
-    {
-        return playerID;
     }
 }

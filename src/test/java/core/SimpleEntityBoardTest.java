@@ -1,11 +1,11 @@
 package core;
 
 
-import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.entities.EntityDoesNotExist;
 import core.entities.EntityIsAlreadyPlaced;
 import core.entities.SimpleEntityBoard;
+import core.entities.model.Entity;
+import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static core.EntityBoardAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -36,7 +37,7 @@ class SimpleEntityBoardTest
     @Test
     void initial_board_contains_no_entities()
     {
-        assertThat(board.allEntities()).isEmpty();
+        assertThat(board).containsNoEntities();
     }
 
     @Nested
@@ -65,8 +66,9 @@ class SimpleEntityBoardTest
             Entity entity = board.createEntity(DATA, OWNER, POSITION_0);
 
             // then
-            assertThat(board.allEntities()).containsExactly(entity);
-            assertThat(board.containsEntity(entity.id())).isTrue();
+            assertThat(board)
+                    .containsExactlyEntities(entity)
+                    .containsEntityWithId(entity.id());
         }
 
         @Test
@@ -92,7 +94,7 @@ class SimpleEntityBoardTest
 
             // then
             assertThat(firstEntity).isNotEqualTo(secondEntity);
-            assertThat(board.allEntities()).containsExactly(firstEntity, secondEntity);
+            assertThat(board).containsExactlyEntities(firstEntity, secondEntity);
             assertThat(board.entitiesAt(POSITION_0)).containsExactly(firstEntity, secondEntity);
         }
     }
@@ -110,8 +112,8 @@ class SimpleEntityBoardTest
             board.placeEntity(entity, POSITION_1);
 
             // then
-            assertThatThrownBy(() -> board.placeEntity(entity, POSITION_0)).isInstanceOf(
-                    EntityIsAlreadyPlaced.class);
+            assertThatThrownBy(() -> board.placeEntity(entity, POSITION_0))
+                    .isInstanceOf(EntityIsAlreadyPlaced.class);
         }
     }
 
@@ -129,8 +131,9 @@ class SimpleEntityBoardTest
             board.removeEntity(entity.id());
 
             // then
-            assertThat(board.containsEntity(entity.id())).isFalse();
-            assertThat(board.allEntities()).isEmpty();
+            assertThat(board)
+                    .containsNoEntities()
+                    .doesNotContainEntityWithId(entity.id());
             assertThat(board.entitiesAt(position)).isEmpty();
         }
 
@@ -144,8 +147,8 @@ class SimpleEntityBoardTest
             board.removeEntity(entity.id());
 
             // then
-            assertThatThrownBy(() -> board.removeEntity(entity.id())).isInstanceOf(
-                    EntityDoesNotExist.class);
+            assertThatThrownBy(() -> board.removeEntity(entity.id()))
+                    .isInstanceOf(EntityDoesNotExist.class);
         }
     }
 
@@ -162,8 +165,9 @@ class SimpleEntityBoardTest
             board.moveEntity(entity.id(), POSITION_1);
 
             // then
-            assertThat(board.containsEntity(entity.id())).isTrue();
-            assertThat(board.allEntities()).containsExactly(entity);
+            assertThat(board)
+                    .containsEntityWithId(entity.id())
+                    .containsExactlyEntities(entity);
         }
 
         @Test
@@ -185,8 +189,8 @@ class SimpleEntityBoardTest
         @Test
         void moving_nonexistent_entity_throws_exception()
         {
-            assertThatThrownBy(() -> board.moveEntity(new EntityID(0), POSITION_0)).isInstanceOf(
-                    EntityDoesNotExist.class);
+            assertThatThrownBy(() -> board.moveEntity(new EntityID(0), POSITION_0))
+                    .isInstanceOf(EntityDoesNotExist.class);
         }
     }
 }
