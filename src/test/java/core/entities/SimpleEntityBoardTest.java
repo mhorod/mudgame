@@ -1,9 +1,6 @@
-package core;
+package core.entities;
 
 
-import core.entities.EntityDoesNotExist;
-import core.entities.EntityIsAlreadyPlaced;
-import core.entities.SimpleEntityBoard;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
 import core.model.EntityID;
@@ -13,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static core.EntityBoardAssert.assertThat;
+import static core.entities.EntityBoardAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;

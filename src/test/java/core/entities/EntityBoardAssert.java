@@ -1,6 +1,5 @@
-package core;
+package core.entities;
 
-import core.entities.EntityBoard;
 import core.entities.model.Entity;
 import core.model.EntityID;
 import org.assertj.core.api.AbstractAssert;

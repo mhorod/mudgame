@@ -1,13 +1,13 @@
 package core;
 
-import core.entities.model.Entity;
 import core.entities.EntityBoard;
-import core.entities.model.EntityData;
 import core.entities.SimpleEntityBoard;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
+import core.entities.model.Entity;
+import core.entities.model.EntityData;
 import core.events.Event;
 import core.events.EventObserver;
 import core.events.ObserverEventSender;
@@ -24,9 +24,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class EventEntityBoardTest
 {
@@ -257,7 +255,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void plycer_receives_remove_event_when_sees_entity_position()
+        void player_receives_remove_event_when_sees_entity_position()
         {
             // given
             Position position = POSITION_0;
