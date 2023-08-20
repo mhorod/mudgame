@@ -7,6 +7,7 @@ import core.server.rules.ActionRule;
 import core.terrain.Terrain;
 import core.turns.PlayerManager;
 
+import java.io.Serializable;
 import java.util.List;
 
 public record ClientGameState(
@@ -16,5 +17,5 @@ public record ClientGameState(
         PlayerFogOfWar fogOfWar,
         Terrain terrain,
         List<ActionRule> rules
-) {
+) implements Serializable {
 }
