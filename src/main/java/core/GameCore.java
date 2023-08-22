@@ -16,6 +16,8 @@ import core.rules.PlayerOwnsMovedEntity;
 import core.rules.PlayerSeesCreationPosition;
 import core.rules.PlayerSeesMoveDestination;
 import core.rules.PlayerTakesActionDuringOwnTurn;
+import core.terrain.Terrain;
+import core.terrain.generators.SimpleLandGenerator;
 
 import java.util.List;
 
@@ -30,6 +32,8 @@ public class GameCore implements ActionProcessor, EventObserver
 
     public final List<ActionRule> rules;
     private final RuleBasedActionProcessor actionProcessor;
+
+    public final Terrain terrain;
 
     GameCore(int playerCount, EventSender eventSender)
     {
@@ -55,6 +59,10 @@ public class GameCore implements ActionProcessor, EventObserver
         actionProcessor = new RuleBasedActionProcessor(rules);
         actionProcessor.addObserver(eventPlayerManager);
         actionProcessor.addObserver(eventEntityBoard);
+
+        terrain = new SimpleLandGenerator(2, 3, 50)
+                .generateTerrain(playerCount)
+                .terrain();
     }
 
     @Override
