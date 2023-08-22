@@ -29,8 +29,7 @@ import static org.mockito.Mockito.*;
  * Test that game core ends up in correct state and sends appropriate events.
  * when receiving actions
  */
-class GameCoreActionProcessingTest
-{
+class GameCoreActionProcessingTest {
     static final Position POSITION_0_0 = new Position(0, 0);
     static final Position POSITION_0_1 = new Position(0, 1);
 
@@ -40,8 +39,7 @@ class GameCoreActionProcessingTest
     EventObserver eventObserver;
 
     @BeforeEach
-    void init()
-    {
+    void init() {
         eventSender = new ObserverEventSender();
         core = new GameCore(4, eventSender);
         List<PlayerID> players = core.playerManager.getPlayerIDs();
@@ -54,22 +52,18 @@ class GameCoreActionProcessingTest
         eventSender.addObserver(eventObserver);
     }
 
-    void verifyNoEvents()
-    {
+    void verifyNoEvents() {
         for (PlayerEventObserver o : playerEventObservers)
             verifyNoInteractions(o.observer());
         verifyNoInteractions(eventObserver);
     }
 
     @Nested
-    class EntityActionsTest
-    {
+    class EntityActionsTest {
         @Nested
-        class CreateEntityTest
-        {
+        class CreateEntityTest {
             @Test
-            void entity_is_not_created_when_player_does_not_see_position()
-            {
+            void entity_is_not_created_when_player_does_not_see_position() {
                 // when
                 process(core, create(0, mock(EntityData.class), 0, POSITION_0_0));
 
@@ -79,8 +73,7 @@ class GameCoreActionProcessingTest
             }
 
             @Test
-            void entity_is_not_created_when_player_does_not_own_it()
-            {
+            void entity_is_not_created_when_player_does_not_own_it() {
                 // given
                 sees(core, 0, POSITION_0_0);
 
@@ -93,8 +86,7 @@ class GameCoreActionProcessingTest
             }
 
             @Test
-            void entity_is_not_created_when_position_is_occupied()
-            {
+            void entity_is_not_created_when_position_is_occupied() {
                 // given
                 sees(core, 0, POSITION_0_0);
                 Entity entity = mock(Entity.class);
@@ -109,8 +101,7 @@ class GameCoreActionProcessingTest
             }
 
             @Test
-            void entity_is_not_created_when_other_player_has_turn()
-            {
+            void entity_is_not_created_when_other_player_has_turn() {
                 // given
                 sees(core, 0, POSITION_0_0);
 
@@ -123,8 +114,7 @@ class GameCoreActionProcessingTest
             }
 
             @Test
-            void entity_is_created_when_all_conditions_are_met()
-            {
+            void entity_is_created_when_all_conditions_are_met() {
                 // given
                 sees(core, 0, POSITION_0_0);
 
@@ -138,12 +128,10 @@ class GameCoreActionProcessingTest
         }
 
         @Nested
-        class MoveEntityTest
-        {
+        class MoveEntityTest {
 
             @Test
-            void entity_is_not_moved_when_player_does_not_see_destination()
-            {
+            void entity_is_not_moved_when_player_does_not_see_destination() {
                 // given
                 sees(core, 0, POSITION_0_0);
                 core.entityBoard.placeEntity(mockEntity(0, 0), POSITION_0_0);
@@ -156,8 +144,7 @@ class GameCoreActionProcessingTest
             }
 
             @Test
-            void entity_is_not_moved_when_other_player_has_turn()
-            {
+            void entity_is_not_moved_when_other_player_has_turn() {
                 // given
                 sees(core, 1, POSITION_0_0, POSITION_0_1);
                 core.entityBoard.placeEntity(mockEntity(0, 1), POSITION_0_0);
@@ -171,8 +158,7 @@ class GameCoreActionProcessingTest
             }
 
             @Test
-            void entity_is_not_moved_when_player_does_not_own_it()
-            {
+            void entity_is_not_moved_when_player_does_not_own_it() {
                 // given
                 sees(core, 0, POSITION_0_0, POSITION_0_1);
 
@@ -189,8 +175,7 @@ class GameCoreActionProcessingTest
             }
 
             @Test
-            void entity_is_not_moved_when_destination_is_occupied()
-            {
+            void entity_is_not_moved_when_destination_is_occupied() {
                 // given
                 sees(core, 0, POSITION_0_0, POSITION_0_1);
 
@@ -208,8 +193,7 @@ class GameCoreActionProcessingTest
             }
 
             @Test
-            void entity_is_moved_when_all_conditions_are_met()
-            {
+            void entity_is_moved_when_all_conditions_are_met() {
                 // given
                 sees(core, 0, POSITION_0_0, POSITION_0_1);
 
@@ -226,8 +210,7 @@ class GameCoreActionProcessingTest
             }
 
             @Test
-            void player_receives_move_event_when_sees_source_or_destination()
-            {
+            void player_receives_move_event_when_sees_source_or_destination() {
                 // given
                 sees(core, 0, POSITION_0_0, POSITION_0_1);
                 sees(core, 1, POSITION_0_0);
@@ -251,19 +234,16 @@ class GameCoreActionProcessingTest
             }
         }
 
-        static void sees(GameCore core, long player, Position... positions)
-        {
+        static void sees(GameCore core, long player, Position... positions) {
             for (Position position : positions)
                 core.fogOfWar.setVisibility(position, new PlayerID(player), true);
         }
     }
 
     @Nested
-    class TurnActionsTest
-    {
+    class TurnActionsTest {
         @Test
-        void player_changes_when_current_player_completes_turn()
-        {
+        void player_changes_when_current_player_completes_turn() {
             // given
             PlayerID playerBefore = core.playerManager.getCurrentPlayer();
 
@@ -279,8 +259,7 @@ class GameCoreActionProcessingTest
         }
 
         @Test
-        void player_does_not_change_when_not_current_player_completes_turn()
-        {
+        void player_does_not_change_when_not_current_player_completes_turn() {
             // given
             PlayerID playerBefore = core.playerManager.getCurrentPlayer();
 
@@ -294,8 +273,7 @@ class GameCoreActionProcessingTest
         }
     }
 
-    static Entity mockEntity(long entityID, long playerID)
-    {
+    static Entity mockEntity(long entityID, long playerID) {
         return new Entity(mock(EntityData.class), new EntityID(entityID), new PlayerID(playerID));
     }
 }

@@ -2,7 +2,6 @@ package gdx_io;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,8 +9,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import io.*;
-import org.lwjgl.system.CallbackI;
+import io.Arrow;
+import io.Drawer;
+import io.GameUI;
+import io.ScreenPosition;
+import io.Tile;
+import io.Top;
 
 import java.util.List;
 
@@ -23,19 +26,19 @@ public class GdxGameUI implements ApplicationListener, Drawer {
     private TextureRegion tile_dark;
     private TextureRegion tile_light;
 
-    private TextureRegion arrow_none, arrow_sw_ne, arrow_se_nw,
-        arrow_start_ne, arrow_start_se, arrow_start_nw, arrow_start_sw,
-        arrow_end_ne, arrow_end_se, arrow_end_nw, arrow_end_sw,
-        arrow_se_ne, arrow_sw_se, arrow_sw_nw, arrow_nw_ne;
+    private TextureRegion arrow_none, arrow_sw_ne, arrow_se_nw, arrow_start_ne, arrow_start_se, arrow_start_nw, arrow_start_sw, arrow_end_ne, arrow_end_se, arrow_end_nw, arrow_end_sw, arrow_se_ne, arrow_sw_se, arrow_sw_nw, arrow_nw_ne;
+
     public GdxGameUI(GameUI gameUI) {
         this.gameUI = gameUI;
 
     }
+
     private static final int TILE_WIDTH = 128;
     private static final int TILE_HEIGHT = 89;
 
     private TextureRegion cutOut(Texture tex, int x, int y, float tile_width, float tile_height) {
-        return new TextureRegion(tex, (int) (x * tile_width), (int) (y * tile_height), (int) tile_width, (int) tile_height);
+        return new TextureRegion(tex, (int) (x * tile_width), (int) (y * tile_height),
+                                 (int) tile_width, (int) tile_height);
     }
 
     @Override
@@ -104,7 +107,7 @@ public class GdxGameUI implements ApplicationListener, Drawer {
     }
 
     private void drawTile(Tile tile, float tile_width) {
-        var texture = switch(tile.kind()) {
+        var texture = switch (tile.kind()) {
             case LIGHT -> tile_light;
             case DARK -> tile_dark;
         };
@@ -116,36 +119,36 @@ public class GdxGameUI implements ApplicationListener, Drawer {
     }
 
     private void drawArrow(Arrow arrow, float tile_width) {
-        var texture = switch(arrow.from) {
-            case NONE -> switch(arrow.to) {
+        var texture = switch (arrow.from) {
+            case NONE -> switch (arrow.to) {
                 case NONE -> arrow_none;
                 case SE -> arrow_start_se;
                 case SW -> arrow_start_sw;
                 case NE -> arrow_start_ne;
                 case NW -> arrow_start_nw;
             };
-            case SE -> switch(arrow.to) {
+            case SE -> switch (arrow.to) {
                 case NONE -> arrow_end_se;
                 case SE -> arrow_none;
                 case SW -> arrow_sw_se;
                 case NE -> arrow_se_ne;
                 case NW -> arrow_se_nw;
             };
-            case SW -> switch(arrow.to) {
+            case SW -> switch (arrow.to) {
                 case NONE -> arrow_end_sw;
                 case SE -> arrow_sw_se;
                 case SW -> arrow_none;
                 case NE -> arrow_sw_ne;
                 case NW -> arrow_sw_nw;
             };
-            case NE -> switch(arrow.to) {
+            case NE -> switch (arrow.to) {
                 case NONE -> arrow_end_ne;
                 case SE -> arrow_se_ne;
                 case SW -> arrow_sw_ne;
                 case NE -> arrow_none;
                 case NW -> arrow_nw_ne;
             };
-            case NW -> switch(arrow.to) {
+            case NW -> switch (arrow.to) {
                 case NONE -> arrow_end_nw;
                 case SE -> arrow_se_nw;
                 case SW -> arrow_sw_nw;
@@ -161,9 +164,10 @@ public class GdxGameUI implements ApplicationListener, Drawer {
     }
 
     private void drawTop(Top top, float tileWidth) {
-        if(top instanceof Arrow)
+        if (top instanceof Arrow)
             drawArrow((Arrow) top, tileWidth);
     }
+
     @Override
     public void drawTiles(List<Tile> tiles, float tile_width) {
         tiles.forEach(tile -> drawTile(tile, tile_width));

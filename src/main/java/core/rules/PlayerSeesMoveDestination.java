@@ -7,13 +7,11 @@ import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PlayerSeesMoveDestination implements ActionRule
-{
+public class PlayerSeesMoveDestination implements ActionRule {
     private final FogOfWarView fow;
 
     @Override
-    public boolean isSatisfied(Action action, PlayerID actor)
-    {
+    public boolean isSatisfied(Action action, PlayerID actor) {
         if (action instanceof MoveEntity moveEntity)
             return fow.isVisible(moveEntity.destination(), actor);
         else

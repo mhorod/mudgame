@@ -6,13 +6,11 @@ import core.turns.TurnView;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PlayerTakesActionDuringOwnTurn implements ActionRule
-{
+public class PlayerTakesActionDuringOwnTurn implements ActionRule {
     private final TurnView turnView;
 
     @Override
-    public boolean isSatisfied(Action action, PlayerID actor)
-    {
+    public boolean isSatisfied(Action action, PlayerID actor) {
         return turnView.getCurrentPlayer().equals(actor);
     }
 }

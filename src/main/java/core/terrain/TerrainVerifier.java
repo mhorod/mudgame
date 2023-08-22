@@ -1,5 +1,3 @@
 package core.terrain;
 
-public class TerrainVerifier
-{
-}
+public class TerrainVerifier { }

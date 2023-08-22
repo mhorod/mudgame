@@ -7,13 +7,11 @@ import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class CreationPositionIsEmpty implements ActionRule
-{
+public class CreationPositionIsEmpty implements ActionRule {
     private final EntityBoardView boardView;
 
     @Override
-    public boolean isSatisfied(Action action, PlayerID actor)
-    {
+    public boolean isSatisfied(Action action, PlayerID actor) {
         if (action instanceof CreateEntity moveEntity)
             return boardView.entitiesAt(moveEntity.position()).isEmpty();
         else

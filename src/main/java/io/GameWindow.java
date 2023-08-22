@@ -15,26 +15,26 @@ public class GameWindow implements GameUI {
     public void draw(Drawer d) {
         mapView.draw(d);
     }
+
     @Override
     public void update() {
-        if(mapView.scale != targetScale) {
-            if(Math.max(targetScale, mapView.scale) / Math.min(targetScale, mapView.scale) < 1.001)
+        if (mapView.scale != targetScale) {
+            if (Math.max(targetScale, mapView.scale) / Math.min(targetScale, mapView.scale) < 1.001)
                 mapView.setScale(pivot, targetScale);
             else
                 mapView.setScale(pivot, mapView.scale + (targetScale - mapView.scale) * 0.15f);
         }
-        if(!mouseDown) {
-            mapView.offset = new ScreenPosition(
-                    mapView.offset.x() + scrollVelocityX,
-                    mapView.offset.y() + scrollVelocityY
-            );
+        if (!mouseDown) {
+            mapView.offset = new ScreenPosition(mapView.offset.x() + scrollVelocityX,
+                                                mapView.offset.y() + scrollVelocityY);
             scrollVelocityX *= 0.95;
             scrollVelocityY *= 0.95;
             if (scrollVelocityX * scrollVelocityX + scrollVelocityY * scrollVelocityY < 0.0000001) {
                 scrollVelocityX = 0;
                 scrollVelocityY = 0;
             }
-        } else {
+        }
+        else {
             scrollVelocityX = 0;
             scrollVelocityY = 0;
         }
@@ -68,10 +68,8 @@ public class GameWindow implements GameUI {
         scrollVelocityX = pos2.x() - pos1.x();
         scrollVelocityY = pos2.y() - pos1.y();
         mouse = pos2;
-        mapView.offset = new ScreenPosition(
-                mapView.offset.x() + pos2.x() - pos1.x(),
-                mapView.offset.y() + pos2.y() - pos1.y()
-        );
+        mapView.offset = new ScreenPosition(mapView.offset.x() + pos2.x() - pos1.x(),
+                                            mapView.offset.y() + pos2.y() - pos1.y());
     }
 
     @Override

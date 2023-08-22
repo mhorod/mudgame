@@ -20,8 +20,7 @@ import java.util.stream.IntStream;
  * Generates rectangular terrain map consisting only of plain land
  */
 @RequiredArgsConstructor
-public class SimpleLandGenerator implements TerrainGenerator
-{
+public class SimpleLandGenerator implements TerrainGenerator {
     private final int minimumDistanceFromEdge;
     private final int minimumStartingDistance;
     private final int minimumTilesPerPlayer;
@@ -29,8 +28,7 @@ public class SimpleLandGenerator implements TerrainGenerator
     private final Random random = new Random();
 
     @Override
-    public GeneratedTerrain generateTerrain(int playerCount)
-    {
+    public GeneratedTerrain generateTerrain(int playerCount) {
         if (playerCount <= 0)
             throw new IllegalArgumentException();
         else if (playerCount > 5)
@@ -51,8 +49,7 @@ public class SimpleLandGenerator implements TerrainGenerator
         return new GeneratedTerrain(placePlayers(playerCount, terrain), terrain);
     }
 
-    private List<Position> placePlayers(int playerCount, Terrain terrain)
-    {
+    private List<Position> placePlayers(int playerCount, Terrain terrain) {
         List<Position> selectedPositions = new ArrayList<>();
         List<Position> candidatePositions = getCandidatePositions(terrain);
         for (int i = 0; i < playerCount; i++)
@@ -60,8 +57,7 @@ public class SimpleLandGenerator implements TerrainGenerator
         return selectedPositions;
     }
 
-    private List<Position> getCandidatePositions(Terrain terrain)
-    {
+    private List<Position> getCandidatePositions(Terrain terrain) {
         List<Position> positions = new ArrayList<>();
         TerrainSize size = terrain.size();
         for (int x = minimumDistanceFromEdge; x < size.width() - minimumDistanceFromEdge; x++)
@@ -70,8 +66,7 @@ public class SimpleLandGenerator implements TerrainGenerator
         return positions;
     }
 
-    private Position placePlayer(List<Position> positions)
-    {
+    private Position placePlayer(List<Position> positions) {
         int index = random.nextInt(positions.size());
         Position position = positions.get(index);
         Set<Position> toRemove = getRemovedPositions(position);
@@ -79,8 +74,7 @@ public class SimpleLandGenerator implements TerrainGenerator
         return position;
     }
 
-    private Set<Position> getRemovedPositions(Position position)
-    {
+    private Set<Position> getRemovedPositions(Position position) {
         Set<Position> removedPositions = new HashSet<>();
         for (int dx = -minimumStartingDistance; dx <= minimumStartingDistance; dx++)
             for (int dy = -minimumStartingDistance; dy <= minimumStartingDistance; dy++)

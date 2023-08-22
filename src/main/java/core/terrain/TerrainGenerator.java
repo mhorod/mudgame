@@ -5,8 +5,7 @@ import lombok.experimental.StandardException;
 
 import java.util.List;
 
-public interface TerrainGenerator
-{
+public interface TerrainGenerator {
     @StandardException
     class UnsupportedPlayerCount extends RuntimeException { }
 

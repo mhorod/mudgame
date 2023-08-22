@@ -6,14 +6,12 @@ import core.turns.TurnView;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class PlayerManager implements TurnView
-{
+public class PlayerManager implements TurnView {
     private final int playerCount;
     private final List<PlayerID> playerIDs;
     private int currentTurn;
 
-    public PlayerManager(int playerCount)
-    {
+    public PlayerManager(int playerCount) {
         if (playerCount <= 0)
             throw new IllegalArgumentException("playerCount must be positive");
 
@@ -22,20 +20,17 @@ public class PlayerManager implements TurnView
         currentTurn = 0;
     }
 
-    public List<PlayerID> getPlayerIDs()
-    {
+    public List<PlayerID> getPlayerIDs() {
         return playerIDs;
     }
 
     public PlayerID getCurrentPlayer() { return playerIDs.get(currentTurn); }
 
-    public void setCurrentPlayer(PlayerID player)
-    {
+    public void setCurrentPlayer(PlayerID player) {
         currentTurn = playerIDs.indexOf(player);
     }
 
-    public void completeTurn()
-    {
+    public void completeTurn() {
         currentTurn = nextTurn();
     }
 

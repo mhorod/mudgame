@@ -26,8 +26,7 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class EventEntityBoardTest
-{
+class EventEntityBoardTest {
     final EntityData MOCK_DATA = mock(EntityData.class);
 
     final PlayerID PLAYER_0 = new PlayerID(0);
@@ -45,8 +44,7 @@ class EventEntityBoardTest
     EventEntityBoard testee;
 
     @BeforeEach
-    void init()
-    {
+    void init() {
         players = IntStream.range(0, 3).mapToObj(PlayerID::new).toList();
         entityBoard = new SimpleEntityBoard();
         fow = new FogOfWar(players);
@@ -55,11 +53,9 @@ class EventEntityBoardTest
     }
 
     @Nested
-    class EventApplicationTest
-    {
+    class EventApplicationTest {
         @Test
-        void creates_entity_on_board()
-        {
+        void creates_entity_on_board() {
             // given
             Event event = new CreateEntity(MOCK_DATA, PLAYER_0, POSITION_0);
 
@@ -72,8 +68,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void places_entity_on_board()
-        {
+        void places_entity_on_board() {
             // given
             Entity entity = new Entity(MOCK_DATA, ENTITY_0, PLAYER_0);
             Position position = POSITION_0;
@@ -88,8 +83,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void moves_entity_on_board()
-        {
+        void moves_entity_on_board() {
             // given
             Position from = POSITION_0;
             Position to = POSITION_1;
@@ -108,8 +102,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void removes_entity_from_board()
-        {
+        void removes_entity_from_board() {
             // given
             Entity entity = new Entity(MOCK_DATA, ENTITY_0, PLAYER_0);
             entityBoard.placeEntity(entity, POSITION_0);
@@ -125,11 +118,9 @@ class EventEntityBoardTest
     }
 
     @Nested
-    class EventPropagationTest
-    {
+    class EventPropagationTest {
         @Test
-        void creating_entity_produces_place_event()
-        {
+        void creating_entity_produces_place_event() {
             // given
             Position position = POSITION_0;
             Event event = new CreateEntity(MOCK_DATA, PLAYER_0, position);
@@ -146,8 +137,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void placing_entity_produces_place_event()
-        {
+        void placing_entity_produces_place_event() {
             // given
             EventObserver observer = mock(EventObserver.class);
             eventSender.addObserver(observer);
@@ -163,8 +153,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void removing_entity_produces_remove_event()
-        {
+        void removing_entity_produces_remove_event() {
             // given
             EventObserver observer = mock(EventObserver.class);
             eventSender.addObserver(observer);
@@ -182,8 +171,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void moving_entity_produces_remove_event()
-        {
+        void moving_entity_produces_remove_event() {
             // given
             EventObserver observer = mock(EventObserver.class);
             eventSender.addObserver(observer);
@@ -202,11 +190,9 @@ class EventEntityBoardTest
     }
 
     @Nested
-    class FogOfWarTest
-    {
+    class FogOfWarTest {
         @Test
-        void player_receives_create_event_effect_when_sees_position()
-        {
+        void player_receives_create_event_effect_when_sees_position() {
             // given
             Position position = POSITION_0;
 
@@ -231,8 +217,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void player_receives_place_event_when_sees_position()
-        {
+        void player_receives_place_event_when_sees_position() {
             // given
             Position position = POSITION_0;
 
@@ -255,8 +240,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void player_receives_remove_event_when_sees_entity_position()
-        {
+        void player_receives_remove_event_when_sees_entity_position() {
             // given
             Position position = POSITION_0;
 
@@ -282,8 +266,7 @@ class EventEntityBoardTest
         }
 
         @Test
-        void player_receives_move_event_when_sees_either_end()
-        {
+        void player_receives_move_event_when_sees_either_end() {
             // given
             Position from = POSITION_0;
             Position to = POSITION_1;

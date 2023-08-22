@@ -1,9 +1,8 @@
 package core.fogofwar;
 
-import core.model.Position;
 import core.model.PlayerID;
+import core.model.Position;
 
-public interface FogOfWarView
-{
+public interface FogOfWarView {
     boolean isVisible(Position position, PlayerID viewer);
 }

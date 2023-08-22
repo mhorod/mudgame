@@ -18,15 +18,13 @@ import java.util.function.Predicate;
 
 
 @RequiredArgsConstructor
-public class EventEntityBoard implements EventObserver
-{
+public class EventEntityBoard implements EventObserver {
     private final EntityBoard board;
     private final FogOfWarView fow;
     private final EventSender eventSender;
 
     @Override
-    public void receive(Event event)
-    {
+    public void receive(Event event) {
         if (event instanceof CreateEntity e)
             createEntity(e);
         else if (event instanceof PlaceEntity e)
@@ -37,8 +35,7 @@ public class EventEntityBoard implements EventObserver
             removeEntity(e);
     }
 
-    private void removeEntity(RemoveEntity event)
-    {
+    private void removeEntity(RemoveEntity event) {
         if (!board.containsEntity(event.entityID()))
             return;
 
@@ -47,8 +44,7 @@ public class EventEntityBoard implements EventObserver
         eventSender.send(event, isVisible(position));
     }
 
-    private void moveEntity(MoveEntity event)
-    {
+    private void moveEntity(MoveEntity event) {
         if (!board.containsEntity(event.entityID()))
             return;
 
@@ -58,8 +54,7 @@ public class EventEntityBoard implements EventObserver
         eventSender.send(event, isMoveVisible(from, to));
     }
 
-    private void placeEntity(PlaceEntity event)
-    {
+    private void placeEntity(PlaceEntity event) {
         if (board.containsEntity(event.entity().id()))
             return;
 
@@ -67,20 +62,17 @@ public class EventEntityBoard implements EventObserver
         eventSender.send(event, isVisible(event.position()));
     }
 
-    private void createEntity(CreateEntity event)
-    {
+    private void createEntity(CreateEntity event) {
         Entity entity = board.createEntity(event.entityData(), event.owner(), event.position());
         PlaceEntity resultEvent = new PlaceEntity(entity, event.position());
         eventSender.send(resultEvent, isVisible(event.position()));
     }
 
-    private Predicate<PlayerID> isVisible(Position position)
-    {
+    private Predicate<PlayerID> isVisible(Position position) {
         return id -> fow.isVisible(position, id);
     }
 
-    private Predicate<PlayerID> isMoveVisible(Position from, Position to)
-    {
+    private Predicate<PlayerID> isMoveVisible(Position from, Position to) {
         return id -> fow.isVisible(from, id) || fow.isVisible(to, id);
     }
 }

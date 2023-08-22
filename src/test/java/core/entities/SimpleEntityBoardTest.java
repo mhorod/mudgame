@@ -16,8 +16,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 
-class SimpleEntityBoardTest
-{
+class SimpleEntityBoardTest {
     static final EntityData DATA = mock(EntityData.class);
     static final PlayerID OWNER = new PlayerID(0);
     static final Position POSITION_0 = new Position(0, 0);
@@ -26,24 +25,20 @@ class SimpleEntityBoardTest
     SimpleEntityBoard board;
 
     @BeforeEach
-    void init()
-    {
+    void init() {
         board = new SimpleEntityBoard();
     }
 
     @Test
-    void initial_board_contains_no_entities()
-    {
+    void initial_board_contains_no_entities() {
         assertThat(board).containsNoEntities();
     }
 
     @Nested
-    class CreateTest
-    {
+    class CreateTest {
 
         @Test
-        void board_creates_entity_with_given_arguments()
-        {
+        void board_creates_entity_with_given_arguments() {
             // given
             EntityData data = DATA;
             PlayerID owner = OWNER;
@@ -57,20 +52,16 @@ class SimpleEntityBoardTest
         }
 
         @Test
-        void board_contains_created_entity()
-        {
+        void board_contains_created_entity() {
             // when
             Entity entity = board.createEntity(DATA, OWNER, POSITION_0);
 
             // then
-            assertThat(board)
-                    .containsExactlyEntities(entity)
-                    .containsEntityWithId(entity.id());
+            assertThat(board).containsExactlyEntities(entity).containsEntityWithId(entity.id());
         }
 
         @Test
-        void board_creates_entity_at_given_position()
-        {
+        void board_creates_entity_at_given_position() {
             // given
             Position position = POSITION_0;
 
@@ -83,8 +74,7 @@ class SimpleEntityBoardTest
         }
 
         @Test
-        void board_creates_different_entities_with_same_arguments()
-        {
+        void board_creates_different_entities_with_same_arguments() {
             // when
             Entity firstEntity = board.createEntity(DATA, OWNER, POSITION_0);
             Entity secondEntity = board.createEntity(DATA, OWNER, POSITION_0);
@@ -97,11 +87,9 @@ class SimpleEntityBoardTest
     }
 
     @Nested
-    class PlaceTest
-    {
+    class PlaceTest {
         @Test
-        void placing_same_entity_twice_throws_exception()
-        {
+        void placing_same_entity_twice_throws_exception() {
             // given
             Entity entity = new Entity(DATA, new EntityID(0), OWNER);
 
@@ -109,17 +97,15 @@ class SimpleEntityBoardTest
             board.placeEntity(entity, POSITION_1);
 
             // then
-            assertThatThrownBy(() -> board.placeEntity(entity, POSITION_0))
-                    .isInstanceOf(EntityIsAlreadyPlaced.class);
+            assertThatThrownBy(() -> board.placeEntity(entity, POSITION_0)).isInstanceOf(
+                    EntityIsAlreadyPlaced.class);
         }
     }
 
     @Nested
-    class RemoveTest
-    {
+    class RemoveTest {
         @Test
-        void board_does_not_contain_removed_entity()
-        {
+        void board_does_not_contain_removed_entity() {
             // given
             Position position = POSITION_0;
             Entity entity = board.createEntity(DATA, OWNER, position);
@@ -128,15 +114,12 @@ class SimpleEntityBoardTest
             board.removeEntity(entity.id());
 
             // then
-            assertThat(board)
-                    .containsNoEntities()
-                    .doesNotContainEntityWithId(entity.id());
+            assertThat(board).containsNoEntities().doesNotContainEntityWithId(entity.id());
             assertThat(board.entitiesAt(position)).isEmpty();
         }
 
         @Test
-        void removing_same_entity_twice_throws_exception()
-        {
+        void removing_same_entity_twice_throws_exception() {
             // given
             Entity entity = board.createEntity(DATA, OWNER, POSITION_0);
 
@@ -144,17 +127,15 @@ class SimpleEntityBoardTest
             board.removeEntity(entity.id());
 
             // then
-            assertThatThrownBy(() -> board.removeEntity(entity.id()))
-                    .isInstanceOf(EntityDoesNotExist.class);
+            assertThatThrownBy(() -> board.removeEntity(entity.id())).isInstanceOf(
+                    EntityDoesNotExist.class);
         }
     }
 
     @Nested
-    class MoveTest
-    {
+    class MoveTest {
         @Test
-        void board_contains_moved_entity()
-        {
+        void board_contains_moved_entity() {
             // given
             Entity entity = board.createEntity(DATA, OWNER, POSITION_0);
 
@@ -162,14 +143,11 @@ class SimpleEntityBoardTest
             board.moveEntity(entity.id(), POSITION_1);
 
             // then
-            assertThat(board)
-                    .containsEntityWithId(entity.id())
-                    .containsExactlyEntities(entity);
+            assertThat(board).containsEntityWithId(entity.id()).containsExactlyEntities(entity);
         }
 
         @Test
-        void moved_entity_is_on_another_position()
-        {
+        void moved_entity_is_on_another_position() {
             // given
             Position from = POSITION_0;
             Position to = POSITION_1;
@@ -184,10 +162,9 @@ class SimpleEntityBoardTest
         }
 
         @Test
-        void moving_nonexistent_entity_throws_exception()
-        {
-            assertThatThrownBy(() -> board.moveEntity(new EntityID(0), POSITION_0))
-                    .isInstanceOf(EntityDoesNotExist.class);
+        void moving_nonexistent_entity_throws_exception() {
+            assertThatThrownBy(() -> board.moveEntity(new EntityID(0), POSITION_0)).isInstanceOf(
+                    EntityDoesNotExist.class);
         }
     }
 }

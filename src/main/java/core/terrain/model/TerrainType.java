@@ -1,9 +1,5 @@
 package core.terrain.model;
 
-public enum TerrainType
-{
-    UNKNOWN,
-    VOID,
-    WATER,
-    LAND
+public enum TerrainType {
+    UNKNOWN, VOID, WATER, LAND
 }

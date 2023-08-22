@@ -10,26 +10,21 @@ import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 
-public class EntityEvents
-{
+public class EntityEvents {
 
-    public static PlaceEntity place(Entity entity, Position position)
-    {
+    public static PlaceEntity place(Entity entity, Position position) {
         return new PlaceEntity(entity, position);
     }
 
-    public static RemoveEntity remove(EntityID entityID)
-    {
+    public static RemoveEntity remove(EntityID entityID) {
         return new RemoveEntity(entityID);
     }
 
-    public static CreateEntity create(EntityData data, long playerId, Position position)
-    {
+    public static CreateEntity create(EntityData data, long playerId, Position position) {
         return new CreateEntity(data, new PlayerID(playerId), position);
     }
 
-    public static MoveEntity move(EntityID entityID, Position destination)
-    {
+    public static MoveEntity move(EntityID entityID, Position destination) {
         return new MoveEntity(entityID, destination);
     }
 }
