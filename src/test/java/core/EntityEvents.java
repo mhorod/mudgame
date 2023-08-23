@@ -9,7 +9,9 @@ import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class EntityEvents {
 
     public static PlaceEntity place(Entity entity, Position position) {

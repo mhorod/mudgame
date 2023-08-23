@@ -6,13 +6,14 @@ import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class SimpleEntityBoard implements EntityBoard {
+public class SimpleEntityBoard implements EntityBoard, Serializable {
     private final Map<Position, List<EntityID>> board = new HashMap<>();
     private final Map<EntityID, Position> entityPositions = new HashMap<>();
     private final Map<EntityID, Entity> entitiesById = new HashMap<>();

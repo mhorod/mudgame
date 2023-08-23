@@ -1,3 +1,5 @@
 package core.model;
 
-public record Position(int x, int y) { }
+import java.io.Serializable;
+
+public record Position(int x, int y) implements Serializable { }

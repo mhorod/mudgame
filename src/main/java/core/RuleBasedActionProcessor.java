@@ -7,6 +7,7 @@ import core.rules.ActionRule;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -27,6 +28,10 @@ public class RuleBasedActionProcessor implements ActionProcessor {
 
     public void addObserver(EventObserver observer) {
         observers.add(observer);
+    }
+
+    public void addObservers(EventObserver... observers) {
+        Collections.addAll(this.observers, observers);
     }
 
 

@@ -16,56 +16,85 @@ import core.rules.PlayerOwnsMovedEntity;
 import core.rules.PlayerSeesCreationPosition;
 import core.rules.PlayerSeesMoveDestination;
 import core.rules.PlayerTakesActionDuringOwnTurn;
-import core.terrain.Terrain;
+import core.terrain.TerrainGenerator;
+import core.terrain.TerrainGenerator.GeneratedTerrain;
 import core.terrain.generators.SimpleLandGenerator;
 
 import java.util.List;
 
 public class GameCore implements ActionProcessor, EventObserver {
-    public final PlayerManager playerManager;
-    private final EventPlayerManager eventPlayerManager;
+    private final GameState state;
 
-    public final EntityBoard entityBoard;
-    public final FogOfWar fogOfWar;
+    // event processing
+    private final EventPlayerManager eventPlayerManager;
     private final EventEntityBoard eventEntityBoard;
 
+    // rule processing
     public final List<ActionRule> rules;
     private final RuleBasedActionProcessor actionProcessor;
 
-    public final Terrain terrain;
+    public GameCore(GameState state, EventSender eventSender, List<ActionRule> rules) {
+        this.state = state;
+        eventPlayerManager = new EventPlayerManager(state.playerManager(), eventSender);
+        eventEntityBoard = new EventEntityBoard(
+                state.entityBoard(),
+                state.fogOfWar(),
+                eventSender
+        );
 
-    GameCore(int playerCount, EventSender eventSender) {
-        playerManager = new PlayerManager(playerCount);
-        eventPlayerManager = new EventPlayerManager(playerManager, eventSender);
-
-        entityBoard = new SimpleEntityBoard();
-        fogOfWar = new FogOfWar(playerManager.getPlayerIDs());
-        eventEntityBoard = new EventEntityBoard(entityBoard, fogOfWar, eventSender);
-
-        rules = List.of(new PlayerTakesActionDuringOwnTurn(playerManager),
-
-                        // entity rules
-                        new PlayerOwnsMovedEntity(entityBoard),
-                        new PlayerSeesMoveDestination(fogOfWar),
-                        new PlayerSeesCreationPosition(fogOfWar),
-                        new CreationPositionIsEmpty(entityBoard), new PlayerOwnsCreatedEntity(),
-                        new MoveDestinationIsEmpty(entityBoard));
-
+        this.rules = rules;
         actionProcessor = new RuleBasedActionProcessor(rules);
-        actionProcessor.addObserver(eventPlayerManager);
-        actionProcessor.addObserver(eventEntityBoard);
-
-        terrain = new SimpleLandGenerator(2, 3, 50).generateTerrain(playerCount).terrain();
+        actionProcessor.addObservers(eventPlayerManager, eventEntityBoard);
     }
+
 
     @Override
     public void process(Action action, PlayerID actor) {
         actionProcessor.process(action, actor);
     }
 
+    public GameState state() {
+        return state;
+    }
+
     @Override
     public void receive(Event event) {
         eventPlayerManager.receive(event);
         eventEntityBoard.receive(event);
+    }
+
+    public static List<ActionRule> defaultRules(GameState state) {
+        return List.of(
+                new PlayerTakesActionDuringOwnTurn(state.playerManager()),
+
+                // entity rules
+                new PlayerOwnsMovedEntity(state.entityBoard()),
+                new PlayerSeesMoveDestination(state.fogOfWar()),
+                new PlayerSeesCreationPosition(state.fogOfWar()),
+                new CreationPositionIsEmpty(state.entityBoard()),
+                new PlayerOwnsCreatedEntity(),
+                new MoveDestinationIsEmpty(state.entityBoard())
+        );
+    }
+
+    public static GameState newGameState(int playerCount) {
+        return newGameState(playerCount, defaultTerrainGenerator());
+    }
+
+    private static TerrainGenerator defaultTerrainGenerator() {
+        return new SimpleLandGenerator(2, 3, 50);
+    }
+
+    public static GameState newGameState(int playerCount, TerrainGenerator terrainGenerator) {
+        PlayerManager playerManager = new PlayerManager(playerCount);
+        FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
+        EntityBoard entityBoard = new SimpleEntityBoard();
+        GeneratedTerrain generatedTerrain = terrainGenerator.generateTerrain(playerCount);
+        return new GameState(
+                playerManager,
+                entityBoard,
+                fow,
+                generatedTerrain.terrain()
+        );
     }
 }

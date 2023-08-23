@@ -1,5 +1,7 @@
 package core.terrain.model;
 
-public enum TerrainType {
+import java.io.Serializable;
+
+public enum TerrainType implements Serializable {
     UNKNOWN, VOID, WATER, LAND
 }

@@ -3,13 +3,16 @@ package core.terrain;
 import core.model.Position;
 import core.terrain.model.TerrainSize;
 import core.terrain.model.TerrainType;
+import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import static core.terrain.model.TerrainType.VOID;
 
-public class Terrain implements TerrainView {
+@EqualsAndHashCode
+public class Terrain implements TerrainView, Serializable {
     private final TerrainSize size;
     private final Map<Position, TerrainType> terrainMap;
 
