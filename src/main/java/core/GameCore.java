@@ -1,12 +1,14 @@
 package core;
 
 import core.entities.EntityBoard;
+import core.entities.EntityBoardView;
 import core.entities.SimpleEntityBoard;
 import core.events.Event;
 import core.events.Event.Action;
 import core.events.EventObserver;
 import core.events.EventSender;
 import core.fogofwar.FogOfWar;
+import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.rules.ActionRule;
 import core.rules.CreationPositionIsEmpty;
@@ -19,6 +21,7 @@ import core.rules.PlayerTakesActionDuringOwnTurn;
 import core.terrain.TerrainGenerator;
 import core.terrain.TerrainGenerator.GeneratedTerrain;
 import core.terrain.generators.SimpleLandGenerator;
+import core.turns.TurnView;
 
 import java.util.List;
 
@@ -30,10 +33,9 @@ public class GameCore implements ActionProcessor, EventObserver {
     private final EventEntityBoard eventEntityBoard;
 
     // rule processing
-    public final List<ActionRule> rules;
     private final RuleBasedActionProcessor actionProcessor;
 
-    public GameCore(GameState state, EventSender eventSender, List<ActionRule> rules) {
+    public GameCore(GameState state, EventSender eventSender) {
         this.state = state;
         eventPlayerManager = new EventPlayerManager(state.playerManager(), eventSender);
         eventEntityBoard = new EventEntityBoard(
@@ -42,8 +44,7 @@ public class GameCore implements ActionProcessor, EventObserver {
                 eventSender
         );
 
-        this.rules = rules;
-        actionProcessor = new RuleBasedActionProcessor(rules);
+        actionProcessor = new RuleBasedActionProcessor(state.rules());
         actionProcessor.addObservers(eventPlayerManager, eventEntityBoard);
     }
 
@@ -63,17 +64,21 @@ public class GameCore implements ActionProcessor, EventObserver {
         eventEntityBoard.receive(event);
     }
 
-    public static List<ActionRule> defaultRules(GameState state) {
+    public static List<ActionRule> defaultRules(
+            TurnView turnView,
+            EntityBoardView entityBoard,
+            FogOfWarView fow
+    ) {
         return List.of(
-                new PlayerTakesActionDuringOwnTurn(state.playerManager()),
+                new PlayerTakesActionDuringOwnTurn(turnView),
 
                 // entity rules
-                new PlayerOwnsMovedEntity(state.entityBoard()),
-                new PlayerSeesMoveDestination(state.fogOfWar()),
-                new PlayerSeesCreationPosition(state.fogOfWar()),
-                new CreationPositionIsEmpty(state.entityBoard()),
+                new PlayerOwnsMovedEntity(entityBoard),
+                new PlayerSeesMoveDestination(fow),
+                new PlayerSeesCreationPosition(fow),
+                new CreationPositionIsEmpty(entityBoard),
                 new PlayerOwnsCreatedEntity(),
-                new MoveDestinationIsEmpty(state.entityBoard())
+                new MoveDestinationIsEmpty(entityBoard)
         );
     }
 
@@ -94,7 +99,8 @@ public class GameCore implements ActionProcessor, EventObserver {
                 playerManager,
                 entityBoard,
                 fow,
-                generatedTerrain.terrain()
+                generatedTerrain.terrain(),
+                defaultRules(playerManager, entityBoard, fow)
         );
     }
 }

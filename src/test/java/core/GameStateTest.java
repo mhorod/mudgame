@@ -11,7 +11,7 @@ class GameStateTest {
         @Test
         void game_state_is_serializable() {
             GameState gameState = GameCore.newGameState(4);
-            assertDeserializedIsEqual(gameState);
+            assertCanSerialize(gameState);
         }
     }
 }

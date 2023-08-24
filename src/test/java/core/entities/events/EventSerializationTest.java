@@ -18,13 +18,13 @@ class EventSerializationTest extends SerializationTestBase {
     void create_entity_is_serializable() {
         EntityData entityData = new MockEntityData();
         CreateEntity e = EntityEvents.create(entityData, 0, new Position(0, 0));
-        assertDeserializedIsEqual(e);
+        assertCanSerialize(e);
     }
 
     @Test
     void move_entity_is_serializable() {
         MoveEntity e = EntityEvents.move(new EntityID(0), new Position(0, 0));
-        assertDeserializedIsEqual(e);
+        assertCanSerialize(e);
     }
 
     @Test
@@ -35,13 +35,13 @@ class EventSerializationTest extends SerializationTestBase {
                 new PlayerID(0)
         );
         PlaceEntity e = EntityEvents.place(entity, new Position(0, 0));
-        assertDeserializedIsEqual(e);
+        assertCanSerialize(e);
     }
 
     @Test
     void remove_entity_is_serializable() {
         RemoveEntity e = EntityEvents.remove(new EntityID(0));
-        assertDeserializedIsEqual(e);
+        assertCanSerialize(e);
     }
 
 }

@@ -55,6 +55,6 @@ abstract class GameCoreTestBase {
     public static GameCore newGame(int playerCount, EventSender sender) {
         TerrainGenerator terrainGenerator = new SimpleLandGenerator(2, 3, 50);
         GameState state = GameCore.newGameState(playerCount, terrainGenerator);
-        return new GameCore(state, sender, GameCore.defaultRules(state));
+        return new GameCore(state, sender);
     }
 }
