@@ -10,11 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-class PlayerManagerTest
-{
+class PlayerManagerTest {
     @Test
-    void playerManager_returns_as_many_player_ids_as_there_are_players()
-    {
+    void playerManager_returns_as_many_player_ids_as_there_are_players() {
         // given
         PlayerManager playerManager = new PlayerManager(4);
 
@@ -26,16 +24,14 @@ class PlayerManagerTest
     }
 
     @Test
-    void playerManager_throws_exception_when_created_with_non_positive_player_count()
-    {
+    void playerManager_throws_exception_when_created_with_non_positive_player_count() {
         assertThatThrownBy(() -> new PlayerManager(0)).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new PlayerManager(-1)).isInstanceOf(
                 IllegalArgumentException.class);
     }
 
     @Test
-    void player_ids_are_unique()
-    {
+    void player_ids_are_unique() {
         // given
         PlayerManager playerManager = new PlayerManager(4);
 
@@ -47,8 +43,7 @@ class PlayerManagerTest
     }
 
     @Test
-    void completing_turn_switches_current_player()
-    {
+    void completing_turn_switches_current_player() {
         // given
         PlayerManager playerManager = new PlayerManager(2);
         PlayerID first = playerManager.getCurrentPlayer();
@@ -61,8 +56,7 @@ class PlayerManagerTest
     }
 
     @Test
-    void turn_cycles_back_to_starting_player_after_each_player_completes_turn()
-    {
+    void turn_cycles_back_to_starting_player_after_each_player_completes_turn() {
         // given
         PlayerManager playerManager = new PlayerManager(3);
         PlayerID first = playerManager.getCurrentPlayer();
@@ -76,8 +70,7 @@ class PlayerManagerTest
     }
 
     @Test
-    void each_player_takes_turn_once_during_one_cycle()
-    {
+    void each_player_takes_turn_once_during_one_cycle() {
         // given
         PlayerManager playerManager = new PlayerManager(3);
         List<PlayerID> playerIDs = playerManager.getPlayerIDs();
@@ -85,8 +78,7 @@ class PlayerManagerTest
         // when
         List<PlayerID> turns = new LinkedList<>();
 
-        for (int i = 0; i < 3; i++)
-        {
+        for (int i = 0; i < 3; i++) {
             turns.add(playerManager.getCurrentPlayer());
             playerManager.completeTurn();
         }

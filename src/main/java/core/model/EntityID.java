@@ -1,5 +1,6 @@
 package core.model;
 
-public record EntityID(long id)
-{ }
+import java.io.Serializable;
+
+public record EntityID(long id) implements Serializable { }
 

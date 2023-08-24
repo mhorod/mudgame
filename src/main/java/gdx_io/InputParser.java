@@ -11,6 +11,7 @@ public class InputParser implements InputProcessor {
 
     private boolean mouse_moved = false;
     private ScreenPosition lastMousePosition;
+
     public InputParser(GameUI gameUI, PositionTranslator translator) {
         this.gameUI = gameUI;
         this.translator = translator;
@@ -41,7 +42,7 @@ public class InputParser implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if(!mouse_moved)
+        if (!mouse_moved)
             gameUI.mouseClick(translator.translate(screenX, screenY));
         gameUI.mouseRelease(translator.translate(screenX, screenY));
         return true;

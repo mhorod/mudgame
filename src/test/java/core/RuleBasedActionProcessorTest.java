@@ -9,16 +9,11 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-class RuleBasedActionProcessorTest
-{
+class RuleBasedActionProcessorTest {
     @Test
-    void action_is_sent_when_all_rules_are_satisfied()
-    {
+    void action_is_sent_when_all_rules_are_satisfied() {
         // given
         ActionRule rule = mock(ActionRule.class);
         when(rule.isSatisfied(any(), any())).thenReturn(true);
@@ -38,8 +33,7 @@ class RuleBasedActionProcessorTest
     }
 
     @Test
-    void action_is_sent_when_there_is_unsatisfied_rule()
-    {
+    void action_is_sent_when_there_is_unsatisfied_rule() {
         // given
         ActionRule satisfiedRule = mock(ActionRule.class);
         when(satisfiedRule.isSatisfied(any(), any())).thenReturn(true);
@@ -64,8 +58,7 @@ class RuleBasedActionProcessorTest
     }
 
     @Test
-    void action_is_sent_when_there_are_no_rules()
-    {
+    void action_is_sent_when_there_are_no_rules() {
         // given
         List<ActionRule> rules = List.of();
         RuleBasedActionProcessor actionProcessor = new RuleBasedActionProcessor(rules);

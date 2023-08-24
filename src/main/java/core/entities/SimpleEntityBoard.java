@@ -1,27 +1,26 @@
 package core.entities;
 
-import core.model.Position;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
+import core.model.Position;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class SimpleEntityBoard implements EntityBoard
-{
+public class SimpleEntityBoard implements EntityBoard, Serializable {
     private final Map<Position, List<EntityID>> board = new HashMap<>();
     private final Map<EntityID, Position> entityPositions = new HashMap<>();
     private final Map<EntityID, Entity> entitiesById = new HashMap<>();
     private long nextEntityID = 0;
 
     @Override
-    public Entity createEntity(EntityData data, PlayerID owner, Position position)
-    {
+    public Entity createEntity(EntityData data, PlayerID owner, Position position) {
         EntityID entityID = newEntityID();
         Entity entity = new Entity(data, entityID, owner);
         placeEntity(entity, position);
@@ -29,28 +28,24 @@ public class SimpleEntityBoard implements EntityBoard
     }
 
     @Override
-    public List<Entity> allEntities()
-    {
+    public List<Entity> allEntities() {
         return entitiesById.values().stream().toList();
     }
 
     @Override
-    public List<Entity> entitiesAt(Position position)
-    {
+    public List<Entity> entitiesAt(Position position) {
         return mutableEntitiesAt(position).stream().map(entitiesById::get).toList();
     }
 
     @Override
-    public Position entityPosition(EntityID entityID)
-    {
+    public Position entityPosition(EntityID entityID) {
         if (!containsEntity(entityID))
             throw new EntityDoesNotExist(entityID);
         return entityPositions.get(entityID);
     }
 
     @Override
-    public void removeEntity(EntityID entityID)
-    {
+    public void removeEntity(EntityID entityID) {
         if (!containsEntity(entityID))
             throw new EntityDoesNotExist(entityID);
 
@@ -61,14 +56,12 @@ public class SimpleEntityBoard implements EntityBoard
     }
 
     @Override
-    public boolean containsEntity(EntityID entityID)
-    {
+    public boolean containsEntity(EntityID entityID) {
         return entityPositions.containsKey(entityID);
     }
 
     @Override
-    public void placeEntity(Entity entity, Position position)
-    {
+    public void placeEntity(Entity entity, Position position) {
         if (containsEntity(entity.id()))
             throw new EntityIsAlreadyPlaced(entity);
 
@@ -78,8 +71,7 @@ public class SimpleEntityBoard implements EntityBoard
     }
 
     @Override
-    public void moveEntity(EntityID entityID, Position targetPosition)
-    {
+    public void moveEntity(EntityID entityID, Position targetPosition) {
         if (!containsEntity(entityID))
             throw new EntityDoesNotExist(entityID);
 
@@ -89,25 +81,21 @@ public class SimpleEntityBoard implements EntityBoard
     }
 
     @Override
-    public Entity findEntityByID(EntityID entityID)
-    {
+    public Entity findEntityByID(EntityID entityID) {
         return entitiesById.get(entityID);
     }
 
-    private EntityID newEntityID()
-    {
+    private EntityID newEntityID() {
         return new EntityID(nextEntityID++);
     }
 
 
-    private List<EntityID> mutableEntitiesAt(Position position)
-    {
+    private List<EntityID> mutableEntitiesAt(Position position) {
         return board.computeIfAbsent(position, key -> new ArrayList<>());
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -118,8 +106,7 @@ public class SimpleEntityBoard implements EntityBoard
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(board, entityPositions, entitiesById);
     }
 }
