@@ -2,7 +2,7 @@ package core.rules;
 
 import core.entities.EntityBoardView;
 import core.entities.events.MoveEntity;
-import core.events.Event.Action;
+import core.events.model.Event.Action;
 import core.model.EntityID;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;

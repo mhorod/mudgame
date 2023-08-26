@@ -4,7 +4,7 @@ import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
-import core.events.PlayerEventObserver;
+import core.events.model.PlayerEventObserver;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;

@@ -1,7 +1,7 @@
 package core;
 
-import core.events.Event;
-import core.events.Event.Action;
+import core.events.model.Event;
+import core.events.model.Event.Action;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

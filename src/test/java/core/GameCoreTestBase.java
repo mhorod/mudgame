@@ -4,10 +4,10 @@ package core;
 import core.entities.EntityBoard;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
-import core.events.EventObserver;
-import core.events.EventSender;
-import core.events.ObserverEventSender;
-import core.events.PlayerEventObserver;
+import core.events.observers.EventObserver;
+import core.events.observers.EventOccurrenceObserver;
+import core.events.senders.EventOccurrenceSender;
+import core.events.model.PlayerEventObserver;
 import core.fogofwar.FogOfWar;
 import core.model.EntityID;
 import core.model.PlayerID;
@@ -25,13 +25,13 @@ abstract class GameCoreTestBase {
     FogOfWar fogOfWar;
     GameCore core;
 
-    ObserverEventSender eventSender;
+    EventOccurrenceSender eventSender;
     List<PlayerEventObserver> playerEventObservers;
     EventObserver eventObserver;
 
     @BeforeEach
     void init() {
-        eventSender = new ObserverEventSender();
+        eventSender = new EventOccurrenceSender();
         core = GameCoreTestBase.newGame(4, eventSender);
         playerManager = core.state().playerManager();
         entityBoard = core.state().entityBoard();
@@ -52,9 +52,12 @@ abstract class GameCoreTestBase {
         return new Entity(mock(EntityData.class), new EntityID(entityID), new PlayerID(playerID));
     }
 
-    public static GameCore newGame(int playerCount, EventSender sender) {
-        TerrainGenerator terrainGenerator = new SimpleLandGenerator(2, 3, 50);
-        GameState state = GameCore.newGameState(playerCount, terrainGenerator);
-        return new GameCore(state, sender);
+    public static GameCore newGame(int playerCount, EventOccurrenceObserver observer) {
+        GameState state = GameCore.newGameState(playerCount, defaultTerrainGenerator());
+        return new GameCore(state, observer);
+    }
+
+    private static TerrainGenerator defaultTerrainGenerator() {
+        return new SimpleLandGenerator(2, 3, 50);
     }
 }

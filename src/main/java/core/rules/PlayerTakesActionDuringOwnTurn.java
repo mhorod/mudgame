@@ -1,6 +1,6 @@
 package core.rules;
 
-import core.events.Event.Action;
+import core.events.model.Event.Action;
 import core.model.PlayerID;
 import core.turns.TurnView;
 import lombok.RequiredArgsConstructor;
