@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @EqualsAndHashCode
-public class FogOfWar implements FogOfWarView, Serializable {
+public final class FogOfWar implements FogOfWarView, Serializable {
     private final Map<PlayerID, PlayerFogOfWar> fows;
 
     public FogOfWar(List<PlayerID> players) {

@@ -8,7 +8,7 @@ import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PlayerOwnsMovedEntity implements ActionRule {
+public final class PlayerOwnsMovedEntity implements ActionRule {
     private final EntityBoardView boardView;
 
     @Override

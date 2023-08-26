@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class RuleBasedActionProcessor implements ActionProcessor {
+public final class RuleBasedActionProcessor implements ActionProcessor {
     private final List<ActionRule> rules;
     private final List<EventObserver> observers = new ArrayList<>();
 

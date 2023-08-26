@@ -6,7 +6,7 @@ import core.turns.TurnView;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PlayerTakesActionDuringOwnTurn implements ActionRule {
+public final class PlayerTakesActionDuringOwnTurn implements ActionRule {
     private final TurnView turnView;
 
     @Override

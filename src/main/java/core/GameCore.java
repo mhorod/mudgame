@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class GameCore implements ActionProcessor, EventObserver {
+public final class GameCore implements ActionProcessor, EventObserver {
 
     @RequiredArgsConstructor
     private static final class InternalConditionalEventObserver

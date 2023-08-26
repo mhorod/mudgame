@@ -7,7 +7,7 @@ import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class CreationPositionIsEmpty implements ActionRule {
+public final class CreationPositionIsEmpty implements ActionRule {
     private final EntityBoardView boardView;
 
     @Override

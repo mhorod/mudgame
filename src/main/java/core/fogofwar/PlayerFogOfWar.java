@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @EqualsAndHashCode
-public class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
+public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
     private final Set<Position> visiblePositions = new HashSet<>();
 
     public void setVisibility(Position position, boolean isVisible) {

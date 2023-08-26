@@ -4,7 +4,7 @@ import core.entities.events.CreateEntity;
 import core.events.model.Event.Action;
 import core.model.PlayerID;
 
-public class PlayerOwnsCreatedEntity implements ActionRule {
+public final class PlayerOwnsCreatedEntity implements ActionRule {
     @Override
     public boolean isSatisfied(Action action, PlayerID actor) {
         if (action instanceof CreateEntity createEntity)

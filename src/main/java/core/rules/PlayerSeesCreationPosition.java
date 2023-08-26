@@ -7,7 +7,7 @@ import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PlayerSeesCreationPosition implements ActionRule {
+public final class PlayerSeesCreationPosition implements ActionRule {
     private final FogOfWarView fow;
 
     @Override

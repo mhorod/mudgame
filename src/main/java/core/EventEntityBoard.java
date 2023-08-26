@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 
 
 @RequiredArgsConstructor
-public class EventEntityBoard implements EventObserver {
+public final class EventEntityBoard implements EventObserver {
     private final EntityBoard board;
     private final FogOfWarView fow;
     private final ConditionalEventObserver conditionalEventObserver;

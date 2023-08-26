@@ -7,7 +7,7 @@ import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PlayerSeesMoveDestination implements ActionRule {
+public final class PlayerSeesMoveDestination implements ActionRule {
     private final FogOfWarView fow;
 
     @Override
