@@ -54,7 +54,7 @@ class RuleBasedActionProcessorTest {
         actionProcessor.process(action, actor);
 
         // then
-        verify(observer, times(0)).receive(action);
+        verifyNoInteractions(observer);
     }
 
     @Test
