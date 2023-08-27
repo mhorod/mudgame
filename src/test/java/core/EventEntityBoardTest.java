@@ -1,7 +1,6 @@
 package core;
 
 import core.entities.EntityBoard;
-import core.entities.SimpleEntityBoard;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
@@ -16,6 +15,7 @@ import core.fogofwar.FogOfWar;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import core.server.ServerVisibilityPredicates;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,10 +46,14 @@ class EventEntityBoardTest {
     @BeforeEach
     void init() {
         players = IntStream.range(0, 3).mapToObj(PlayerID::new).toList();
-        entityBoard = new SimpleEntityBoard();
+        entityBoard = new EntityBoard();
         fow = new FogOfWar(players);
         eventSender = new ConditionalEventSender();
-        testee = new EventEntityBoard(entityBoard, fow, eventSender);
+        testee = new EventEntityBoard(
+                entityBoard,
+                new ServerVisibilityPredicates(fow),
+                eventSender
+        );
     }
 
     @Nested

@@ -1,5 +1,7 @@
-package core;
+package core.client;
 
+import core.EventEntityBoard;
+import core.EventPlayerManager;
 import core.events.model.Event;
 import core.events.observers.ConditionalEventObserver;
 import core.events.observers.EventObserver;
@@ -18,13 +20,13 @@ public final class ClientCore implements EventObserver {
         }
     }
 
-    private final GameState state;
+    private final ClientGameState state;
 
     // event processing
     private final EventPlayerManager eventPlayerManager;
     private final EventEntityBoard eventEntityBoard;
 
-    public ClientCore(GameState state) {
+    public ClientCore(ClientGameState state) {
         this.state = state;
         ConditionalEventSink eventSink = new ConditionalEventSink();
         eventPlayerManager = new EventPlayerManager(
@@ -33,12 +35,12 @@ public final class ClientCore implements EventObserver {
         );
         eventEntityBoard = new EventEntityBoard(
                 state.entityBoard(),
-                state.fogOfWar(),
+                new ClientVisibilityPredicates(state.playerID()),
                 eventSink
         );
     }
 
-    public GameState state() { return state; }
+    public ClientGameState state() { return state; }
 
     @Override
     public void receive(Event event) {

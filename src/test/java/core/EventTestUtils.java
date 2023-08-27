@@ -1,7 +1,9 @@
 package core;
 
+import core.client.ClientCore;
 import core.events.model.Event;
 import core.events.model.Event.Action;
+import core.server.ServerCore;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

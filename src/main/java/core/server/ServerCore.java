@@ -1,8 +1,12 @@
-package core;
+package core.server;
 
+import core.ActionProcessor;
+import core.EventEntityBoard;
+import core.EventPlayerManager;
+import core.PlayerManager;
+import core.RuleBasedActionProcessor;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
-import core.entities.SimpleEntityBoard;
 import core.events.model.Event;
 import core.events.model.Event.Action;
 import core.events.model.EventOccurrence;
@@ -51,7 +55,7 @@ public final class ServerCore implements ActionProcessor {
         }
     }
 
-    private final GameState state;
+    private final ServerGameState state;
 
     // event processing
     private final EventPlayerManager eventPlayerManager;
@@ -62,14 +66,14 @@ public final class ServerCore implements ActionProcessor {
     // rule processing
     private final RuleBasedActionProcessor actionProcessor;
 
-    public ServerCore(GameState state, EventOccurrenceObserver eventOccurrenceObserver) {
+    public ServerCore(ServerGameState state, EventOccurrenceObserver eventOccurrenceObserver) {
         this.eventOccurrenceObserver = eventOccurrenceObserver;
 
         this.state = state;
         eventPlayerManager = new EventPlayerManager(state.playerManager(), senderTo());
         eventEntityBoard = new EventEntityBoard(
                 state.entityBoard(),
-                state.fogOfWar(),
+                new ServerVisibilityPredicates(state.fogOfWar()),
                 senderTo()
         );
 
@@ -86,7 +90,7 @@ public final class ServerCore implements ActionProcessor {
         actionProcessor.process(action, actor);
     }
 
-    public GameState state() {
+    public ServerGameState state() {
         return state;
     }
 
@@ -108,7 +112,7 @@ public final class ServerCore implements ActionProcessor {
         );
     }
 
-    public static GameState newGameState(int playerCount) {
+    public static ServerGameState newGameState(int playerCount) {
         return newGameState(playerCount, defaultTerrainGenerator());
     }
 
@@ -116,12 +120,12 @@ public final class ServerCore implements ActionProcessor {
         return new SimpleLandGenerator(2, 3, 50);
     }
 
-    public static GameState newGameState(int playerCount, TerrainGenerator terrainGenerator) {
+    public static ServerGameState newGameState(int playerCount, TerrainGenerator terrainGenerator) {
         PlayerManager playerManager = new PlayerManager(playerCount);
         FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
-        EntityBoard entityBoard = new SimpleEntityBoard();
+        EntityBoard entityBoard = new EntityBoard();
         GeneratedTerrain generatedTerrain = terrainGenerator.generateTerrain(playerCount);
-        return new GameState(
+        return new ServerGameState(
                 playerManager,
                 entityBoard,
                 fow,

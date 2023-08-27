@@ -11,6 +11,8 @@ import core.events.senders.EventOccurrenceSender;
 import core.fogofwar.FogOfWar;
 import core.model.EntityID;
 import core.model.PlayerID;
+import core.server.ServerCore;
+import core.server.ServerGameState;
 import core.terrain.TerrainGenerator;
 import core.terrain.generators.SimpleLandGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +55,7 @@ abstract class ServerCoreTestBase {
     }
 
     public static ServerCore newGame(int playerCount, EventOccurrenceObserver observer) {
-        GameState state = ServerCore.newGameState(playerCount, defaultTerrainGenerator());
+        ServerGameState state = ServerCore.newGameState(playerCount, defaultTerrainGenerator());
         return new ServerCore(state, observer);
     }
 

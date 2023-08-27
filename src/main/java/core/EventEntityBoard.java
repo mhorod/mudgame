@@ -9,7 +9,6 @@ import core.entities.model.Entity;
 import core.events.model.Event;
 import core.events.observers.ConditionalEventObserver;
 import core.events.observers.EventObserver;
-import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,15 @@ import java.util.function.Predicate;
 
 @RequiredArgsConstructor
 public final class EventEntityBoard implements EventObserver {
+
+    public interface VisibilityPredicates {
+        Predicate<PlayerID> isVisible(Position position);
+        Predicate<PlayerID> isMoveVisible(Position from, Position to);
+    }
+
+
     private final EntityBoard board;
-    private final FogOfWarView fow;
+    private final VisibilityPredicates visibilityPredicates;
     private final ConditionalEventObserver conditionalEventObserver;
 
     @Override
@@ -44,6 +50,7 @@ public final class EventEntityBoard implements EventObserver {
         conditionalEventObserver.receive(event, isVisible(position));
     }
 
+
     private void moveEntity(MoveEntity event) {
         if (!board.containsEntity(event.entityID()))
             return;
@@ -53,6 +60,7 @@ public final class EventEntityBoard implements EventObserver {
         board.moveEntity(event.entityID(), to);
         conditionalEventObserver.receive(event, isMoveVisible(from, to));
     }
+
 
     private void placeEntity(PlaceEntity event) {
         if (board.containsEntity(event.entity().id()))
@@ -69,10 +77,10 @@ public final class EventEntityBoard implements EventObserver {
     }
 
     private Predicate<PlayerID> isVisible(Position position) {
-        return id -> fow.isVisible(position, id);
+        return visibilityPredicates.isVisible(position);
     }
 
     private Predicate<PlayerID> isMoveVisible(Position from, Position to) {
-        return id -> fow.isVisible(from, id) || fow.isVisible(to, id);
+        return visibilityPredicates.isMoveVisible(from, to);
     }
 }

@@ -87,6 +87,7 @@ public final class EntityVisionBoard {
     }
 
     private void setCount(Position position, Integer count) {
+        visionCount.put(position, count);
         fow.setVisibility(position, count != 0);
     }
 

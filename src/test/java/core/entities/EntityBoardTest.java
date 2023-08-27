@@ -16,17 +16,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 
-class SimpleEntityBoardTest {
+class EntityBoardTest {
     static final EntityData DATA = mock(EntityData.class);
     static final PlayerID OWNER = new PlayerID(0);
     static final Position POSITION_0 = new Position(0, 0);
     static final Position POSITION_1 = new Position(0, 1);
 
-    SimpleEntityBoard board;
+    EntityBoard board;
 
     @BeforeEach
     void init() {
-        board = new SimpleEntityBoard();
+        board = new EntityBoard();
     }
 
     @Test

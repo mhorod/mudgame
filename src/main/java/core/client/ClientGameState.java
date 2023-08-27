@@ -1,17 +1,20 @@
-package core;
+package core.client;
 
+import core.PlayerManager;
 import core.entities.EntityBoard;
-import core.fogofwar.FogOfWar;
+import core.fogofwar.PlayerFogOfWar;
+import core.model.PlayerID;
 import core.rules.ActionRule;
 import core.terrain.Terrain;
 
-import java.io.Serializable;
 import java.util.List;
 
-public record GameState(
+public record ClientGameState(
+        PlayerID playerID,
         PlayerManager playerManager,
         EntityBoard entityBoard,
-        FogOfWar fogOfWar,
+        PlayerFogOfWar fogOfWar,
         Terrain terrain,
         List<ActionRule> rules
-) implements Serializable { }
+) {
+}
