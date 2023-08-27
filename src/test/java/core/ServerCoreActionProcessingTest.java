@@ -4,7 +4,7 @@ import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
-import core.events.PlayerEventObserver;
+import core.events.model.PlayerEventObserver;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
  * Test that game core ends up in correct state and sends appropriate events.
  * when receiving actions
  */
-class GameCoreActionProcessingTest extends GameCoreTestBase {
+class ServerCoreActionProcessingTest extends ServerCoreTestBase {
     static final Position POSITION_0_0 = new Position(0, 0);
     static final Position POSITION_0_1 = new Position(0, 1);
 

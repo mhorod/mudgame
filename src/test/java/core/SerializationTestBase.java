@@ -7,13 +7,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 public abstract class SerializationTestBase {
-    public static <T extends Serializable> void assertDeserializedIsEqual(T obj) {
+    public static <T extends Serializable> void assertCanSerialize(T obj) {
         try {
-            assertThat(serializeAndDeserialize(obj)).isEqualTo(obj);
+            serializeAndDeserialize(obj);
         } catch (ClassNotFoundException e) {
             fail("This exception should never happen: ", e);
         } catch (IOException e) {

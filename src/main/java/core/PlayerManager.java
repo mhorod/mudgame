@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 @EqualsAndHashCode
-public class PlayerManager implements TurnView, Serializable {
+public final class PlayerManager implements TurnView, Serializable {
     private final int playerCount;
     private final List<PlayerID> playerIDs;
     private int currentTurn;

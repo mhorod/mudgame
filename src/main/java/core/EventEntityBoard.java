@@ -6,9 +6,9 @@ import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
 import core.entities.model.Entity;
-import core.events.Event;
-import core.events.EventObserver;
-import core.events.EventSender;
+import core.events.model.Event;
+import core.events.observers.ConditionalEventObserver;
+import core.events.observers.EventObserver;
 import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.model.Position;
@@ -18,10 +18,10 @@ import java.util.function.Predicate;
 
 
 @RequiredArgsConstructor
-public class EventEntityBoard implements EventObserver {
+public final class EventEntityBoard implements EventObserver {
     private final EntityBoard board;
     private final FogOfWarView fow;
-    private final EventSender eventSender;
+    private final ConditionalEventObserver conditionalEventObserver;
 
     @Override
     public void receive(Event event) {
@@ -41,7 +41,7 @@ public class EventEntityBoard implements EventObserver {
 
         Position position = board.entityPosition(event.entityID());
         board.removeEntity(event.entityID());
-        eventSender.send(event, isVisible(position));
+        conditionalEventObserver.receive(event, isVisible(position));
     }
 
     private void moveEntity(MoveEntity event) {
@@ -51,7 +51,7 @@ public class EventEntityBoard implements EventObserver {
         Position from = board.entityPosition(event.entityID());
         Position to = event.destination();
         board.moveEntity(event.entityID(), to);
-        eventSender.send(event, isMoveVisible(from, to));
+        conditionalEventObserver.receive(event, isMoveVisible(from, to));
     }
 
     private void placeEntity(PlaceEntity event) {
@@ -59,13 +59,13 @@ public class EventEntityBoard implements EventObserver {
             return;
 
         board.placeEntity(event.entity(), event.position());
-        eventSender.send(event, isVisible(event.position()));
+        conditionalEventObserver.receive(event, isVisible(event.position()));
     }
 
     private void createEntity(CreateEntity event) {
         Entity entity = board.createEntity(event.entityData(), event.owner(), event.position());
         PlaceEntity resultEvent = new PlaceEntity(entity, event.position());
-        eventSender.send(resultEvent, isVisible(event.position()));
+        conditionalEventObserver.receive(resultEvent, isVisible(event.position()));
     }
 
     private Predicate<PlayerID> isVisible(Position position) {

@@ -1,6 +1,6 @@
 package core.terrain.events;
 
-import core.events.Event;
+import core.events.model.Event;
 import core.model.Position;
 import core.terrain.model.TerrainType;
 

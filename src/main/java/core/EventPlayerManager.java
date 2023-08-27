@@ -1,22 +1,22 @@
 package core;
 
-import core.events.Event;
-import core.events.EventObserver;
-import core.events.EventSender;
+import core.events.model.Event;
+import core.events.observers.ConditionalEventObserver;
+import core.events.observers.EventObserver;
 import core.turns.CompleteTurn;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class EventPlayerManager implements EventObserver {
+public final class EventPlayerManager implements EventObserver {
     private final PlayerManager playerManager;
-    private final EventSender eventSender;
+    private final ConditionalEventObserver conditionalEventObserver;
 
 
     @Override
     public void receive(Event event) {
         if (event instanceof CompleteTurn) {
             playerManager.completeTurn();
-            eventSender.send(event, player -> true);
+            conditionalEventObserver.receive(event, player -> true);
         }
     }
 }

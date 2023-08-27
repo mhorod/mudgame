@@ -1,13 +1,11 @@
 package core;
 
-
 import core.entities.EntityBoard;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
-import core.events.EventObserver;
-import core.events.EventSender;
-import core.events.ObserverEventSender;
-import core.events.PlayerEventObserver;
+import core.events.model.PlayerEventObserver;
+import core.events.observers.EventObserver;
+import core.events.senders.EventOccurrenceSender;
 import core.fogofwar.FogOfWar;
 import core.model.EntityID;
 import core.model.PlayerID;
@@ -19,20 +17,20 @@ import java.util.List;
 
 import static org.mockito.Mockito.mock;
 
-abstract class GameCoreTestBase {
+abstract class ClientCoreTestBase {
     PlayerManager playerManager;
     EntityBoard entityBoard;
     FogOfWar fogOfWar;
-    GameCore core;
+    ClientCore core;
 
-    ObserverEventSender eventSender;
+    EventOccurrenceSender eventSender;
     List<PlayerEventObserver> playerEventObservers;
     EventObserver eventObserver;
 
     @BeforeEach
     void init() {
-        eventSender = new ObserverEventSender();
-        core = GameCoreTestBase.newGame(4, eventSender);
+        eventSender = new EventOccurrenceSender();
+        core = new ClientCore(ServerCore.newGameState(4, defaultTerrainGenerator()));
         playerManager = core.state().playerManager();
         entityBoard = core.state().entityBoard();
         fogOfWar = core.state().fogOfWar();
@@ -52,9 +50,7 @@ abstract class GameCoreTestBase {
         return new Entity(mock(EntityData.class), new EntityID(entityID), new PlayerID(playerID));
     }
 
-    public static GameCore newGame(int playerCount, EventSender sender) {
-        TerrainGenerator terrainGenerator = new SimpleLandGenerator(2, 3, 50);
-        GameState state = GameCore.newGameState(playerCount, terrainGenerator);
-        return new GameCore(state, sender, GameCore.defaultRules(state));
+    private static TerrainGenerator defaultTerrainGenerator() {
+        return new SimpleLandGenerator(2, 3, 50);
     }
 }

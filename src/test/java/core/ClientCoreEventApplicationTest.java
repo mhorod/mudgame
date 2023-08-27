@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 /**
  * Test that game core ends up in correct state when receiving events
  */
-class GameCoreEventApplicationTest extends GameCoreTestBase {
+class ClientCoreEventApplicationTest extends ClientCoreTestBase {
     static final Position POSITION_0_0 = new Position(0, 0);
     static final Position POSITION_0_1 = new Position(0, 1);
 

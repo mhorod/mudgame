@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class SimpleEntityBoard implements EntityBoard, Serializable {
+public final class SimpleEntityBoard implements EntityBoard, Serializable {
     private final Map<Position, List<EntityID>> board = new HashMap<>();
     private final Map<EntityID, Position> entityPositions = new HashMap<>();
     private final Map<EntityID, Entity> entitiesById = new HashMap<>();

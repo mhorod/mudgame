@@ -1,7 +1,7 @@
 package core;
 
-import core.events.Event.Action;
-import core.events.EventObserver;
+import core.events.model.Event.Action;
+import core.events.observers.EventObserver;
 import core.model.PlayerID;
 import core.rules.ActionRule;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class RuleBasedActionProcessorTest {
         actionProcessor.process(action, actor);
 
         // then
-        verify(observer, times(0)).receive(action);
+        verifyNoInteractions(observer);
     }
 
     @Test

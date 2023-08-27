@@ -1,4 +1,4 @@
-package core.events;
+package core.events.model;
 
 import java.io.Serializable;
 

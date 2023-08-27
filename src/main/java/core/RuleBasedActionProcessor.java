@@ -1,7 +1,7 @@
 package core;
 
-import core.events.Event.Action;
-import core.events.EventObserver;
+import core.events.model.Event.Action;
+import core.events.observers.EventObserver;
 import core.model.PlayerID;
 import core.rules.ActionRule;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class RuleBasedActionProcessor implements ActionProcessor {
+public final class RuleBasedActionProcessor implements ActionProcessor {
     private final List<ActionRule> rules;
     private final List<EventObserver> observers = new ArrayList<>();
 

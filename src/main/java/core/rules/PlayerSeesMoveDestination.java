@@ -1,13 +1,13 @@
 package core.rules;
 
 import core.entities.events.MoveEntity;
-import core.events.Event.Action;
+import core.events.model.Event.Action;
 import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PlayerSeesMoveDestination implements ActionRule {
+public final class PlayerSeesMoveDestination implements ActionRule {
     private final FogOfWarView fow;
 
     @Override

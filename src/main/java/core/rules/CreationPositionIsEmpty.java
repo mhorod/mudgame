@@ -2,12 +2,12 @@ package core.rules;
 
 import core.entities.EntityBoardView;
 import core.entities.events.CreateEntity;
-import core.events.Event.Action;
+import core.events.model.Event.Action;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class CreationPositionIsEmpty implements ActionRule {
+public final class CreationPositionIsEmpty implements ActionRule {
     private final EntityBoardView boardView;
 
     @Override
