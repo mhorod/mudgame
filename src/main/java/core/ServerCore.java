@@ -29,26 +29,25 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.function.Predicate;
 
-public final class GameCore implements ActionProcessor, EventObserver {
+public final class ServerCore implements ActionProcessor {
+
 
     @RequiredArgsConstructor
-    private static final class InternalConditionalEventObserver
+    private final class InternalSender
             implements ConditionalEventObserver {
-        private final List<PlayerID> players;
         private final List<EventObserver> eventObservers;
-        private final List<EventOccurrenceObserver> occurrenceObservers;
 
         @Override
         public void receive(Event event, Predicate<PlayerID> shouldPlayerReceive) {
-            List<PlayerID> recipients = players
+            List<PlayerID> recipients = ServerCore.this
+                    .state().playerManager().getPlayerIDs()
                     .stream()
                     .filter(shouldPlayerReceive)
                     .toList();
             EventOccurrence occurrence = new EventOccurrence(event, recipients);
             for (EventObserver observer : eventObservers)
                 observer.receive(event);
-            for (EventOccurrenceObserver observer : occurrenceObservers)
-                observer.receive(occurrence);
+            (ServerCore.this).eventOccurrenceObserver.receive(occurrence);
         }
     }
 
@@ -58,26 +57,28 @@ public final class GameCore implements ActionProcessor, EventObserver {
     private final EventPlayerManager eventPlayerManager;
     private final EventEntityBoard eventEntityBoard;
 
+    private final EventOccurrenceObserver eventOccurrenceObserver;
+
     // rule processing
     private final RuleBasedActionProcessor actionProcessor;
 
-    public GameCore(GameState state, EventOccurrenceObserver eventOccurrenceObserver) {
-        InternalConditionalEventObserver eventSender = new InternalConditionalEventObserver(
-                state.playerManager().getPlayerIDs(),
-                List.of(),
-                List.of(eventOccurrenceObserver)
-        );
+    public ServerCore(GameState state, EventOccurrenceObserver eventOccurrenceObserver) {
+        this.eventOccurrenceObserver = eventOccurrenceObserver;
 
         this.state = state;
-        eventPlayerManager = new EventPlayerManager(state.playerManager(), eventSender);
+        eventPlayerManager = new EventPlayerManager(state.playerManager(), senderTo());
         eventEntityBoard = new EventEntityBoard(
                 state.entityBoard(),
                 state.fogOfWar(),
-                eventSender
+                senderTo()
         );
 
         actionProcessor = new RuleBasedActionProcessor(state.rules());
         actionProcessor.addObservers(eventPlayerManager, eventEntityBoard);
+    }
+
+    private InternalSender senderTo(EventObserver... observers) {
+        return new InternalSender(List.of(observers));
     }
 
     @Override
@@ -87,12 +88,6 @@ public final class GameCore implements ActionProcessor, EventObserver {
 
     public GameState state() {
         return state;
-    }
-
-    @Override
-    public void receive(Event event) {
-        eventPlayerManager.receive(event);
-        eventEntityBoard.receive(event);
     }
 
     public static List<ActionRule> defaultRules(
