@@ -2,6 +2,7 @@ package core.entities.events;
 
 import core.EntityEvents;
 import core.SerializationTestBase;
+import core.entities.components.Component;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
 import core.model.EntityID;
@@ -10,9 +11,16 @@ import core.model.Position;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
+import java.util.List;
 
 class EventSerializationTest extends SerializationTestBase {
-    record MockEntityData() implements EntityData, Serializable { }
+    record MockEntityData() implements EntityData, Serializable {
+
+        @Override
+        public List<Component> components() {
+            return List.of();
+        }
+    }
 
     @Test
     void create_entity_is_serializable() {

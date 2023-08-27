@@ -7,7 +7,7 @@ import core.model.PlayerID;
 
 import java.util.function.Predicate;
 
-public class ClientCore implements EventObserver {
+public final class ClientCore implements EventObserver {
 
     private static final class ConditionalEventSink implements ConditionalEventObserver {
         @Override
