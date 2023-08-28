@@ -1,7 +1,7 @@
 package core.entities.events;
 
 import core.entities.model.EntityData;
-import core.events.model.Event.Action;
+import core.events.Event.Action;
 import core.model.PlayerID;
 import core.model.Position;
 

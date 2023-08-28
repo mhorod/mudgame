@@ -1,21 +1,27 @@
 package core.client;
 
-import core.EventEntityBoard;
-import core.EventPlayerManager;
-import core.events.model.Event;
-import core.events.observers.ConditionalEventObserver;
-import core.events.observers.EventObserver;
+import core.components.ConditionalEventObserver;
+import core.components.EventEntityBoard;
+import core.components.EventPlayerManager;
+import core.events.Event;
+import core.events.EventObserver;
 import core.model.PlayerID;
 
 import java.util.function.Predicate;
 
 public final class ClientCore implements EventObserver {
 
-    private static final class ConditionalEventSink implements ConditionalEventObserver {
+    private static final class ConditionalEventSink
+            implements EventObserver, ConditionalEventObserver {
         @Override
         public void receive(
                 Event event, Predicate<PlayerID> shouldPlayerReceive
         ) {
+            // Sink does not process events in any way
+        }
+
+        @Override
+        public void receive(Event event) {
             // Sink does not process events in any way
         }
     }

@@ -1,11 +1,11 @@
 package core.client;
 
-import core.PlayerManager;
 import core.entities.EntityBoard;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
-import core.rules.ActionRule;
+import core.server.rules.ActionRule;
 import core.terrain.Terrain;
+import core.turns.PlayerManager;
 
 import java.util.List;
 

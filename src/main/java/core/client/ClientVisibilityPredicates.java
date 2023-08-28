@@ -1,6 +1,6 @@
 package core.client;
 
-import core.EventEntityBoard;
+import core.components.EventEntityBoard;
 import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public class ClientVisibilityPredicates implements EventEntityBoard.VisibilityPredicates {
+final class ClientVisibilityPredicates implements EventEntityBoard.VisibilityPredicates {
 
     private final PlayerID playerID;
 

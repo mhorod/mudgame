@@ -1,6 +1,6 @@
 package core.server;
 
-import core.EventEntityBoard;
+import core.components.EventEntityBoard;
 import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.model.Position;
@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public class ServerVisibilityPredicates implements EventEntityBoard.VisibilityPredicates {
+public final class ServerVisibilityPredicates implements EventEntityBoard.VisibilityPredicates {
 
     private final FogOfWarView fogOfWar;
 
