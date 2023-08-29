@@ -13,13 +13,13 @@ import core.model.PlayerID;
 import core.terrain.TerrainGenerator;
 import core.terrain.generators.SimpleLandGenerator;
 import core.turns.PlayerManager;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
 
 abstract class ServerCoreTestBase {
+
     PlayerManager playerManager;
     EntityBoard entityBoard;
     FogOfWar fogOfWar;
@@ -29,16 +29,14 @@ abstract class ServerCoreTestBase {
     List<PlayerEventObserver> playerEventObservers;
     EventObserver eventObserver;
 
-    @BeforeEach
-    void init() {
+    protected void initState(ServerGameState state) {
+
+        playerManager = state.playerManager();
+        entityBoard = state.entityBoard();
+        fogOfWar = state.fogOfWar();
+
         eventSender = new EventOccurrenceSender();
-        ServerGameState state = ServerCore.newGameState(4);
-
         core = new ServerCore(state, eventSender);
-        playerManager = core.state().playerManager();
-        entityBoard = core.state().entityBoard();
-        fogOfWar = core.state().fogOfWar();
-
 
         List<PlayerID> players = playerManager.getPlayerIDs();
         playerEventObservers = players.stream()
@@ -48,6 +46,7 @@ abstract class ServerCoreTestBase {
 
         eventObserver = mock(EventObserver.class);
         eventSender.addObserver(eventObserver);
+
     }
 
     public static Entity mockEntity(long entityID, long playerID) {

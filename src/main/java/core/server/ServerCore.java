@@ -10,7 +10,6 @@ import core.events.Event.Action;
 import core.events.EventObserver;
 import core.events.EventOccurrence;
 import core.fogofwar.FogOfWar;
-import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.server.rules.ActionRule;
 import core.server.rules.CreationPositionIsEmpty;
@@ -101,7 +100,7 @@ public final class ServerCore {
     static List<ActionRule> defaultRules(
             TurnView turnView,
             EntityBoardView entityBoard,
-            FogOfWarView fow
+            FogOfWar fow
     ) {
         return List.of(
                 new PlayerTakesActionDuringOwnTurn(turnView),

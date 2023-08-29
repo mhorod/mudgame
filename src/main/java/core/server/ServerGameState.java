@@ -15,4 +15,5 @@ public record ServerGameState(
         FogOfWar fogOfWar,
         Terrain terrain,
         List<ActionRule> rules
-) implements Serializable { }
+) implements Serializable {
+}

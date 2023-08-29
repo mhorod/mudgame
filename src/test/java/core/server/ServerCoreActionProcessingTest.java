@@ -5,9 +5,11 @@ import core.entities.events.PlaceEntity;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
 import core.events.PlayerEventObserver;
+import core.fogofwar.FogOfWar;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +36,21 @@ class ServerCoreActionProcessingTest extends ServerCoreTestBase {
         verifyNoInteractions(eventObserver);
     }
 
+    @BeforeEach
+    void init() {
+        FogOfWar fow = mock(FogOfWar.class);
+        when(fow.isVisible(any(), any())).thenReturn(false);
+        ServerGameState state =
+                ServerStateBuilder.from(ServerCore.newGameState(4))
+                        .withFogOfWar(fow)
+                        .build();
+        initState(state);
+    }
+
     @Nested
     class EntityActionsTest {
+
+
         @Nested
         class CreateEntityTest {
             @Test
@@ -212,7 +227,7 @@ class ServerCoreActionProcessingTest extends ServerCoreTestBase {
 
         void sees(long player, Position... positions) {
             for (Position position : positions)
-                fogOfWar.setVisibility(position, new PlayerID(player), true);
+                when(fogOfWar.isVisible(position, new PlayerID(player))).thenReturn(true);
         }
     }
 
