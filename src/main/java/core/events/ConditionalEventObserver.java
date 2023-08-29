@@ -1,6 +1,5 @@
-package core.components;
+package core.events;
 
-import core.events.Event;
 import core.model.PlayerID;
 
 import java.util.function.Predicate;

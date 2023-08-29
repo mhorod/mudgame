@@ -1,11 +1,11 @@
 package core.client;
 
-import core.components.ConditionalEventObserver;
-import core.components.EventEntityBoard;
-import core.components.EventPlayerManager;
+import core.entities.EventEntityBoard;
+import core.events.ConditionalEventObserver;
 import core.events.Event;
 import core.events.EventObserver;
 import core.model.PlayerID;
+import core.turns.EventPlayerManager;
 
 import java.util.function.Predicate;
 

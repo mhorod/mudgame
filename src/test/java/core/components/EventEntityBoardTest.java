@@ -1,6 +1,7 @@
 package core.components;
 
 import core.entities.EntityBoard;
+import core.entities.EventEntityBoard;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;

@@ -1,6 +1,6 @@
 package core.server;
 
-import core.components.EventEntityBoard;
+import core.entities.EventEntityBoard;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;

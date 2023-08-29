@@ -1,10 +1,9 @@
 package core.server;
 
-import core.components.ConditionalEventObserver;
-import core.components.EventEntityBoard;
-import core.components.EventPlayerManager;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
+import core.entities.EventEntityBoard;
+import core.events.ConditionalEventObserver;
 import core.events.Event;
 import core.events.Event.Action;
 import core.events.EventObserver;
@@ -22,6 +21,7 @@ import core.server.rules.PlayerTakesActionDuringOwnTurn;
 import core.terrain.TerrainGenerator;
 import core.terrain.TerrainGenerator.GeneratedTerrain;
 import core.terrain.generators.SimpleLandGenerator;
+import core.turns.EventPlayerManager;
 import core.turns.PlayerManager;
 import core.turns.TurnView;
 import lombok.RequiredArgsConstructor;
