@@ -47,7 +47,7 @@ public final class PlayerFogOfWar implements Serializable {
     private final Map<EntityID, VisionArea> entityVision = new HashMap<>();
 
     public boolean isVisible(Position position) {
-        return visionCount.get(position) > 0;
+        return visionCount.getOrDefault(position, 0) > 0;
     }
 
     Set<Position> placeEntity(Entity entity, Position position) {
@@ -80,10 +80,20 @@ public final class PlayerFogOfWar implements Serializable {
 
         Set<Position> removed = removeVisionArea(currentArea);
         Set<Position> added = addVisionArea(newArea);
-        Set<Position> common = new HashSet<>(removed);
-        added.addAll(removed);
-        added.removeAll(common);
-        return added;
+
+        return xor(removed, added);
+    }
+
+    private <T> Set<T> xor(Set<T> s1, Set<T> s2) {
+        Set<T> union = new HashSet<>();
+        union.addAll(s1);
+        union.addAll(s2);
+
+        Set<T> intersection = new HashSet<>(s1);
+        intersection.retainAll(s2);
+
+        union.removeAll(intersection);
+        return union;
     }
 
     private boolean hasVision(Entity e) {

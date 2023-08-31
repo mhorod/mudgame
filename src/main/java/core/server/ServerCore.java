@@ -8,6 +8,7 @@ import core.events.Event;
 import core.events.Event.Action;
 import core.events.EventObserver;
 import core.events.EventOccurrence;
+import core.fogofwar.EventFogOfWar;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.server.rules.ActionRule;
@@ -70,19 +71,28 @@ public final class ServerCore {
 
     public ServerCore(ServerGameState state, EventOccurrenceObserver eventOccurrenceObserver) {
         this.eventOccurrenceObserver = eventOccurrenceObserver;
-
         this.state = state;
+
         // event processing
-        EventPlayerManager eventPlayerManager = new EventPlayerManager(state.playerManager(),
-                                                                       senderTo());
-        EventEntityBoard eventEntityBoard = new EventEntityBoard(
-                state.entityBoard(),
-                new ServerVisibilityPredicates(state.fogOfWar()),
+        EventFogOfWar eventFogOfWar = new EventFogOfWar(state.fogOfWar(), senderTo());
+
+        EventPlayerManager eventPlayerManager = new EventPlayerManager(
+                state.playerManager(),
                 senderTo()
         );
 
+        EventEntityBoard eventEntityBoard = new EventEntityBoard(
+                state.entityBoard(),
+                new ServerVisibilityPredicates(state.fogOfWar()),
+                senderTo(eventFogOfWar)
+        );
+
+
         actionProcessor = new RuleBasedActionProcessor(state.rules());
-        actionProcessor.addObservers(eventPlayerManager, eventEntityBoard);
+        actionProcessor.addObservers(
+                eventPlayerManager,
+                eventEntityBoard
+        );
     }
 
     private InternalSender senderTo(EventObserver... observers) {

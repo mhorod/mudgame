@@ -6,8 +6,8 @@ import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.events.Event;
 import core.events.EventObserver;
 import core.events.PlayerEventObserver;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class EventEntityBoardTest {
-    final EntityData MOCK_DATA = mock(EntityData.class);
+    final Components MOCK_DATA = mock(Components.class);
 
     final PlayerID PLAYER_0 = new PlayerID(0);
     final PlayerID PLAYER_1 = new PlayerID(1);

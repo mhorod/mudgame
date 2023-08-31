@@ -3,8 +3,8 @@ package core.server;
 
 import core.EventOccurrenceSender;
 import core.entities.EntityBoard;
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.events.EventObserver;
 import core.events.PlayerEventObserver;
 import core.fogofwar.FogOfWar;
@@ -50,7 +50,7 @@ abstract class ServerCoreTestBase {
     }
 
     public static Entity mockEntity(long entityID, long playerID) {
-        return new Entity(mock(EntityData.class), new EntityID(entityID), new PlayerID(playerID));
+        return new Entity(mock(Components.class), new EntityID(entityID), new PlayerID(playerID));
     }
 
     public static ServerCore newGame(int playerCount, EventOccurrenceObserver observer) {

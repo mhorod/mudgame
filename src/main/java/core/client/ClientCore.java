@@ -4,6 +4,7 @@ import core.entities.EventEntityBoard;
 import core.events.ConditionalEventObserver;
 import core.events.Event;
 import core.events.EventObserver;
+import core.fogofwar.EventPlayerFogOfWar;
 import core.model.PlayerID;
 import core.turns.EventPlayerManager;
 
@@ -31,6 +32,7 @@ public final class ClientCore implements EventObserver {
     // event processing
     private final EventPlayerManager eventPlayerManager;
     private final EventEntityBoard eventEntityBoard;
+    private final EventPlayerFogOfWar eventPlayerFogOfWar;
 
     public ClientCore(ClientGameState state) {
         this.state = state;
@@ -44,6 +46,7 @@ public final class ClientCore implements EventObserver {
                 new ClientVisibilityPredicates(state.playerID()),
                 eventSink
         );
+        eventPlayerFogOfWar = new EventPlayerFogOfWar(state.fogOfWar(), eventSink);
     }
 
     public ClientGameState state() { return state; }
@@ -52,6 +55,6 @@ public final class ClientCore implements EventObserver {
     public void receive(Event event) {
         eventPlayerManager.receive(event);
         eventEntityBoard.receive(event);
-
+        eventPlayerFogOfWar.receive(event);
     }
 }

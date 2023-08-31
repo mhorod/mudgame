@@ -1,8 +1,8 @@
 package core.entities;
 
 
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 
 
 class EntityBoardTest {
-    static final EntityData DATA = mock(EntityData.class);
+    static final Components DATA = mock(Components.class);
     static final PlayerID OWNER = new PlayerID(0);
     static final Position POSITION_0 = new Position(0, 0);
     static final Position POSITION_1 = new Position(0, 1);
@@ -40,7 +40,7 @@ class EntityBoardTest {
         @Test
         void board_creates_entity_with_given_arguments() {
             // given
-            EntityData data = DATA;
+            Components data = DATA;
             PlayerID owner = OWNER;
 
             // when
