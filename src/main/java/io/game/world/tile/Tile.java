@@ -1,13 +1,13 @@
 package io.game.world.tile;
 
+import core.model.Position;
 import io.game.Camera;
-import io.game.GamePosition;
 import io.game.WorldPosition;
 import io.game.world.WorldEntity;
 import io.game.world.WorldTexture;
 import io.model.engine.Canvas;
 
-public record Tile(GamePosition position, TileKind kind) implements WorldEntity {
+public record Tile(Position position, TileKind kind) implements WorldEntity {
     public static final float ASPECT_RATIO = 128.0f / 74.0f;
 
     @Override

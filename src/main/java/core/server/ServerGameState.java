@@ -14,7 +14,6 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public record ServerGameState(
         PlayerManager playerManager,
@@ -34,15 +33,7 @@ public record ServerGameState(
                 newEntityBoard.placeEntity(SerializationUtils.clone(entity), position);
         }
 
-        Terrain newTerrain = new Terrain(
-                terrain().size(),
-                fogOfWar.visiblePositions(playerID)
-                        .stream()
-                        .collect(Collectors.toMap(
-                                position -> position,
-                                terrain::terrainAt
-                        ))
-        );
+        Terrain newTerrain = terrain.applyFogOfWar(newFogOfWar);
 
         return new ClientGameState(
                 playerID,
