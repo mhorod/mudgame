@@ -2,32 +2,29 @@ package core.fogofwar;
 
 import core.model.PlayerID;
 import core.model.Position;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-@EqualsAndHashCode
-public final class FogOfWar implements FogOfWarView, Serializable {
+public final class FogOfWar implements Serializable {
     private final Map<PlayerID, PlayerFogOfWar> fows;
 
     public FogOfWar(List<PlayerID> players) {
         fows = players.stream().collect(Collectors.toMap(p -> p, p -> new PlayerFogOfWar()));
     }
 
-    @Override
     public boolean isVisible(Position position, PlayerID viewer) {
         return fows.get(viewer).isVisible(position);
     }
 
-    @Override
-    public PlayerFogOfWar playerView(PlayerID viewer) {
-        return fows.get(viewer);
+    public Set<PlayerID> players() {
+        return fows.keySet();
     }
 
-    public void setVisibility(Position position, PlayerID viewer, boolean isVisible) {
-        fows.get(viewer).setVisibility(position, isVisible);
+    public PlayerFogOfWar playerFogOfWar(PlayerID id) {
+        return fows.get(id);
     }
 }

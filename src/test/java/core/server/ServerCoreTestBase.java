@@ -3,8 +3,8 @@ package core.server;
 
 import core.EventOccurrenceSender;
 import core.entities.EntityBoard;
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.events.EventObserver;
 import core.events.PlayerEventObserver;
 import core.fogofwar.FogOfWar;
@@ -13,13 +13,13 @@ import core.model.PlayerID;
 import core.terrain.TerrainGenerator;
 import core.terrain.generators.SimpleLandGenerator;
 import core.turns.PlayerManager;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
 
 abstract class ServerCoreTestBase {
+
     PlayerManager playerManager;
     EntityBoard entityBoard;
     FogOfWar fogOfWar;
@@ -29,16 +29,14 @@ abstract class ServerCoreTestBase {
     List<PlayerEventObserver> playerEventObservers;
     EventObserver eventObserver;
 
-    @BeforeEach
-    void init() {
+    protected void initState(ServerGameState state) {
+
+        playerManager = state.playerManager();
+        entityBoard = state.entityBoard();
+        fogOfWar = state.fogOfWar();
+
         eventSender = new EventOccurrenceSender();
-        ServerGameState state = ServerCore.newGameState(4);
-
         core = new ServerCore(state, eventSender);
-        playerManager = core.state().playerManager();
-        entityBoard = core.state().entityBoard();
-        fogOfWar = core.state().fogOfWar();
-
 
         List<PlayerID> players = playerManager.getPlayerIDs();
         playerEventObservers = players.stream()
@@ -48,10 +46,11 @@ abstract class ServerCoreTestBase {
 
         eventObserver = mock(EventObserver.class);
         eventSender.addObserver(eventObserver);
+
     }
 
     public static Entity mockEntity(long entityID, long playerID) {
-        return new Entity(mock(EntityData.class), new EntityID(entityID), new PlayerID(playerID));
+        return new Entity(mock(Components.class), new EntityID(entityID), new PlayerID(playerID));
     }
 
     public static ServerCore newGame(int playerCount, EventOccurrenceObserver observer) {

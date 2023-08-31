@@ -1,9 +1,10 @@
 package core.components;
 
+import core.events.ConditionalEventObserver;
 import core.events.Event;
+import core.events.EventObserver;
 import core.events.EventSource;
 import core.events.PlayerEventObserver;
-import core.events.EventObserver;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 

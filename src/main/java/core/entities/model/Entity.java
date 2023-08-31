@@ -8,4 +8,4 @@ import java.io.Serializable;
 /**
  * Represents an existing, individual entity instance that has id and owner
  */
-public record Entity(EntityData data, EntityID id, PlayerID owner) implements Serializable { }
+public record Entity(Components data, EntityID id, PlayerID owner) implements Serializable { }

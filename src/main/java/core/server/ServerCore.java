@@ -1,16 +1,15 @@
 package core.server;
 
-import core.components.ConditionalEventObserver;
-import core.components.EventEntityBoard;
-import core.components.EventPlayerManager;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
+import core.entities.EventEntityBoard;
+import core.events.ConditionalEventObserver;
 import core.events.Event;
 import core.events.Event.Action;
 import core.events.EventObserver;
 import core.events.EventOccurrence;
+import core.fogofwar.EventFogOfWar;
 import core.fogofwar.FogOfWar;
-import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.server.rules.ActionRule;
 import core.server.rules.CreationPositionIsEmpty;
@@ -23,6 +22,7 @@ import core.server.rules.PlayerTakesActionDuringOwnTurn;
 import core.terrain.TerrainGenerator;
 import core.terrain.TerrainGenerator.GeneratedTerrain;
 import core.terrain.generators.SimpleLandGenerator;
+import core.turns.EventPlayerManager;
 import core.turns.PlayerManager;
 import core.turns.TurnView;
 import lombok.RequiredArgsConstructor;
@@ -71,19 +71,28 @@ public final class ServerCore {
 
     public ServerCore(ServerGameState state, EventOccurrenceObserver eventOccurrenceObserver) {
         this.eventOccurrenceObserver = eventOccurrenceObserver;
-
         this.state = state;
+
         // event processing
-        EventPlayerManager eventPlayerManager = new EventPlayerManager(state.playerManager(),
-                                                                       senderTo());
-        EventEntityBoard eventEntityBoard = new EventEntityBoard(
-                state.entityBoard(),
-                new ServerVisibilityPredicates(state.fogOfWar()),
+        EventFogOfWar eventFogOfWar = new EventFogOfWar(state.fogOfWar(), senderTo());
+
+        EventPlayerManager eventPlayerManager = new EventPlayerManager(
+                state.playerManager(),
                 senderTo()
         );
 
+        EventEntityBoard eventEntityBoard = new EventEntityBoard(
+                state.entityBoard(),
+                new ServerVisibilityPredicates(state.fogOfWar()),
+                senderTo(eventFogOfWar)
+        );
+
+
         actionProcessor = new RuleBasedActionProcessor(state.rules());
-        actionProcessor.addObservers(eventPlayerManager, eventEntityBoard);
+        actionProcessor.addObservers(
+                eventPlayerManager,
+                eventEntityBoard
+        );
     }
 
     private InternalSender senderTo(EventObserver... observers) {
@@ -101,7 +110,7 @@ public final class ServerCore {
     static List<ActionRule> defaultRules(
             TurnView turnView,
             EntityBoardView entityBoard,
-            FogOfWarView fow
+            FogOfWar fow
     ) {
         return List.of(
                 new PlayerTakesActionDuringOwnTurn(turnView),

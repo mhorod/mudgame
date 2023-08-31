@@ -1,6 +1,6 @@
 package core.client;
 
-import core.components.EventEntityBoard;
+import core.entities.EventEntityBoard;
 import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;

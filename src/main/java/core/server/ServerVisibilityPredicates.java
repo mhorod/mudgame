@@ -1,7 +1,7 @@
 package core.server;
 
-import core.components.EventEntityBoard;
-import core.fogofwar.FogOfWarView;
+import core.entities.EventEntityBoard;
+import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public final class ServerVisibilityPredicates implements EventEntityBoard.VisibilityPredicates {
 
-    private final FogOfWarView fogOfWar;
+    private final FogOfWar fogOfWar;
 
     @Override
     public Predicate<PlayerID> isVisible(Position position) {

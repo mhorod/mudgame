@@ -4,13 +4,13 @@ import core.client.ClientGameState;
 import core.entities.EntityBoard;
 import core.entities.model.Entity;
 import core.fogofwar.FogOfWar;
-import core.fogofwar.FogOfWarView;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
 import core.server.rules.ActionRule;
 import core.terrain.Terrain;
 import core.turns.PlayerManager;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -24,18 +24,19 @@ public record ServerGameState(
         List<ActionRule> rules
 ) implements Serializable {
     public ClientGameState toClientGameState(PlayerID playerID) {
-        PlayerFogOfWar playerFogOfWar = fogOfWar.playerView(playerID);
+        PlayerManager newPlayerManager = SerializationUtils.clone(playerManager);
+        PlayerFogOfWar newFogOfWar = SerializationUtils.clone(fogOfWar.playerFogOfWar(playerID));
 
-        EntityBoard playerEntityBoard = new EntityBoard();
+        EntityBoard newEntityBoard = new EntityBoard();
         for (Entity entity : entityBoard.allEntities()) {
             Position position = entityBoard.entityPosition(entity.id());
-            if (playerFogOfWar.isVisible(position))
-                playerEntityBoard.placeEntity(entity, position);
+            if (newFogOfWar.isVisible(position))
+                newEntityBoard.placeEntity(SerializationUtils.clone(entity), position);
         }
 
-        Terrain playerTerrain = new Terrain(
+        Terrain newTerrain = new Terrain(
                 terrain().size(),
-                playerFogOfWar
+                newFogOfWar
                         .visiblePositions()
                         .stream()
                         .collect(Collectors.toMap(
@@ -46,10 +47,10 @@ public record ServerGameState(
 
         return new ClientGameState(
                 playerID,
-                playerManager,
-                playerEntityBoard,
-                playerFogOfWar,
-                playerTerrain,
+                newPlayerManager,
+                newEntityBoard,
+                newFogOfWar,
+                newTerrain,
                 rules
         );
     }

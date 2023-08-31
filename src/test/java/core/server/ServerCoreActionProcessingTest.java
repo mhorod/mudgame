@@ -2,12 +2,14 @@ package core.server;
 
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.events.PlayerEventObserver;
+import core.fogofwar.FogOfWar;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -34,14 +36,27 @@ class ServerCoreActionProcessingTest extends ServerCoreTestBase {
         verifyNoInteractions(eventObserver);
     }
 
+    @BeforeEach
+    void init() {
+        FogOfWar fow = mock(FogOfWar.class);
+        when(fow.isVisible(any(), any())).thenReturn(false);
+        ServerGameState state =
+                ServerStateBuilder.from(ServerCore.newGameState(4))
+                        .withFogOfWar(fow)
+                        .build();
+        initState(state);
+    }
+
     @Nested
     class EntityActionsTest {
+
+
         @Nested
         class CreateEntityTest {
             @Test
             void entity_is_not_created_when_player_does_not_see_position() {
                 // when
-                process(core, create(0, mock(EntityData.class), 0, POSITION_0_0));
+                process(core, create(0, mock(Components.class), 0, POSITION_0_0));
 
                 // then
                 assertThat(entityBoard).containsNoEntities();
@@ -54,7 +69,7 @@ class ServerCoreActionProcessingTest extends ServerCoreTestBase {
                 sees(0, POSITION_0_0);
 
                 // when
-                process(core, create(0, mock(EntityData.class), 1, POSITION_0_0));
+                process(core, create(0, mock(Components.class), 1, POSITION_0_0));
 
                 // then
                 assertThat(entityBoard).containsNoEntities();
@@ -69,7 +84,7 @@ class ServerCoreActionProcessingTest extends ServerCoreTestBase {
                 entityBoard.placeEntity(entity, POSITION_0_0);
 
                 // when
-                process(core, create(0, mock(EntityData.class), 0, POSITION_0_0));
+                process(core, create(0, mock(Components.class), 0, POSITION_0_0));
 
                 // then
                 assertThat(entityBoard).containsExactlyEntities(entity);
@@ -82,7 +97,7 @@ class ServerCoreActionProcessingTest extends ServerCoreTestBase {
                 sees(0, POSITION_0_0);
 
                 // when
-                process(core, create(1, mock(EntityData.class), 1, POSITION_0_0));
+                process(core, create(1, mock(Components.class), 1, POSITION_0_0));
 
                 // then
                 assertThat(entityBoard).containsNoEntities();
@@ -95,7 +110,7 @@ class ServerCoreActionProcessingTest extends ServerCoreTestBase {
                 sees(0, POSITION_0_0);
 
                 // when
-                process(core, create(0, mock(EntityData.class), 0, POSITION_0_0));
+                process(core, create(0, mock(Components.class), 0, POSITION_0_0));
 
                 // then
                 assertThat(entityBoard.allEntities()).hasSize(1);
@@ -212,7 +227,7 @@ class ServerCoreActionProcessingTest extends ServerCoreTestBase {
 
         void sees(long player, Position... positions) {
             for (Position position : positions)
-                fogOfWar.setVisibility(position, new PlayerID(player), true);
+                when(fogOfWar.isVisible(position, new PlayerID(player))).thenReturn(true);
         }
     }
 

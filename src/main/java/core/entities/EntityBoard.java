@@ -1,25 +1,26 @@
 package core.entities;
 
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
+@EqualsAndHashCode
 public final class EntityBoard implements EntityBoardView, Serializable {
     private final Map<Position, List<EntityID>> board = new HashMap<>();
     private final Map<EntityID, Position> entityPositions = new HashMap<>();
     private final Map<EntityID, Entity> entitiesById = new HashMap<>();
     private long nextEntityID = 0;
 
-    public Entity createEntity(EntityData data, PlayerID owner, Position position) {
+    public Entity createEntity(Components data, PlayerID owner, Position position) {
         EntityID entityID = newEntityID();
         Entity entity = new Entity(data, entityID, owner);
         placeEntity(entity, position);
@@ -36,6 +37,10 @@ public final class EntityBoard implements EntityBoardView, Serializable {
         return mutableEntitiesAt(position).stream().map(entitiesById::get).toList();
     }
 
+    @Override
+    public boolean containsEntity(EntityID entityID) {
+        return entityPositions.containsKey(entityID);
+    }
 
     @Override
     public Position entityPosition(EntityID entityID) {
@@ -54,10 +59,6 @@ public final class EntityBoard implements EntityBoardView, Serializable {
         entitiesById.remove(entityID);
     }
 
-    @Override
-    public boolean containsEntity(EntityID entityID) {
-        return entityPositions.containsKey(entityID);
-    }
 
     public void placeEntity(Entity entity, Position position) {
         if (containsEntity(entity.id()))
@@ -89,21 +90,5 @@ public final class EntityBoard implements EntityBoardView, Serializable {
 
     private List<EntityID> mutableEntitiesAt(Position position) {
         return board.computeIfAbsent(position, key -> new ArrayList<>());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        EntityBoard that = (EntityBoard) o;
-        return board.equals(that.board) && entityPositions.equals(that.entityPositions) &&
-               entitiesById.equals(that.entitiesById);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(board, entityPositions, entitiesById);
     }
 }

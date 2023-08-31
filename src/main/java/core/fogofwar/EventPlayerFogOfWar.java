@@ -1,21 +1,22 @@
-package core.components;
+package core.fogofwar;
 
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
 import core.events.Event;
 import core.events.EventObserver;
-import core.fogofwar.PlayerVisionBoard;
-import core.fogofwar.events.SetVisible;
+import core.fogofwar.events.SetVisibility;
+import core.fogofwar.events.SetVisibility.SetPositionVisibility;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class EventEntityVisionBoard implements EventObserver {
+public class EventPlayerFogOfWar implements EventObserver {
 
-    private final PlayerVisionBoard entityBoard;
+    private final PlayerFogOfWar playerFow;
     private final EventObserver eventObserver;
 
     @Override
@@ -29,20 +30,24 @@ public class EventEntityVisionBoard implements EventObserver {
     }
 
     private void placeEntity(PlaceEntity e) {
-        process(entityBoard.placeEntity(e.entity(), e.position()));
+        process(playerFow.placeEntity(e.entity(), e.position()));
     }
 
 
     private void moveEntity(MoveEntity e) {
-        process(entityBoard.moveEntity(e.entityID(), e.destination()));
+        process(playerFow.moveEntity(e.entityID(), e.destination()));
     }
 
     private void removeEntity(RemoveEntity e) {
-        process(entityBoard.removeEntity(e.entityID()));
+        process(playerFow.removeEntity(e.entityID()));
     }
 
     private void process(Set<Position> changedPositions) {
-        for (Position position : changedPositions)
-            eventObserver.receive(new SetVisible(position, entityBoard.isVisible(position)));
+        List<SetPositionVisibility> changes = changedPositions
+                .stream()
+                .map(pos -> new SetPositionVisibility(pos, playerFow.isVisible(pos)))
+                .toList();
+        if (!changes.isEmpty())
+            eventObserver.receive(new SetVisibility(changes));
     }
 }

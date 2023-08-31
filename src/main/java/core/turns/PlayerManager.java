@@ -28,11 +28,7 @@ public final class PlayerManager implements TurnView, Serializable {
 
     public PlayerID getCurrentPlayer() { return playerIDs.get(currentTurn); }
 
-    public void setCurrentPlayer(PlayerID player) {
-        currentTurn = playerIDs.indexOf(player);
-    }
-
-    public void completeTurn() {
+    void completeTurn() {
         currentTurn = nextTurn();
     }
 

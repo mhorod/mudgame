@@ -1,12 +1,13 @@
 package core.components;
 
 import core.entities.EntityBoard;
+import core.entities.EventEntityBoard;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.events.Event;
 import core.events.EventObserver;
 import core.events.PlayerEventObserver;
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class EventEntityBoardTest {
-    final EntityData MOCK_DATA = mock(EntityData.class);
+    final Components MOCK_DATA = mock(Components.class);
 
     final PlayerID PLAYER_0 = new PlayerID(0);
     final PlayerID PLAYER_1 = new PlayerID(1);
@@ -46,7 +47,8 @@ class EventEntityBoardTest {
     void init() {
         players = IntStream.range(0, 3).mapToObj(PlayerID::new).toList();
         entityBoard = new EntityBoard();
-        fow = new FogOfWar(players);
+        fow = mock(FogOfWar.class);
+        when(fow.isVisible(any(), any())).thenReturn(false);
         eventSender = new ConditionalEventSender();
         testee = new EventEntityBoard(
                 entityBoard,
@@ -202,8 +204,7 @@ class EventEntityBoardTest {
             EventObserver observerWithView = mock(EventObserver.class);
             EventObserver observerWithoutView = mock(EventObserver.class);
 
-            fow.setVisibility(position, PLAYER_0, true);
-            fow.setVisibility(position, PLAYER_1, false);
+            sees(PLAYER_0, position);
             eventSender.addObserver(new PlayerEventObserver(PLAYER_0, observerWithView));
             eventSender.addObserver(new PlayerEventObserver(PLAYER_1, observerWithoutView));
 
@@ -227,8 +228,7 @@ class EventEntityBoardTest {
             EventObserver observerWithView = mock(EventObserver.class);
             EventObserver observerWithoutView = mock(EventObserver.class);
 
-            fow.setVisibility(position, PLAYER_0, true);
-            fow.setVisibility(position, PLAYER_1, false);
+            sees(PLAYER_0, position);
             eventSender.addObserver(new PlayerEventObserver(PLAYER_0, observerWithView));
             eventSender.addObserver(new PlayerEventObserver(PLAYER_1, observerWithoutView));
             Entity entity = new Entity(MOCK_DATA, ENTITY_0, PLAYER_0);
@@ -250,8 +250,7 @@ class EventEntityBoardTest {
             EventObserver observerWithView = mock(EventObserver.class);
             EventObserver observerWithoutView = mock(EventObserver.class);
 
-            fow.setVisibility(position, PLAYER_0, true);
-            fow.setVisibility(position, PLAYER_1, false);
+            sees(PLAYER_0, position);
             eventSender.addObserver(new PlayerEventObserver(PLAYER_0, observerWithView));
             eventSender.addObserver(new PlayerEventObserver(PLAYER_1, observerWithoutView));
 
@@ -278,8 +277,8 @@ class EventEntityBoardTest {
             EventObserver observerWithToView = mock(EventObserver.class);
             EventObserver observerWithoutView = mock(EventObserver.class);
 
-            fow.setVisibility(from, PLAYER_0, true);
-            fow.setVisibility(to, PLAYER_1, true);
+            sees(PLAYER_0, from);
+            sees(PLAYER_1, to);
 
             eventSender.addObserver(new PlayerEventObserver(PLAYER_0, observerWithFromView));
             eventSender.addObserver(new PlayerEventObserver(PLAYER_1, observerWithToView));
@@ -299,6 +298,12 @@ class EventEntityBoardTest {
             verifyNoInteractions(observerWithoutView);
         }
 
+    }
+
+    void sees(PlayerID playerID, Position... positions) {
+        for (Position position : positions) {
+            when(fow.isVisible(position, playerID)).thenReturn(true);
+        }
     }
 
 }

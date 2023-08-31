@@ -4,8 +4,8 @@ import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -22,7 +22,7 @@ public class EntityEvents {
         return new RemoveEntity(entityID);
     }
 
-    public static CreateEntity create(EntityData data, long playerId, Position position) {
+    public static CreateEntity create(Components data, long playerId, Position position) {
         return new CreateEntity(data, new PlayerID(playerId), position);
     }
 

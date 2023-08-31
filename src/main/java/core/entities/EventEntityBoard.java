@@ -1,11 +1,11 @@
-package core.components;
+package core.entities;
 
-import core.entities.EntityBoard;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
 import core.entities.model.Entity;
+import core.events.ConditionalEventObserver;
 import core.events.Event;
 import core.events.EventObserver;
 import core.model.PlayerID;
@@ -70,7 +70,7 @@ public final class EventEntityBoard implements EventObserver {
     }
 
     private void createEntity(CreateEntity event) {
-        Entity entity = board.createEntity(event.entityData(), event.owner(), event.position());
+        Entity entity = board.createEntity(event.components(), event.owner(), event.position());
         PlaceEntity resultEvent = new PlaceEntity(entity, event.position());
         conditionalEventObserver.receive(resultEvent, isVisible(event.position()));
     }

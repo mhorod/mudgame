@@ -1,9 +1,7 @@
-package core.components;
+package core.turns;
 
 import core.events.Event;
 import core.events.EventObserver;
-import core.turns.CompleteTurn;
-import core.turns.PlayerManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

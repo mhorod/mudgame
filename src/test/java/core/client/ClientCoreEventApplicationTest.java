@@ -2,8 +2,8 @@ package core.client;
 
 import core.EventTestUtils;
 import core.entities.EntityBoardAssert;
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.model.PlayerID;
 import core.model.Position;
 import org.junit.jupiter.api.Nested;
@@ -29,7 +29,7 @@ class ClientCoreEventApplicationTest extends ClientCoreTestBase {
         @Test
         void test_create_entity() {
             // given
-            EntityData data = mock(EntityData.class);
+            Components data = mock(Components.class);
             Position position = POSITION_0_0;
 
             // when

@@ -2,30 +2,20 @@ package core.entities.events;
 
 import core.EntityEvents;
 import core.SerializationTestBase;
-import core.entities.components.Component;
+import core.entities.components.Vision;
+import core.entities.model.Components;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import org.junit.jupiter.api.Test;
 
-import java.io.Serializable;
-import java.util.List;
-
 class EventSerializationTest extends SerializationTestBase {
-    record MockEntityData() implements EntityData, Serializable {
-
-        @Override
-        public List<Component> components() {
-            return List.of();
-        }
-    }
 
     @Test
     void create_entity_is_serializable() {
-        EntityData entityData = new MockEntityData();
-        CreateEntity e = EntityEvents.create(entityData, 0, new Position(0, 0));
+        Components components = Components.of(new Vision(1));
+        CreateEntity e = EntityEvents.create(components, 0, new Position(0, 0));
         assertCanSerialize(e);
     }
 
@@ -38,7 +28,7 @@ class EventSerializationTest extends SerializationTestBase {
     @Test
     void place_entity_is_serializable() {
         Entity entity = new Entity(
-                new MockEntityData(),
+                Components.of(),
                 new EntityID(0),
                 new PlayerID(0)
         );

@@ -1,5 +1,7 @@
 package core.entities.components;
 
-public interface Component {
+import java.io.Serializable;
+
+public interface Component extends Serializable {
     <T> T accept(ComponentVisitor<T> visitor);
 }
