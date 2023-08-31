@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class Game {
+public final class Game {
     private final ServerCore core;
 
     private final List<PlayerID> playerIDs;
@@ -27,7 +27,7 @@ public class Game {
         this.sender = sender;
 
         core = new ServerCore(ServerCore.newGameState(userIDs.size()),
-                              this::processEventOccurrence);
+                this::processEventOccurrence);
         playerIDs = core.state().playerManager().getPlayerIDs();
 
         for (int i = 0; i < playerCount(); ++i) {
@@ -62,7 +62,7 @@ public class Game {
         return Objects.requireNonNull(userID);
     }
 
-    public void process(Action action, UserID actor) {
+    public void processAction(Action action, UserID actor) {
         core.process(action, toPlayerID(actor));
     }
 }

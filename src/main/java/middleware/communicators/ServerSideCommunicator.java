@@ -4,7 +4,7 @@ import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_server.MessageToServer;
 
 // TODO this should implement only sender (?)
-public class ServerSideCommunicator implements Sender<MessageToClient>, Receiver<MessageToServer> {
+public final class ServerSideCommunicator implements Sender<MessageToClient>, Receiver<MessageToServer> {
     private final Sender<MessageToClient> sender;
     private final Receiver<MessageToServer> receiver;
 
