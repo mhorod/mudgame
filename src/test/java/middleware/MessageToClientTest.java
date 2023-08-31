@@ -21,7 +21,6 @@ class MessageToClientTest {
         message.execute(client);
     }
 
-    @Disabled
     @Test
     void event_message_core_is_not_null() {
         // given
@@ -35,7 +34,7 @@ class MessageToClientTest {
         message.execute(client);
 
         // then
-        verify(core).receive(event);
+        verifyNoInteractions(core);
+        verify(client).receiveEvent(event);
     }
-
 }

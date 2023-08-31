@@ -10,5 +10,3 @@ public record ActionMessage(Action action) implements MessageToServer {
         server.processAction(action, senderID);
     }
 }
-
-// TODO tests for visible positions method in core
