@@ -8,7 +8,6 @@ public class Program {
     public static void main(String[] arg) {
         var config = createNewConfiguration();
         new Lwjgl3Application(new GdxGameUI(new CompositeView(new GameView())), config);
-//        new Lwjgl3Application(new GdxGameUI(new GameWindow()), config);
     }
 
     static Lwjgl3ApplicationConfiguration createNewConfiguration() {

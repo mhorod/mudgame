@@ -1,5 +1,6 @@
 package io.game;
 
+import core.model.Position;
 import io.game.world.tile.Tile;
 import io.model.ScreenPosition;
 
@@ -19,7 +20,7 @@ public class Camera {
         tileWidth = zoom;
     }
 
-    public void forAllVisibleTiles(float windowAspectRatio, Consumer<GamePosition> f) {
+    public void forAllVisibleTiles(float windowAspectRatio, Consumer<Position> f) {
         int fromI = (int) Math.ceil((-offsetX + offsetY * Tile.ASPECT_RATIO - windowAspectRatio * Tile.ASPECT_RATIO) / tileWidth);
         int toI = (int) Math.ceil((-offsetX + offsetY * Tile.ASPECT_RATIO + 1) / tileWidth);
         for (int i = fromI - 1; i < toI + 1; i++) {
@@ -32,7 +33,7 @@ public class Camera {
                     2 * Tile.ASPECT_RATIO * offsetY / tileWidth - i
             ));
             for (int j = fromJ - 1; j < toJ + 1; j++)
-                f.accept(new GamePosition(i, j));
+                f.accept(new Position(i, j));
         }
     }
 
