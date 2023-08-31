@@ -4,10 +4,6 @@ public abstract class Floater implements Animation {
     private float dx, dy;
     private float x, y;
 
-    public Floater() {
-
-    }
-
     public void setValue(float x, float y) {
         this.x = x;
         this.y = y;

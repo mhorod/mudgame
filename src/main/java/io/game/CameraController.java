@@ -6,22 +6,16 @@ import io.animation.Floater;
 import io.model.ScreenPosition;
 
 public class CameraController implements Animation {
-    private final Camera camera;
 
-    private final Floater cameraMoveAnimation = new Floater() {
-        @Override
-        protected void onUpdate(float x, float y) {
-            camera.offsetX = x;
-            camera.offsetY = y;
-        }
-    };
+    private static final float SCROLL_FORCE = 0.85f;
+    private static final float MIN_ZOOM = 0.02f;
+    private static final float MAX_ZOOM = 1f;
 
     private ScreenPosition pivot = new ScreenPosition(0, 0);
     private final Easer zoomAnimation;
     private final Floater moveAnimation;
 
     public CameraController(Camera camera) {
-        this.camera = camera;
         moveAnimation = new Floater() {
             @Override
             protected void onUpdate(float x, float y) {
@@ -44,7 +38,9 @@ public class CameraController implements Animation {
 
     public void scroll(ScreenPosition pivot, float amount) {
         this.pivot = pivot;
-        zoomAnimation.setTarget((float) (zoomAnimation.getTarget() * Math.pow(0.85, amount)));
+        float rawZoom = (float) (zoomAnimation.getTarget() * Math.pow(SCROLL_FORCE, amount));
+        float zoom = Math.min(MAX_ZOOM, Math.max(rawZoom, MIN_ZOOM));
+        zoomAnimation.setTarget(zoom);
     }
 
     @Override

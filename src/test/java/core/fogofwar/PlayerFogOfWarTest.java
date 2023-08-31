@@ -1,7 +1,6 @@
 package core.fogofwar;
 
 import core.entities.components.Vision;
-import core.entities.model.Components;
 import core.entities.model.Entity;
 import core.model.EntityID;
 import core.model.PlayerID;
@@ -9,6 +8,8 @@ import core.model.Position;
 import lombok.RequiredArgsConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 
@@ -123,7 +124,7 @@ class PlayerFogOfWarTest {
 
     Entity entityWithVision(int range) {
         return new Entity(
-                Components.of(new Vision(range)),
+                List.of(new Vision(range)),
                 mock(EntityID.class),
                 mock(PlayerID.class)
         );

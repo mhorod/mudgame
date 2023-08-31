@@ -1,6 +1,6 @@
 package core.entities;
 
-import core.entities.model.Components;
+import core.entities.components.Component;
 import core.entities.model.Entity;
 import core.model.EntityID;
 import core.model.PlayerID;
@@ -20,9 +20,9 @@ public final class EntityBoard implements EntityBoardView, Serializable {
     private final Map<EntityID, Entity> entitiesById = new HashMap<>();
     private long nextEntityID = 0;
 
-    public Entity createEntity(Components data, PlayerID owner, Position position) {
+    public Entity createEntity(List<Component> components, PlayerID owner, Position position) {
         EntityID entityID = newEntityID();
-        Entity entity = new Entity(data, entityID, owner);
+        Entity entity = new Entity(components, entityID, owner);
         placeEntity(entity, position);
         return entity;
     }

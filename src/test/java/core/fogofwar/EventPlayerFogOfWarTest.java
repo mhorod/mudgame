@@ -4,7 +4,6 @@ import core.entities.components.Vision;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
-import core.entities.model.Components;
 import core.entities.model.Entity;
 import core.events.EventObserver;
 import core.fogofwar.events.SetVisibility;
@@ -13,6 +12,8 @@ import core.model.PlayerID;
 import core.model.Position;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -31,7 +32,7 @@ class EventPlayerFogOfWarTest {
     @Test
     void placing_entity_without_vision_does_not_generate_event() {
         // given
-        Entity entity = new Entity(Components.of(), mock(EntityID.class), mock(PlayerID.class));
+        Entity entity = new Entity(List.of(), mock(EntityID.class), mock(PlayerID.class));
         PlaceEntity event = new PlaceEntity(entity, new Position(0, 0));
 
         // when
@@ -44,7 +45,7 @@ class EventPlayerFogOfWarTest {
     @Test
     void moving_entity_without_vision_does_not_generate_event() {
         // given
-        Entity entity = new Entity(Components.of(), mock(EntityID.class), mock(PlayerID.class));
+        Entity entity = new Entity(List.of(), mock(EntityID.class), mock(PlayerID.class));
         PlaceEntity placeEvent = new PlaceEntity(entity, new Position(0, 0));
         MoveEntity moveEvent = new MoveEntity(entity.id(), new Position(0, 1));
 
@@ -59,7 +60,7 @@ class EventPlayerFogOfWarTest {
     @Test
     void removing_entity_without_vision_does_not_generate_event() {
         // given
-        Entity entity = new Entity(Components.of(), mock(EntityID.class), mock(PlayerID.class));
+        Entity entity = new Entity(List.of(), mock(EntityID.class), mock(PlayerID.class));
         PlaceEntity placeEvent = new PlaceEntity(entity, new Position(0, 0));
         RemoveEntity removeEvent = new RemoveEntity(entity.id());
 
@@ -103,7 +104,7 @@ class EventPlayerFogOfWarTest {
 
     static Entity entityWithVision(int range) {
         return new Entity(
-                Components.of(new Vision(range)),
+                List.of(new Vision(range)),
                 mock(EntityID.class),
                 mock(PlayerID.class)
         );

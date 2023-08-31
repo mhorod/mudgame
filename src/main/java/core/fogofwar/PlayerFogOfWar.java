@@ -105,8 +105,7 @@ public final class PlayerFogOfWar implements Serializable {
     }
 
     private boolean hasVision(Entity e) {
-        return e.data()
-                .components()
+        return e.components()
                 .stream()
                 .anyMatch(c -> c.accept(visionVisitor) != null);
     }
@@ -128,7 +127,7 @@ public final class PlayerFogOfWar implements Serializable {
     }
 
     private Integer getVisionRange(Entity e) {
-        for (Component c : e.data().components()) {
+        for (Component c : e.components()) {
             Integer viewRange = c.accept(visionVisitor);
             if (viewRange != null)
                 return viewRange;
