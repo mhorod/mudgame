@@ -2,18 +2,45 @@ package gdx_io;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import io.GameUI;
-import io.ScreenPosition;
+import io.model.input.Input;
+import io.model.input.MouseInfo;
+import io.model.input.WindowInfo;
+import io.model.input.events.Click;
+import io.model.input.events.Event;
+import io.model.input.events.Scroll;
+
+import java.util.ArrayList;
 
 public class InputParser implements InputProcessor {
-    private final GameUI gameUI;
     private final PositionTranslator translator;
 
     private boolean mouse_moved = false;
-    private ScreenPosition lastMousePosition;
-    public InputParser(GameUI gameUI, PositionTranslator translator) {
-        this.gameUI = gameUI;
+    ArrayList<Event> events = new ArrayList<>();
+
+    public InputParser(PositionTranslator translator) {
         this.translator = translator;
+    }
+
+    public Input getInput() {
+        var collectedEvents = events;
+        events = new ArrayList<>();
+        return new Input(
+                collectedEvents,
+                new MouseInfo(
+                        translator.translate(
+                                Gdx.input.getX(0),
+                                Gdx.input.getY(0)
+                        ),
+                        Gdx.input.isButtonPressed(com.badlogic.gdx.Input.Buttons.LEFT),
+                        Gdx.input.isButtonPressed(com.badlogic.gdx.Input.Buttons.MIDDLE),
+                        Gdx.input.isButtonPressed(com.badlogic.gdx.Input.Buttons.RIGHT)
+                ),
+                new WindowInfo(
+                        Gdx.graphics.getWidth(),
+                        Gdx.graphics.getHeight()
+                ),
+                1.f / 60
+        );
     }
 
     @Override
@@ -34,39 +61,31 @@ public class InputParser implements InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         mouse_moved = false;
-        lastMousePosition = translator.translate(screenX, screenY);
-        gameUI.mousePress(lastMousePosition);
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if(!mouse_moved)
-            gameUI.mouseClick(translator.translate(screenX, screenY));
-        gameUI.mouseRelease(translator.translate(screenX, screenY));
+        if (!mouse_moved)
+            events.add(new Click(translator.translate(screenX, screenY)));
         return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         mouse_moved = true;
-        var newMousePosition = translator.translate(screenX, screenY);
-        gameUI.mouseDragged(lastMousePosition, newMousePosition);
-        lastMousePosition = newMousePosition;
         return true;
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        lastMousePosition = translator.translate(screenX, screenY);
-        gameUI.mouseMove(lastMousePosition);
         mouse_moved = true;
         return true;
     }
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        gameUI.mouseScroll(amountY, translator.translate(Gdx.input.getX(), Gdx.input.getY()));
+        events.add(new Scroll(amountY));
         return true;
     }
 }

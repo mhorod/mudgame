@@ -1,6 +1,6 @@
 package gdx_io;
 
-import io.ScreenPosition;
+import io.model.ScreenPosition;
 
 public interface PositionTranslator {
     /**
