@@ -1,6 +1,5 @@
 package middleware;
 
-import core.events.Event;
 import core.events.Event.Action;
 import core.events.EventOccurrence;
 import core.model.PlayerID;
@@ -27,7 +26,8 @@ public class Game {
     public Game(List<UserID> userIDs, MultiSender<MessageToClient> sender) {
         this.sender = sender;
 
-        core = new ServerCore(ServerCore.newGameState(userIDs.size()), this::processEventOccurrence);
+        core = new ServerCore(ServerCore.newGameState(userIDs.size()),
+                              this::processEventOccurrence);
         playerIDs = core.state().playerManager().getPlayerIDs();
 
         for (int i = 0; i < playerCount(); ++i) {

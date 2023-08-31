@@ -2,7 +2,7 @@ package core.client;
 
 import core.EventTestUtils;
 import core.entities.EntityBoardAssert;
-import core.entities.model.Components;
+import core.entities.components.Component;
 import core.entities.model.Entity;
 import core.model.PlayerID;
 import core.model.Position;
@@ -15,7 +15,6 @@ import static core.EntityEvents.*;
 import static core.EventTestUtils.send;
 import static core.turns.TurnEvents.completeTurn;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 /**
  * Test that game core ends up in correct state when receiving events
@@ -29,7 +28,7 @@ class ClientCoreEventApplicationTest extends ClientCoreTestBase {
         @Test
         void test_create_entity() {
             // given
-            Components data = mock(Components.class);
+            List<Component> data = List.of();
             Position position = POSITION_0_0;
 
             // when

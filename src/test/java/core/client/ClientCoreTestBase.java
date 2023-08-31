@@ -2,7 +2,6 @@ package core.client;
 
 import core.EventOccurrenceSender;
 import core.entities.EntityBoard;
-import core.entities.model.Components;
 import core.entities.model.Entity;
 import core.events.EventObserver;
 import core.events.PlayerEventObserver;
@@ -60,7 +59,7 @@ abstract class ClientCoreTestBase {
     }
 
     public static Entity mockEntity(long entityID, long playerID) {
-        return new Entity(mock(Components.class), new EntityID(entityID), new PlayerID(playerID));
+        return new Entity(List.of(), new EntityID(entityID), new PlayerID(playerID));
     }
 
     private static TerrainGenerator defaultTerrainGenerator() {

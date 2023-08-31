@@ -8,9 +8,9 @@ import java.io.Serializable;
 import java.net.Socket;
 
 public class NetworkReceiver<T extends Serializable> implements Receiver<T> {
-    final private Socket socket;
-    final private MessageQueue<T> queue;
-    final private Class<T> clazz;
+    private final Socket socket;
+    private final MessageQueue<T> queue;
+    private final Class<T> clazz;
 
     public NetworkReceiver(Socket socket, MessageQueue<T> queue, Class<T> clazz) {
         this.socket = socket;

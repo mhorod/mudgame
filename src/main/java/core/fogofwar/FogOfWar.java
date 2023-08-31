@@ -27,4 +27,8 @@ public final class FogOfWar implements Serializable {
     public PlayerFogOfWar playerFogOfWar(PlayerID id) {
         return fows.get(id);
     }
+
+    public List<Position> visiblePositions(PlayerID id) {
+        return fows.get(id).visiblePositions();
+    }
 }
