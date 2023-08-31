@@ -53,8 +53,7 @@ abstract class ServerCoreTestBase {
     }
 
     public static ServerCore newGame(int playerCount, EventOccurrenceObserver observer) {
-        ServerGameState state = ServerCore.newGameState(playerCount, defaultTerrainGenerator());
-        return new ServerCore(state, observer);
+        return new ServerCore(playerCount, observer, defaultTerrainGenerator());
     }
 
     private static TerrainGenerator defaultTerrainGenerator() {
