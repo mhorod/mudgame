@@ -5,7 +5,7 @@ import middleware.UserID;
 
 import java.io.Serializable;
 
-public class NotifyingMessageQueue<T extends Serializable> implements MessageQueue<T> {
+public final class NotifyingMessageQueue<T extends Serializable> implements MessageQueue<T> {
     private final MessageQueue<T> queue;
     private final NotificationProcessor processor;
     private final UserID source;

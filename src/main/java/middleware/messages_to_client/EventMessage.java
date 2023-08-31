@@ -8,7 +8,9 @@ public record EventMessage(Event event) implements MessageToClient {
     @Override
     public void execute(Client client) {
         ClientCore core = client.getCore();
-        if (core != null)
+        if (core != null) {
             core.receive(event);
+            client.getEvents().addMessage(event);
+        }
     }
 }

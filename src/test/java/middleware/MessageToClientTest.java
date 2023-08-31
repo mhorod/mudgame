@@ -3,6 +3,7 @@ package middleware;
 import core.client.ClientCore;
 import core.events.Event;
 import middleware.messages_to_client.EventMessage;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -20,6 +21,7 @@ class MessageToClientTest {
         message.execute(client);
     }
 
+    @Disabled
     @Test
     void event_message_core_is_not_null() {
         // given

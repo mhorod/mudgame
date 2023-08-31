@@ -13,7 +13,7 @@ import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import middleware.Client;
-import middleware.SimpleLocalServer;
+import middleware.LocalServer;
 import middleware.messages_to_server.ActionMessage;
 
 import java.util.List;
@@ -34,8 +34,8 @@ public class GameView extends SimpleView {
 
     public GameView() {
         animations.addAnimation(cameraController);
-        var server = new SimpleLocalServer(3);
-        me = server.clients.get(0);
+        var clients = LocalServer.of(3);
+        me = clients.get(0);
         me.processAllMessages();
         me.getCommunicator().sendMessage(new ActionMessage(new CreateEntity(
                 List.of(new Vision(2)),

@@ -2,20 +2,23 @@ package middleware;
 
 import core.client.ClientCore;
 import core.client.ClientGameState;
+import core.events.Event;
 import core.model.PlayerID;
 import lombok.Getter;
 import middleware.communicators.ClientSideCommunicator;
+import middleware.communicators.MessageQueueImpl;
 
 @Getter
-public class Client {
+public final class Client {
     private final ClientSideCommunicator communicator;
+    private final MessageQueueImpl<Event> events = new MessageQueueImpl<>();
     private ClientCore core;
 
     public Client(ClientSideCommunicator communicator) {
         this.communicator = communicator;
     }
 
-    public void setState(ClientGameState state) {
+    public void setGameState(ClientGameState state) {
         this.core = new ClientCore(state);
     }
 
