@@ -36,8 +36,7 @@ public record ServerGameState(
 
         Terrain newTerrain = new Terrain(
                 terrain().size(),
-                newFogOfWar
-                        .visiblePositions()
+                fogOfWar.visiblePositions(playerID)
                         .stream()
                         .collect(Collectors.toMap(
                                 position -> position,

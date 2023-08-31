@@ -51,7 +51,7 @@ public final class PlayerFogOfWar implements Serializable {
         return visionCount.getOrDefault(position, 0) > 0;
     }
 
-    public List<Position> visiblePositions() {
+    List<Position> visiblePositions() {
         return visionCount.keySet()
                 .stream()
                 .filter(this::isVisible)
