@@ -1,4 +1,5 @@
 package core.model;
 
-public record PlayerID(long id)
-{ }
+import java.io.Serializable;
+
+public record PlayerID(long id) implements Serializable { }
