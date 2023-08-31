@@ -22,6 +22,11 @@ public final class FogOfWar implements FogOfWarView, Serializable {
         return fows.get(viewer).isVisible(position);
     }
 
+    @Override
+    public PlayerFogOfWar playerView(PlayerID viewer) {
+        return fows.get(viewer);
+    }
+
     public void setVisibility(Position position, PlayerID viewer, boolean isVisible) {
         fows.get(viewer).setVisibility(position, isVisible);
     }
