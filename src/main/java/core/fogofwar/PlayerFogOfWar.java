@@ -38,7 +38,8 @@ public final class PlayerFogOfWar implements Serializable {
     }
 
     @StandardException
-    private static class EntityHasNoVision extends RuntimeException { }
+    private static class EntityHasNoVision extends RuntimeException {
+    }
 
     private static final VisionVisitor visionVisitor = new VisionVisitor();
 
@@ -48,6 +49,13 @@ public final class PlayerFogOfWar implements Serializable {
 
     public boolean isVisible(Position position) {
         return visionCount.getOrDefault(position, 0) > 0;
+    }
+
+    public List<Position> visiblePositions() {
+        return visionCount.keySet()
+                .stream()
+                .filter(this::isVisible)
+                .toList();
     }
 
     Set<Position> placeEntity(Entity entity, Position position) {

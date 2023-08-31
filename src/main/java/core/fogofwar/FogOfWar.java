@@ -20,11 +20,11 @@ public final class FogOfWar implements Serializable {
         return fows.get(viewer).isVisible(position);
     }
 
-    Set<PlayerID> players() {
+    public Set<PlayerID> players() {
         return fows.keySet();
     }
 
-    PlayerFogOfWar playerFogOfWar(PlayerID id) {
+    public PlayerFogOfWar playerFogOfWar(PlayerID id) {
         return fows.get(id);
     }
 }
