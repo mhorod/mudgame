@@ -1,4 +1,4 @@
-package io;
+package io.game.world.arrow;
 
 public enum Direction {
     NONE(0, 0), SE(1, 0), SW(0, 1), NE(0, -1), NW(-1, 0);
@@ -10,7 +10,7 @@ public enum Direction {
         this.dy = dy;
     }
 
-    Direction getOpposite() {
+    public Direction getOpposite() {
         return switch (this) {
             case NONE -> NONE;
             case SE -> NW;
