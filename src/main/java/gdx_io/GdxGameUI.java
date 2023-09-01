@@ -44,7 +44,7 @@ public class GdxGameUI implements ApplicationListener, Canvas {
     @Override
     public void render() {
         view.update(inputParser.getInput(), textureBank);
-        ScreenUtils.clear(Color.BLACK);
+        ScreenUtils.clear(Color.TAN);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         view.draw(this);

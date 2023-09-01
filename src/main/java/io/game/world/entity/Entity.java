@@ -1,4 +1,4 @@
-package io.game.world.unit;
+package io.game.world.entity;
 
 import io.game.Camera;
 import io.game.WorldPosition;
@@ -8,10 +8,10 @@ import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.TextureBank;
 
-public class Unit implements WorldEntity {
-    private final WorldPosition position;
+public class Entity implements WorldEntity {
+    public WorldPosition position;
 
-    public Unit(WorldPosition position) {
+    public Entity(WorldPosition position) {
         this.position = position;
     }
 

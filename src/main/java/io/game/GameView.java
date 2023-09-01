@@ -1,7 +1,10 @@
 package io.game;
 
+import core.entities.EntityBoardView;
 import core.entities.components.Vision;
 import core.entities.events.CreateEntity;
+import core.entities.model.Entity;
+import core.model.EntityID;
 import core.model.Position;
 import io.animation.AnimationController;
 import io.game.world.Map;
@@ -33,7 +36,6 @@ public class GameView extends SimpleView {
     private final Client me;
 
     public GameView() {
-        animations.addAnimation(cameraController);
         var clients = LocalServer.of(3);
         me = clients.get(0);
         me.processAllMessages();
@@ -43,7 +45,36 @@ public class GameView extends SimpleView {
                 new Position(2, 2)
         )));
         me.processAllMessages();
-        map = new Map(me.getCore().state().terrain());
+        map = new Map(me.getCore().state().terrain(), new EntityBoardView() {
+            @Override
+            public List<Entity> allEntities() {
+                return List.of(new Entity(List.of(), new EntityID(1), me.myPlayerID()));
+            }
+
+            @Override
+            public List<Entity> entitiesAt(Position position) {
+                if (position.equals(new Position(2, 2)))
+                    return List.of(new Entity(List.of(), new EntityID(1), me.myPlayerID()));
+                else return List.of();
+            }
+
+            @Override
+            public Position entityPosition(EntityID entityID) {
+                return new Position(2, 2);
+            }
+
+            @Override
+            public boolean containsEntity(EntityID entityID) {
+                return false;
+            }
+
+            @Override
+            public Entity findEntityByID(EntityID entityID) {
+                return null;
+            }
+        });
+        animations.addAnimation(cameraController);
+        animations.addAnimation(map);
     }
 
     @Override
