@@ -1,7 +1,12 @@
 package middleware;
 
 import lombok.experimental.UtilityClass;
-import middleware.communicators.CommunicatorComposer;
+import middleware.communicators.LocalSender;
+import middleware.communicators.NotifyingMessageProcessor;
+import middleware.communicators.ProcessingMessageQueue;
+import middleware.communicators.Sender;
+import middleware.messages_to_client.MessageToClient;
+import middleware.messages_to_server.MessageToServer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,10 +25,12 @@ public final class LocalServer {
         for (int i = 0; i < playerCount; ++i) {
             UserID userID = new UserID(i);
 
-            var communicators = CommunicatorComposer.local(server, userID);
+            ProcessingMessageQueue<MessageToClient> clientQueue = new ProcessingMessageQueue<>();
+            Sender<MessageToServer> clientSender = new LocalSender<>(new NotifyingMessageProcessor<>(userID, server));
+            Sender<MessageToClient> serverSender = new LocalSender<>(clientQueue);
 
-            server.addConnection(userID, communicators.forServer());
-            clients.add(new Client(communicators.forClient()));
+            server.addConnection(userID, serverSender);
+            clients.add(new Client(clientSender, clientQueue));
         }
 
         server.startGame(IntStream.range(0, playerCount).mapToObj(UserID::new).toList());

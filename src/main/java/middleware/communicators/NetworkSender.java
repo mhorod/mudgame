@@ -6,27 +6,28 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public final class NetworkSender<T extends Serializable> implements Sender<T> {
+    private final BlockingQueue<T> queue = new LinkedBlockingQueue<>();
     private final Socket socket;
-    private final MessageQueue<T> queue;
 
-    public NetworkSender(Socket socket, MessageQueue<T> queue) {
+    public NetworkSender(Socket socket) {
         this.socket = socket;
-        this.queue = queue;
         new Thread(this::work).start();
     }
 
     @Override
     public void sendMessage(T message) {
-        queue.addMessage(message);
+        queue.add(message);
     }
 
     @SneakyThrows(IOException.class)
     private void work() {
         final ObjectOutputStream stream = new ObjectOutputStream(socket.getOutputStream());
 
-        stream.writeObject(null);
+        stream.writeObject(queue.remove());
         throw new RuntimeException();
     }
 }

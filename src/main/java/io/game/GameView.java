@@ -37,13 +37,13 @@ public class GameView extends SimpleView {
         var clients = LocalServer.of(3);
         me = clients.get(0);
         me.processAllMessages();
-        me.getCommunicator().sendMessage(new ActionMessage(new CreateEntity(
+        me.sendMessage(new ActionMessage(new CreateEntity(
                 List.of(new Vision(2)),
                 me.myPlayerID(),
                 new Position(2, 2)
         )));
         me.processAllMessages();
-        map = new Map(me.getCore().state().terrain());
+        map = new Map(me.getGameState().orElseThrow().terrain());
     }
 
     @Override

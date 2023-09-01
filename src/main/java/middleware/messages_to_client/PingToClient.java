@@ -7,6 +7,6 @@ public record PingToClient(String pingText, Boolean requireResponse) implements 
     @Override
     public void execute(Client client) {
         if (requireResponse)
-            client.getCommunicator().sendMessage(new PingToServer(pingText, false));
+            client.sendMessage(new PingToServer(pingText, false));
     }
 }

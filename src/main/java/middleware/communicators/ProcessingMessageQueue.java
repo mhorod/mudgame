@@ -4,13 +4,8 @@ import java.io.Serializable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class MessageQueueImpl<T extends Serializable> implements MessageQueue<T> {
-    final BlockingQueue<T> incomingMessageQueue = new LinkedBlockingQueue<>();
-
-    @Override
-    public void addMessage(T message) {
-        incomingMessageQueue.add(message);
-    }
+public final class ProcessingMessageQueue<T extends Serializable> implements MessageQueue<T>, MessageProcessor<T> {
+    private final BlockingQueue<T> incomingMessageQueue = new LinkedBlockingQueue<>();
 
     @Override
     public boolean hasMessage() {
@@ -22,7 +17,8 @@ public class MessageQueueImpl<T extends Serializable> implements MessageQueue<T>
         return incomingMessageQueue.remove();
     }
 
-    public T takeMessage() throws InterruptedException {
-        return incomingMessageQueue.take();
+    @Override
+    public void processMessage(T message) {
+        incomingMessageQueue.add(message);
     }
 }

@@ -30,7 +30,6 @@ class MessageToClientTest {
         EventMessage message = new EventMessage(event);
 
         // when
-        when(client.getCore()).thenReturn(core);
         message.execute(client);
 
         // then

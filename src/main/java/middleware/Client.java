@@ -4,8 +4,10 @@ import core.client.ClientCore;
 import core.client.ClientGameState;
 import core.events.Event;
 import core.model.PlayerID;
-import lombok.Getter;
-import middleware.communicators.ClientSideCommunicator;
+import middleware.communicators.MessageQueue;
+import middleware.communicators.Sender;
+import middleware.messages_to_client.MessageToClient;
+import middleware.messages_to_server.MessageToServer;
 
 import java.util.ArrayDeque;
 import java.util.Objects;
@@ -13,15 +15,15 @@ import java.util.Optional;
 import java.util.Queue;
 
 public final class Client {
-    @Getter
-    private final ClientSideCommunicator communicator;
+    private final Sender<MessageToServer> sender;
+    private final MessageQueue<MessageToClient> messageQueue;
     private final Queue<Event> eventQueue = new ArrayDeque<>();
-    @Getter
     private ClientCore core;
     private boolean coreChanged = false;
 
-    public Client(ClientSideCommunicator communicator) {
-        this.communicator = communicator;
+    public Client(Sender<MessageToServer> sender, MessageQueue<MessageToClient> messageQueue) {
+        this.sender = sender;
+        this.messageQueue = messageQueue;
     }
 
     public PlayerID myPlayerID() {
@@ -29,8 +31,12 @@ public final class Client {
     }
 
     public void processAllMessages() {
-        while (communicator.hasMessage())
-            communicator.removeMessage().execute(this);
+        while (messageQueue.hasMessage())
+            messageQueue.removeMessage().execute(this);
+    }
+
+    public void sendMessage(MessageToServer message) {
+        sender.sendMessage(message);
     }
 
     public boolean hasCoreChanged() {
@@ -50,6 +56,12 @@ public final class Client {
 
     public void receiveEvent(Event event) {
         eventQueue.add(event);
+    }
+
+    public Optional<ClientGameState> getGameState() {
+        if (core == null)
+            return Optional.empty();
+        return Optional.of(core.state());
     }
 
     public void setGameState(ClientGameState state) {

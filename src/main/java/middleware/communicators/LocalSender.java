@@ -3,14 +3,14 @@ package middleware.communicators;
 import java.io.Serializable;
 
 public final class LocalSender<T extends Serializable> implements Sender<T> {
-    private final MessageQueue<T> queue;
+    private final MessageProcessor<T> processor;
 
-    public LocalSender(MessageQueue<T> queue) {
-        this.queue = queue;
+    public LocalSender(MessageProcessor<T> processor) {
+        this.processor = processor;
     }
 
     @Override
     public void sendMessage(T message) {
-        queue.addMessage(message);
+        processor.processMessage(message);
     }
 }
