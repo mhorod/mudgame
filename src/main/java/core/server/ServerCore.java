@@ -3,8 +3,8 @@ package core.server;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
 import core.entities.EventEntityBoard;
+import core.entities.events.CreateEntity;
 import core.entities.model.Entities;
-import core.entities.model.Entity;
 import core.events.ConditionalEventObserver;
 import core.events.Event;
 import core.events.Event.Action;
@@ -23,6 +23,7 @@ import core.server.rules.PlayerSeesCreationPosition;
 import core.server.rules.PlayerSeesMoveDestination;
 import core.server.rules.PlayerTakesActionDuringOwnTurn;
 import core.terrain.EventTerrain;
+import core.terrain.Terrain;
 import core.terrain.TerrainGenerator;
 import core.terrain.TerrainGenerator.GeneratedTerrain;
 import core.terrain.generators.SimpleLandGenerator;
@@ -37,8 +38,6 @@ import java.util.function.Predicate;
 
 @Slf4j
 public final class ServerCore {
-
-
     @RequiredArgsConstructor
     private final class InternalSender
             implements EventObserver, ConditionalEventObserver {
@@ -70,16 +69,39 @@ public final class ServerCore {
 
     private final ServerGameState state;
 
-    private final EventOccurrenceObserver eventOccurrenceObserver;
+    private EventOccurrenceObserver eventOccurrenceObserver;
 
     // rule processing
     private final RuleBasedActionProcessor actionProcessor;
 
-    public ServerCore(ServerGameState state, EventOccurrenceObserver eventOccurrenceObserver) {
-        this.eventOccurrenceObserver = eventOccurrenceObserver;
-        this.state = state;
+    private EventEntityBoard eventEntityBoard;
 
-        // event processing
+    public ServerCore(int playerCount) {
+        this(playerCount, e -> { });
+    }
+
+    public ServerCore(int playerCount, EventOccurrenceObserver eventOccurrenceObserver) {
+        this(playerCount, eventOccurrenceObserver, defaultTerrainGenerator());
+    }
+
+    public ServerCore(
+            int playerCount,
+            EventOccurrenceObserver eventOccurrenceObserver,
+            TerrainGenerator terrainGenerator
+    ) {
+        GeneratedTerrain generatedTerrain = terrainGenerator.generateTerrain(playerCount);
+        this.state = newState(playerCount, generatedTerrain.terrain());
+        actionProcessor = new RuleBasedActionProcessor(state.rules());
+        this.eventOccurrenceObserver = e -> { };
+        setUpEventHandling(this.state, actionProcessor);
+        placePlayerBases(generatedTerrain.startingLocations());
+        this.eventOccurrenceObserver = eventOccurrenceObserver;
+    }
+
+    private void setUpEventHandling(
+            ServerGameState state,
+            RuleBasedActionProcessor actionProcessor
+    ) {
         EventTerrain eventTerrain = new EventTerrain(state.terrain(), senderTo());
         EventFogOfWar eventFogOfWar = new EventFogOfWar(
                 state.fogOfWar(),
@@ -91,19 +113,39 @@ public final class ServerCore {
                 senderTo()
         );
 
-        EventEntityBoard eventEntityBoard = new EventEntityBoard(
+        eventEntityBoard = new EventEntityBoard(
                 state.entityBoard(),
                 new ServerVisibilityPredicates(state.fogOfWar()),
                 senderTo(eventFogOfWar)
         );
 
-
-        actionProcessor = new RuleBasedActionProcessor(state.rules());
         actionProcessor.addObservers(
                 eventPlayerManager,
                 eventEntityBoard
         );
     }
+
+    public ServerCore(ServerGameState state, EventOccurrenceObserver eventOccurrenceObserver) {
+        this.eventOccurrenceObserver = eventOccurrenceObserver;
+        this.state = state;
+        actionProcessor = new RuleBasedActionProcessor(state.rules());
+        setUpEventHandling(state, actionProcessor);
+    }
+
+    private static ServerGameState newState(int playerCount, Terrain terrain) {
+        PlayerManager playerManager = new PlayerManager(playerCount);
+        FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
+        EntityBoard entityBoard = new EntityBoard();
+
+        return new ServerGameState(
+                playerManager,
+                entityBoard,
+                fow,
+                terrain,
+                defaultRules(playerManager, entityBoard, fow)
+        );
+    }
+
 
     private InternalSender senderTo(EventObserver... observers) {
         return new InternalSender(List.of(observers));
@@ -136,44 +178,18 @@ public final class ServerCore {
         );
     }
 
-    public static ServerGameState newGameState(int playerCount) {
-        return newGameState(playerCount, defaultTerrainGenerator());
-    }
-
     private static TerrainGenerator defaultTerrainGenerator() {
         return new SimpleLandGenerator(2, 4, 72);
     }
 
-    public static ServerGameState newGameState(int playerCount, TerrainGenerator terrainGenerator) {
-        PlayerManager playerManager = new PlayerManager(playerCount);
-        FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
-        EntityBoard entityBoard = new EntityBoard();
-        GeneratedTerrain generatedTerrain = terrainGenerator.generateTerrain(playerCount);
 
-
-        ServerGameState state = new ServerGameState(
-                playerManager,
-                entityBoard,
-                fow,
-                generatedTerrain.terrain(),
-                defaultRules(playerManager, entityBoard, fow)
-        );
-        placePlayers(state, generatedTerrain.startingLocations());
-        return state;
+    private void placePlayerBases(List<Position> startingLocations) {
+        for (int i = 0; i < startingLocations.size(); i++)
+            eventEntityBoard.receive(placeBaseEvent(i, startingLocations.get(i)));
     }
 
-    private static void placePlayers(ServerGameState state, List<Position> positions) {
-
-        for (int i = 0; i < positions.size(); i++) {
-            Position position = positions.get(i);
-            PlayerID player = state.playerManager().getPlayerIDs().get(i);
-            Entity entity = state.entityBoard().createEntity(
-                    Entities.playerBase(),
-                    player,
-                    position
-            );
-            state.fogOfWar().playerFogOfWar(player).placeEntity(entity, position);
-        }
+    private CreateEntity placeBaseEvent(int i, Position position) {
+        PlayerID owner = state.playerManager().getPlayerIDs().get(i);
+        return new CreateEntity(Entities.playerBase(), owner, position);
     }
-
 }

@@ -26,8 +26,7 @@ public class Game {
     public Game(List<UserID> userIDs, MultiSender<MessageToClient> sender) {
         this.sender = sender;
 
-        core = new ServerCore(ServerCore.newGameState(userIDs.size()),
-                              this::processEventOccurrence);
+        core = new ServerCore(userIDs.size(), this::processEventOccurrence);
         playerIDs = core.state().playerManager().getPlayerIDs();
 
         for (int i = 0; i < playerCount(); ++i) {
