@@ -13,9 +13,9 @@ import java.util.ArrayList;
 
 public class InputParser implements InputProcessor {
     private final PositionTranslator translator;
-
-    private boolean mouse_moved = false;
     ArrayList<Event> events = new ArrayList<>();
+    int mouseX, mouseY;
+    int distance = 0;
 
     public InputParser(PositionTranslator translator) {
         this.translator = translator;
@@ -60,26 +60,33 @@ public class InputParser implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        mouse_moved = false;
+        distance = 0;
+        mouseX = screenX;
+        mouseY = screenY;
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (!mouse_moved)
+        if (distance < 10)
             events.add(new Click(translator.translate(screenX, screenY)));
+        mouseX = screenX;
+        mouseY = screenY;
         return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        mouse_moved = true;
+        distance += Math.abs(screenX - mouseX) + Math.abs(screenY - mouseY);
+        mouseX = screenX;
+        mouseY = screenY;
         return true;
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        mouse_moved = true;
+        mouseX = screenX;
+        mouseY = screenY;
         return true;
     }
 

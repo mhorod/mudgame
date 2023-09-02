@@ -38,4 +38,5 @@ public final class EventFogOfWar implements EventObserver {
     public void receive(Event event) {
         eventFows.forEach(f -> f.receive(event));
     }
+
 }

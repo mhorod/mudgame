@@ -1,6 +1,10 @@
 package io.game.world.arrow;
 
+import core.model.Position;
 import io.game.world.WorldTexture;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public record ArrowKind(Direction from, Direction to) {
     public WorldTexture getTexture() {
@@ -41,5 +45,28 @@ public record ArrowKind(Direction from, Direction to) {
                 case NW -> WorldTexture.ARROW_NONE;
             };
         };
+
     }
+
+    public static List<ArrowKind> fromPositions(List<Position> positions) {
+        if (positions.isEmpty()) return List.of();
+        if (positions.size() == 1) return List.of(new ArrowKind(Direction.NONE, Direction.NONE));
+        ArrayList<ArrowKind> result = new ArrayList<>();
+        result.add(new ArrowKind(Direction.NONE, Direction.between(positions.get(0), positions.get(1))));
+        for (int i = 1; i < positions.size() - 1; i++) {
+            var prev = positions.get(i - 1);
+            var cur = positions.get(i);
+            var next = positions.get(i + 1);
+            result.add(new ArrowKind(Direction.between(cur, prev), Direction.between(cur, next)));
+        }
+        result.add(new ArrowKind(
+                Direction.between(
+                        positions.get(positions.size() - 1),
+                        positions.get(positions.size() - 2)
+                ),
+                Direction.NONE
+        ));
+        return result;
+    }
+
 }

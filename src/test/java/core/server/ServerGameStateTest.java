@@ -11,7 +11,7 @@ class ServerGameStateTest {
     class ServerGameStateSerializationTest extends SerializationTestBase {
         @Test
         void game_state_is_serializable() {
-            ServerGameState gameState = ServerCore.newGameState(4);
+            ServerGameState gameState = new ServerCore(4).state();
             assertCanSerialize(gameState);
         }
     }

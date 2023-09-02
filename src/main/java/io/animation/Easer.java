@@ -34,6 +34,6 @@ public abstract class Easer implements Animation {
 
     @Override
     public boolean finished() {
-        return false;
+        return value == target;
     }
 }

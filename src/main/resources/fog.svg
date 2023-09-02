@@ -29,8 +29,8 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="6.2074635"
-     inkscape:cx="242.77227"
-     inkscape:cy="185.18031"
+     inkscape:cx="242.93337"
+     inkscape:cy="185.3414"
      inkscape:window-width="1920"
      inkscape:window-height="1080"
      inkscape:window-x="0"
@@ -48,7 +48,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <path
-       style="fill:#ececec;fill-opacity:0.701847;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:0.701847;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        d="m 64.951905,47.5 -8.660254,5.000001 8.660254,5 8.660254,-5 z"
        id="path303"
        inkscape:export-filename="fog.png"
@@ -66,75 +66,75 @@
        inkscape:tiled-clone-of="#path303"
        xlink:href="#path303"
        id="use1714"
-       style="stroke-width:0.44979167;stroke-dasharray:none;fill:#ececec" />
+       style="stroke-width:0.35;stroke-dasharray:none;fill:#ececec" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-3"
        cy="52.5"
        cx="59.483997"
        r="3.192347" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-56"
        cy="49.757759"
        cx="60.80616"
        r="1.6865772" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3"
        cy="50.014687"
        cx="63.219856"
        r="2.5146863" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-6"
        cy="48.607018"
        cx="64.951904"
        r="1.892982" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-7"
        cy="49.894814"
        cx="68.416008"
        r="2.3948152" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-5"
        cy="51.943409"
        cx="66.420891"
        r="2.6385658" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-5-6"
        cy="51.5"
        cx="71.829773"
        r="2.2268453" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-9"
        cy="53.193043"
        cx="62.633778"
        r="2.5641491" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-27-0"
        cy="55.275074"
        cx="61.210743"
        r="2.0381644" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-27"
        cy="55.17345"
        cx="64.952156"
        r="2.987231" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-27-6"
        cy="55.883911"
        cx="68.037743"
        r="1.5986629" />
     <circle
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.44979167;stroke-linecap:round;stroke-dasharray:none"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.35;stroke-linecap:round;stroke-dasharray:none"
        id="path411-3-0"
        cy="53.5"
        cx="69.281784"

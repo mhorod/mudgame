@@ -23,6 +23,7 @@ public class CameraController implements Animation {
                 camera.offsetY = y;
             }
         };
+        moveAnimation.setValue(0.5f, 1);
         zoomAnimation = new Easer(camera.getTileWidth()) {
             @Override
             public void onUpdate(float value) {

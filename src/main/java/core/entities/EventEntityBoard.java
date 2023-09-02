@@ -20,6 +20,7 @@ public final class EventEntityBoard implements EventObserver {
 
     public interface VisibilityPredicates {
         Predicate<PlayerID> isVisible(Position position);
+
         Predicate<PlayerID> isMoveVisible(Position from, Position to);
     }
 
