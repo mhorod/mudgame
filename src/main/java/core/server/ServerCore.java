@@ -3,13 +3,14 @@ package core.server;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
 import core.entities.EventEntityBoard;
-import core.entities.events.CreateEntity;
 import core.entities.model.Entities;
+import core.entities.model.Entity;
 import core.events.ConditionalEventObserver;
 import core.events.Event;
 import core.events.Event.Action;
 import core.events.EventObserver;
 import core.events.EventOccurrence;
+import core.events.EventOccurrenceObserver;
 import core.fogofwar.EventFogOfWar;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
@@ -38,43 +39,46 @@ import java.util.function.Predicate;
 
 @Slf4j
 public final class ServerCore {
+
     @RequiredArgsConstructor
     private final class InternalSender
-            implements EventObserver, ConditionalEventObserver {
+            implements EventObserver, ConditionalEventObserver, EventOccurrenceObserver {
+
         private final List<EventObserver> eventObservers;
+        private final List<EventOccurrenceObserver> eventOccurenceObservers;
 
         @Override
         public void receive(Event event, Predicate<PlayerID> shouldPlayerReceive) {
             List<PlayerID> recipients = ServerCore.this
-                    .state().playerManager().getPlayerIDs()
+                    .players()
                     .stream()
                     .filter(shouldPlayerReceive)
                     .toList();
-            receive(event, recipients);
-        }
-
-        private void receive(Event event, List<PlayerID> recipients) {
-            for (EventObserver observer : eventObservers)
-                observer.receive(event);
-            EventOccurrence occurrence = new EventOccurrence(event, recipients);
-            (ServerCore.this).eventOccurrenceObserver.receive(occurrence);
+            receive(new EventOccurrence(event, recipients));
         }
 
         @Override
-        public void receive(Event event) {
-            List<PlayerID> recipients = ServerCore.this.state().playerManager().getPlayerIDs();
-            receive(event, recipients);
+        public void receive(EventOccurrence occurrence) {
+            log.info("Sending event occurrence: {}", occurrence);
+            eventObservers.forEach(o -> o.receive(occurrence.event()));
+            eventOccurenceObservers.forEach(o -> o.receive(occurrence));
+            (ServerCore.this).eventOccurrenceObserver.receive(occurrence);
         }
+
+
+        @Override
+        public void receive(Event event) {
+            receive(new EventOccurrence(event, ServerCore.this.players()));
+        }
+
     }
 
     private final ServerGameState state;
 
-    private EventOccurrenceObserver eventOccurrenceObserver;
+    private final EventOccurrenceObserver eventOccurrenceObserver;
 
     // rule processing
     private final RuleBasedActionProcessor actionProcessor;
-
-    private EventEntityBoard eventEntityBoard;
 
     public ServerCore(int playerCount) {
         this(playerCount, e -> { });
@@ -92,31 +96,34 @@ public final class ServerCore {
         GeneratedTerrain generatedTerrain = terrainGenerator.generateTerrain(playerCount);
         this.state = newState(playerCount, generatedTerrain.terrain());
         actionProcessor = new RuleBasedActionProcessor(state.rules());
-        this.eventOccurrenceObserver = e -> { };
-        setUpEventHandling(this.state, actionProcessor);
         placePlayerBases(generatedTerrain.startingLocations());
+        setUpEventHandling(this.state, actionProcessor);
         this.eventOccurrenceObserver = eventOccurrenceObserver;
+    }
+
+    public List<PlayerID> players() {
+        return state.playerManager().getPlayerIDs();
     }
 
     private void setUpEventHandling(
             ServerGameState state,
             RuleBasedActionProcessor actionProcessor
     ) {
-        EventTerrain eventTerrain = new EventTerrain(state.terrain(), senderTo());
+        EventTerrain eventTerrain = new EventTerrain(state.terrain(), sender());
         EventFogOfWar eventFogOfWar = new EventFogOfWar(
                 state.fogOfWar(),
-                senderTo(eventTerrain)
+                sender(List.of(eventTerrain), List.of())
         );
 
         EventPlayerManager eventPlayerManager = new EventPlayerManager(
                 state.playerManager(),
-                senderTo()
+                sender()
         );
 
-        eventEntityBoard = new EventEntityBoard(
+        EventEntityBoard eventEntityBoard = new EventEntityBoard(
                 state.entityBoard(),
                 new ServerVisibilityPredicates(state.fogOfWar()),
-                senderTo(eventFogOfWar)
+                sender(List.of(), List.of(eventFogOfWar))
         );
 
         actionProcessor.addObservers(
@@ -146,13 +153,18 @@ public final class ServerCore {
         );
     }
 
+    private InternalSender sender() {
+        return new InternalSender(List.of(), List.of());
+    }
 
-    private InternalSender senderTo(EventObserver... observers) {
-        return new InternalSender(List.of(observers));
+    private InternalSender sender(
+            List<EventObserver> observers,
+            List<EventOccurrenceObserver> eventOccurrenceObservers
+    ) {
+        return new InternalSender(observers, eventOccurrenceObservers);
     }
 
     public void process(Action action, PlayerID actor) {
-        log.info("Processing action {} by actor {}", action, actor);
         actionProcessor.process(action, actor);
     }
 
@@ -185,11 +197,12 @@ public final class ServerCore {
 
     private void placePlayerBases(List<Position> startingLocations) {
         for (int i = 0; i < startingLocations.size(); i++)
-            eventEntityBoard.receive(placeBaseEvent(i, startingLocations.get(i)));
+            placeBase(i, startingLocations.get(i));
     }
 
-    private CreateEntity placeBaseEvent(int i, Position position) {
+    private void placeBase(int i, Position position) {
         PlayerID owner = state.playerManager().getPlayerIDs().get(i);
-        return new CreateEntity(Entities.playerBase(), owner, position);
+        Entity entity = state.entityBoard().createEntity(Entities.playerBase(), owner, position);
+        state.fogOfWar().playerFogOfWar(owner).placeEntity(entity, position);
     }
 }

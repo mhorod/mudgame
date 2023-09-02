@@ -4,6 +4,8 @@ import core.entities.EventEntityBoard;
 import core.events.ConditionalEventObserver;
 import core.events.Event;
 import core.events.EventObserver;
+import core.events.EventOccurrence;
+import core.events.EventOccurrenceObserver;
 import core.fogofwar.EventPlayerFogOfWar;
 import core.model.PlayerID;
 import core.terrain.EventTerrain;
@@ -16,7 +18,7 @@ import java.util.function.Predicate;
 public final class ClientCore implements EventObserver {
 
     private static final class ConditionalEventSink
-            implements EventObserver, ConditionalEventObserver {
+            implements EventObserver, ConditionalEventObserver, EventOccurrenceObserver {
         @Override
         public void receive(
                 Event event, Predicate<PlayerID> shouldPlayerReceive
@@ -26,6 +28,11 @@ public final class ClientCore implements EventObserver {
 
         @Override
         public void receive(Event event) {
+            // Sink does not process events in any way
+        }
+
+        @Override
+        public void receive(EventOccurrence eventOccurrence) {
             // Sink does not process events in any way
         }
     }

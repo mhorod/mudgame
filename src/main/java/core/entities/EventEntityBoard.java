@@ -11,10 +11,12 @@ import core.events.EventObserver;
 import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Predicate;
 
 
+@Slf4j
 @RequiredArgsConstructor
 public final class EventEntityBoard implements EventObserver {
 
@@ -30,6 +32,7 @@ public final class EventEntityBoard implements EventObserver {
 
     @Override
     public void receive(Event event) {
+        log.info("Received event: {}", event);
         if (event instanceof CreateEntity e)
             createEntity(e);
         else if (event instanceof PlaceEntity e)

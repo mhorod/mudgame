@@ -7,6 +7,6 @@ import java.util.List;
 
 public class Entities {
     public static List<Component> playerBase() {
-        return List.of(new Vision(3));
+        return List.of(new Vision(1));
     }
 }
