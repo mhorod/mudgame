@@ -1,6 +1,4 @@
-package core.server;
-
-import core.events.EventOccurrence;
+package core.events;
 
 public interface EventOccurrenceObserver {
     void receive(EventOccurrence eventOccurrence);

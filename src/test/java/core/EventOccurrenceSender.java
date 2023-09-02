@@ -2,9 +2,9 @@ package core;
 
 import core.events.EventObserver;
 import core.events.EventOccurrence;
+import core.events.EventOccurrenceObserver;
 import core.events.EventSource;
 import core.events.PlayerEventObserver;
-import core.server.EventOccurrenceObserver;
 
 import java.util.ArrayList;
 import java.util.List;

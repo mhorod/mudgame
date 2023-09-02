@@ -8,7 +8,7 @@ public class Entity extends WorldEntity {
     private final EntityID id;
 
     public Entity(WorldPosition position, EntityID id) {
-        super(position, WorldTexture.UNIT, true);
+        super(position, WorldTexture.BASE, true);
         this.id = id;
     }
 

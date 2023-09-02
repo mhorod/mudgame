@@ -38,7 +38,7 @@ public class GameView extends SimpleView {
     private boolean eventObserved = false;
 
     public GameView() {
-        var clients = LocalServer.of(3);
+        var clients = LocalServer.of(5);
         me = clients.get(0);
         me.processAllMessages();
         map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
@@ -51,7 +51,8 @@ public class GameView extends SimpleView {
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
-                        me.getCommunicator().sendMessage(new ActionMessage(new MoveEntity(id, destination)));
+                        me.getCommunicator()
+                                .sendMessage(new ActionMessage(new MoveEntity(id, destination)));
                     }
 
                     @Override
@@ -77,7 +78,10 @@ public class GameView extends SimpleView {
     }
 
     private boolean canEatEvent() {
-        return me.peekEvent().stream().anyMatch(event -> !(event instanceof MoveEntity) && !(event instanceof SetTerrain));
+        return me.peekEvent()
+                .stream()
+                .anyMatch(
+                        event -> !(event instanceof MoveEntity) && !(event instanceof SetTerrain));
     }
 
     @Override
