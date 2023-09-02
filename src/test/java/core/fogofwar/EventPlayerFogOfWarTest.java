@@ -106,7 +106,7 @@ class EventPlayerFogOfWarTest {
         return new Entity(
                 List.of(new Vision(range)),
                 mock(EntityID.class),
-                mock(PlayerID.class)
+                new PlayerID(0)
         );
     }
 }

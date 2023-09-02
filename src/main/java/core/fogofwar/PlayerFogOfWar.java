@@ -62,7 +62,7 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
     }
 
     public Set<Position> placeEntity(Entity entity, Position position) {
-        if (entity.owner() != playerID || !hasVision(entity))
+        if (!entity.owner().equals(playerID) || !hasVision(entity))
             return Set.of();
 
         VisionArea area = new VisionArea(position, getVisionRange(entity));
