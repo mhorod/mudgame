@@ -3,9 +3,9 @@ package io.game.world.entity;
 import io.animation.Animation;
 
 public abstract class EntityAnimation implements Animation {
-    private Entity entity;
+    private WorldEntity entity;
 
-    public void init(Entity entity) {
+    public void init(WorldEntity entity) {
         this.entity = entity;
         init();
     }
@@ -13,7 +13,7 @@ public abstract class EntityAnimation implements Animation {
     abstract void init();
 
 
-    public Entity getEntity() {
+    public WorldEntity getEntity() {
         return entity;
     }
 }

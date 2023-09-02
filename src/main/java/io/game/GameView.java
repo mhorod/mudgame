@@ -1,14 +1,15 @@
 package io.game;
 
-import core.entities.EntityBoardView;
-import core.entities.components.Vision;
-import core.entities.events.CreateEntity;
-import core.entities.model.Entity;
+import core.entities.events.MoveEntity;
+import core.events.Event;
 import core.model.EntityID;
 import core.model.Position;
+import core.terrain.events.SetTerrain;
 import io.animation.AnimationController;
 import io.game.world.Map;
 import io.game.world.MapObserver;
+import io.game.world.controller.Controls;
+import io.game.world.controller.WorldController;
 import io.model.engine.Canvas;
 import io.model.engine.TextureBank;
 import io.model.input.Input;
@@ -19,9 +20,6 @@ import io.views.SimpleView;
 import middleware.Client;
 import middleware.LocalServer;
 import middleware.messages_to_server.ActionMessage;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GameView extends SimpleView {
     private final AnimationController animations = new AnimationController();
@@ -34,51 +32,52 @@ public class GameView extends SimpleView {
             cameraController.drag(dx, dy, deltaTime);
         }
     };
+    private final WorldController worldController;
 
     private final Client me;
-    private EntityID selectedEntity;
-    private Position entityPosition = new Position(2, 2);
+    private boolean eventObserved = false;
 
     public GameView() {
         var clients = LocalServer.of(3);
         me = clients.get(0);
         me.processAllMessages();
-        me.getCommunicator().sendMessage(new ActionMessage(new CreateEntity(
-                List.of(new Vision(2)),
-                me.myPlayerID(),
-                new Position(2, 2)
-        )));
-        me.processAllMessages();
-        map = new Map(me.getCore().state().terrain(), new EntityBoardView() {
-            @Override
-            public List<Entity> allEntities() {
-                return List.of(new Entity(List.of(), new EntityID(1), me.myPlayerID()));
-            }
-
-            @Override
-            public List<Entity> entitiesAt(Position position) {
-                if (position.equals(entityPosition))
-                    return List.of(new Entity(List.of(), new EntityID(1), me.myPlayerID()));
-                else return List.of();
-            }
-
-            @Override
-            public Position entityPosition(EntityID entityID) {
-                return entityPosition;
-            }
-
-            @Override
-            public boolean containsEntity(EntityID entityID) {
-                return false;
-            }
-
-            @Override
-            public Entity findEntityByID(EntityID entityID) {
-                return null;
-            }
-        });
+        map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
+        worldController = new WorldController(
+                map,
+                me.getCore().state().entityBoard(),
+                me.getCore().state().terrain(),
+                new Controls() {
+                    @Override
+                    public void moveEntity(EntityID id, Position destination) {
+                        me.getCommunicator().sendMessage(new ActionMessage(new MoveEntity(id, destination)));
+                    }
+
+                    @Override
+                    public void nextEvent() {
+                        do {
+                            me.processEvent();
+                        } while (canEatEvent());
+                        eventObserved = false;
+                        var maybeEvent = me.peekEvent();
+                        maybeEvent.ifPresent(GameView.this::processEvent);
+                    }
+                });
+    }
+
+    private void processEvent(Event event) {
+        if (event instanceof MoveEntity) {
+            eventObserved = true;
+            worldController.onMoveEntity((MoveEntity) event);
+        } else if (event instanceof SetTerrain) {
+            eventObserved = true;
+            worldController.onSetTerrain((SetTerrain) event);
+        }
+    }
+
+    private boolean canEatEvent() {
+        return me.peekEvent().stream().anyMatch(event -> !(event instanceof MoveEntity) && !(event instanceof SetTerrain));
     }
 
     @Override
@@ -89,36 +88,25 @@ public class GameView extends SimpleView {
     @Override
     public void update(Input input, TextureBank bank) {
         me.processAllMessages();
+        worldController.update();
+        if (!eventObserved) {
+            while (canEatEvent())
+                me.processEvent();
+            me.peekEvent().ifPresent(this::processEvent);
+        }
+
         input.events().forEach(event -> event.accept(new EventHandler() {
             @Override
             public void onClick(Click click) {
                 map.objectAt(click.position(), bank, camera, new MapObserver() {
                     @Override
                     public void onEntity(EntityID id) {
-                        if (selectedEntity == null) {
-                            map.pickUp(id);
-                            selectedEntity = id;
-                        } else if (selectedEntity.equals(id)) {
-                            map.putDown(id);
-                            map.setPath(List.of());
-                            selectedEntity = null;
-                        } else {
-                            map.putDown(selectedEntity);
-                            map.pickUp(id);
-                            map.setPath(List.of());
-                            selectedEntity = id;
-                        }
+                        worldController.onEntityClick(id);
                     }
 
                     @Override
                     public void onTile(Position position) {
-                        if (selectedEntity != null) {
-                            map.putDown(selectedEntity);
-                            map.setPath(List.of());
-                            map.moveAlongPath(selectedEntity, pathBetween(entityPosition, position));
-                            entityPosition = position;
-                            selectedEntity = null;
-                        }
+                        worldController.onTileClick(position);
                     }
                 });
             }
@@ -131,36 +119,17 @@ public class GameView extends SimpleView {
         map.objectAt(input.mouse().position(), bank, camera, new MapObserver() {
             @Override
             public void onEntity(EntityID id) {
-
+                worldController.onEntityHover(id);
             }
 
             @Override
             public void onTile(Position position) {
-                if (selectedEntity != null)
-                    map.setPath(pathBetween(entityPosition, position));
+                worldController.onTileHover(position);
             }
         });
         dragDetector.update(input.mouse(), input.deltaTime());
         animations.update(input.deltaTime());
     }
 
-    private static List<Position> pathBetween(Position a, Position b) {
-        ArrayList<Position> result = new ArrayList<>();
-        while (!a.equals(b)) {
-            result.add(a);
-            var dx = b.x() - a.x();
-            var dy = b.y() - a.y();
-            if (dx > 0)
-                a = new Position(a.x() + 1, a.y());
-            else if (dx < 0)
-                a = new Position(a.x() - 1, a.y());
-            else if (dy > 0)
-                a = new Position(a.x(), a.y() + 1);
-            else if (dy < 0)
-                a = new Position(a.x(), a.y() - 1);
-        }
-        result.add(b);
-        return result;
-    }
 
 }

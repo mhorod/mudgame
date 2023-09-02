@@ -55,4 +55,8 @@ public enum WorldTexture {
     public void draw(WorldPosition position, Canvas canvas, Camera camera) {
         canvas.draw(getDrawData(position, camera));
     }
+
+    public void drawTransparent(WorldPosition position, Canvas canvas, Camera camera, float alpha) {
+        canvas.drawTransparent(getDrawData(position, camera), alpha);
+    }
 }
