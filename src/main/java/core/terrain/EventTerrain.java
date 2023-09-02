@@ -28,7 +28,8 @@ public class EventTerrain implements EventOccurrenceObserver, EventObserver {
     private SetTerrain setVisibility(SetVisibility e) {
         List<SetPositionTerrain> terrainPositions = new ArrayList<>();
         for (SetPositionVisibility p : e.postions())
-            terrainPositions.add(intoTerrainChange(p));
+            if (terrain.contains(p.position()))
+                terrainPositions.add(intoTerrainChange(p));
         return new SetTerrain(terrainPositions);
     }
 
