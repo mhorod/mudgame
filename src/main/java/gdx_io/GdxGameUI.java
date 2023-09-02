@@ -79,6 +79,21 @@ public class GdxGameUI implements ApplicationListener, Canvas {
     }
 
     @Override
+    public void drawTransparent(TextureDrawData texture, float alpha) {
+        batch.setColor(1, 1, 1, alpha);
+        var tex = textureBank.getTexture(texture.texture());
+        batch.draw(
+                tex,
+                texture.position().x(),
+                texture.position().y(),
+                texture.height() * tex.getRegionWidth() / tex.getRegionHeight(),
+                texture.height()
+        );
+        batch.setColor(1, 1, 1, 1);
+
+    }
+
+    @Override
     public float getAspectRatio() {
         return (float) Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
     }

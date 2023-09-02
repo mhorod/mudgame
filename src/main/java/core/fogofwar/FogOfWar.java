@@ -13,7 +13,7 @@ public final class FogOfWar implements Serializable {
     private final Map<PlayerID, PlayerFogOfWar> fows;
 
     public FogOfWar(List<PlayerID> players) {
-        fows = players.stream().collect(Collectors.toMap(p -> p, p -> new PlayerFogOfWar()));
+        fows = players.stream().collect(Collectors.toMap(p -> p, PlayerFogOfWar::new));
     }
 
     public boolean isVisible(Position position, PlayerID viewer) {
@@ -26,9 +26,5 @@ public final class FogOfWar implements Serializable {
 
     public PlayerFogOfWar playerFogOfWar(PlayerID id) {
         return fows.get(id);
-    }
-
-    public List<Position> visiblePositions(PlayerID id) {
-        return fows.get(id).visiblePositions();
     }
 }

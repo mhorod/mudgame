@@ -31,21 +31,28 @@ import core.terrain.generators.SimpleLandGenerator;
 import core.turns.EventPlayerManager;
 import core.turns.PlayerManager;
 import core.turns.TurnView;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
 @Slf4j
 public final class ServerCore {
 
-    @RequiredArgsConstructor
     private final class InternalSender
             implements EventObserver, ConditionalEventObserver, EventOccurrenceObserver {
 
         private final List<EventObserver> eventObservers;
-        private final List<EventOccurrenceObserver> eventOccurenceObservers;
+        private final List<EventOccurrenceObserver> eventOccurrenceObservers;
+
+        public InternalSender(
+                List<EventObserver> eventObservers,
+                List<EventOccurrenceObserver> eventOccurrenceObservers
+        ) {
+            this.eventObservers = new ArrayList<>(eventObservers);
+            this.eventOccurrenceObservers = new ArrayList<>(eventOccurrenceObservers);
+        }
 
         @Override
         public void receive(Event event, Predicate<PlayerID> shouldPlayerReceive) {
@@ -61,7 +68,7 @@ public final class ServerCore {
         public void receive(EventOccurrence occurrence) {
             log.info("Sending event occurrence: {}", occurrence);
             eventObservers.forEach(o -> o.receive(occurrence.event()));
-            eventOccurenceObservers.forEach(o -> o.receive(occurrence));
+            eventOccurrenceObservers.forEach(o -> o.receive(occurrence));
             (ServerCore.this).eventOccurrenceObserver.receive(occurrence);
         }
 
@@ -71,6 +78,9 @@ public final class ServerCore {
             receive(new EventOccurrence(event, ServerCore.this.players()));
         }
 
+        void addEventOccurrenceObserver(EventOccurrenceObserver o) {
+            eventOccurrenceObservers.add(o);
+        }
     }
 
     private final ServerGameState state;
@@ -81,7 +91,8 @@ public final class ServerCore {
     private final RuleBasedActionProcessor actionProcessor;
 
     public ServerCore(int playerCount) {
-        this(playerCount, e -> { });
+        this(playerCount, e -> {
+        });
     }
 
     public ServerCore(int playerCount, EventOccurrenceObserver eventOccurrenceObserver) {
@@ -110,9 +121,10 @@ public final class ServerCore {
             RuleBasedActionProcessor actionProcessor
     ) {
         EventTerrain eventTerrain = new EventTerrain(state.terrain(), sender());
+        InternalSender fowSender = sender(List.of(), List.of(eventTerrain));
         EventFogOfWar eventFogOfWar = new EventFogOfWar(
                 state.fogOfWar(),
-                sender(List.of(eventTerrain), List.of())
+                fowSender
         );
 
         EventPlayerManager eventPlayerManager = new EventPlayerManager(
@@ -125,6 +137,7 @@ public final class ServerCore {
                 new ServerVisibilityPredicates(state.fogOfWar()),
                 sender(List.of(), List.of(eventFogOfWar))
         );
+        fowSender.addEventOccurrenceObserver(eventEntityBoard);
 
         actionProcessor.addObservers(
                 eventPlayerManager,
@@ -191,7 +204,7 @@ public final class ServerCore {
     }
 
     private static TerrainGenerator defaultTerrainGenerator() {
-        return new SimpleLandGenerator(2, 4, 72);
+        return new SimpleLandGenerator(2, 4, 100);
     }
 
 

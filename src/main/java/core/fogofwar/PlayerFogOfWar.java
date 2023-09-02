@@ -5,6 +5,7 @@ import core.entities.components.ComponentVisitor;
 import core.entities.components.Vision;
 import core.entities.model.Entity;
 import core.model.EntityID;
+import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.StandardException;
@@ -19,6 +20,7 @@ import java.util.Set;
 
 @RequiredArgsConstructor
 public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
+
     private static final class VisionVisitor implements ComponentVisitor<Integer> {
         @Override
         public Integer visit(Vision vision) {
@@ -44,6 +46,7 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
     private static final VisionVisitor visionVisitor = new VisionVisitor();
 
 
+    private final PlayerID playerID;
     private final Map<Position, Integer> visionCount = new HashMap<>();
     private final Map<EntityID, VisionArea> entityVision = new HashMap<>();
 
@@ -59,7 +62,7 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
     }
 
     public Set<Position> placeEntity(Entity entity, Position position) {
-        if (!hasVision(entity))
+        if (entity.owner() != playerID || !hasVision(entity))
             return Set.of();
 
         VisionArea area = new VisionArea(position, getVisionRange(entity));

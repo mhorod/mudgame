@@ -43,7 +43,7 @@ class PlayerFogOfWarTest {
 
     @Test
     void placing_unit_with_vision_makes_area_around_visible() {
-        PlayerFogOfWar testee = new PlayerFogOfWar();
+        PlayerFogOfWar testee = new PlayerFogOfWar(new PlayerID(0));
 
         // given
         Entity entity = entityWithVision(1);
@@ -61,7 +61,7 @@ class PlayerFogOfWarTest {
 
     @Test
     void removing_unit_makes_area_invisible() {
-        PlayerFogOfWar testee = new PlayerFogOfWar();
+        PlayerFogOfWar testee = new PlayerFogOfWar(new PlayerID(0));
 
         // given
         Entity entity = entityWithVision(1);
@@ -80,7 +80,7 @@ class PlayerFogOfWarTest {
 
     @Test
     void removing_unit_does_not_affect_area_seen_by_other_units() {
-        PlayerFogOfWar testee = new PlayerFogOfWar();
+        PlayerFogOfWar testee = new PlayerFogOfWar(new PlayerID(0));
 
         // given
         Entity firstEntity = entityWithVision(1);
@@ -103,7 +103,7 @@ class PlayerFogOfWarTest {
 
     @Test
     void moving_unit_changes_visible_area() {
-        PlayerFogOfWar testee = new PlayerFogOfWar();
+        PlayerFogOfWar testee = new PlayerFogOfWar(new PlayerID(0));
 
         // given
         Entity entity = entityWithVision(1);

@@ -3,7 +3,7 @@ package middleware.communicators;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_server.MessageToServer;
 
-public class ClientSideCommunicator implements Sender<MessageToServer>, Receiver<MessageToClient> {
+public final class ClientSideCommunicator implements Sender<MessageToServer>, Receiver<MessageToClient> {
     private final Sender<MessageToServer> sender;
     private final Receiver<MessageToClient> receiver;
 

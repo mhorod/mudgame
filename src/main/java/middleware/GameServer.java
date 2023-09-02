@@ -1,5 +1,6 @@
 package middleware;
 
+import core.events.Event.Action;
 import middleware.communicators.MultiSender;
 import middleware.communicators.ServerSideCommunicator;
 import middleware.messages_to_client.MessageToClient;
@@ -9,12 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class SimpleServer implements NotificationProcessor, MultiSender<MessageToClient> {
-    protected final Map<UserID, ServerSideCommunicator> communicatorMap = new HashMap<>();
+public final class GameServer implements NotificationProcessor, MultiSender<MessageToClient> {
+    private final Map<UserID, ServerSideCommunicator> communicatorMap = new HashMap<>();
     private final Map<UserID, Game> gameMap = new HashMap<>();
 
     @Override
-    public void processNotification(UserID source) {
+    public synchronized void processNotification(UserID source) {
         ServerSideCommunicator communicator = communicatorMap.get(source);
         if (communicator == null)
             return;
@@ -22,6 +23,12 @@ public abstract class SimpleServer implements NotificationProcessor, MultiSender
             MessageToServer message = communicator.removeMessage();
             message.execute(this, source);
         }
+    }
+
+    public void addConnection(UserID userID, ServerSideCommunicator communicator) {
+        if (communicatorMap.containsKey(userID))
+            throw new IllegalArgumentException(userID + " is already connected");
+        communicatorMap.put(userID, communicator);
     }
 
     @Override
@@ -43,7 +50,9 @@ public abstract class SimpleServer implements NotificationProcessor, MultiSender
             gameMap.put(userID, newGame);
     }
 
-    public Game getGame(UserID userID) {
-        return gameMap.get(userID);
+    public void processAction(Action action, UserID userID) {
+        Game game = gameMap.get(userID);
+        if (game != null)
+            game.process(action, userID);
     }
 }

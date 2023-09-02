@@ -1,7 +1,5 @@
 package io.animation;
 
-public interface Animation {
+public interface Animation extends Finishable {
     void update(float deltaTime);
-
-    boolean finished();
 }

@@ -43,4 +43,10 @@ public class Camera {
         return new ScreenPosition(screenX, screenY);
     }
 
+    public Position getTile(ScreenPosition pos) {
+        var y = Math.round(-((pos.x() - offsetX) + (pos.y() - offsetY) * Tile.ASPECT_RATIO) / tileWidth);
+        var x = Math.round(((pos.x() - offsetX) - (pos.y() - offsetY) * Tile.ASPECT_RATIO) / tileWidth);
+        return new Position(x, y);
+    }
+
 }

@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.Socket;
 
-public class NetworkReceiver<T extends Serializable> implements Receiver<T> {
+public final class NetworkReceiver<T extends Serializable> implements Receiver<T> {
     private final Socket socket;
     private final MessageQueue<T> queue;
     private final Class<T> clazz;

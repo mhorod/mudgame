@@ -9,7 +9,7 @@ import middleware.messages_to_server.MessageToServer;
 import java.net.Socket;
 
 @UtilityClass
-public class CommunicatorComposer {
+public final class CommunicatorComposer {
     public static CommunicatorPair local(NotificationProcessor processor, UserID userID) {
         MessageQueue<MessageToServer> serverQueue = new NotifyingMessageQueue<>(new MessageQueueImpl<>(), processor, userID);
         MessageQueue<MessageToClient> clientQueue = new MessageQueueImpl<>();

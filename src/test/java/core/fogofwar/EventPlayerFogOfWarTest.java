@@ -25,7 +25,7 @@ class EventPlayerFogOfWarTest {
     @BeforeEach
     void init() {
         observer = mock(EventObserver.class);
-        fow = new PlayerFogOfWar();
+        fow = new PlayerFogOfWar(new PlayerID(0));
         testee = new EventPlayerFogOfWar(fow, observer);
     }
 
@@ -83,7 +83,7 @@ class EventPlayerFogOfWarTest {
 
         // then
         verify(observer).receive(any(SetVisibility.class));
-        verify(observer).receive(argThat(e -> ((SetVisibility) e).postions().size() == 9));
+        verify(observer).receive(argThat(e -> ((SetVisibility) e).positions().size() == 9));
     }
 
     @Test
@@ -99,7 +99,7 @@ class EventPlayerFogOfWarTest {
         // then
         verify(observer).receive(any(SetVisibility.class));
         // 3 removed and 3 added
-        verify(observer).receive(argThat(e -> ((SetVisibility) e).postions().size() == 6));
+        verify(observer).receive(argThat(e -> ((SetVisibility) e).positions().size() == 6));
     }
 
     static Entity entityWithVision(int range) {

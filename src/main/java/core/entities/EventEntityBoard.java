@@ -8,20 +8,27 @@ import core.entities.model.Entity;
 import core.events.ConditionalEventObserver;
 import core.events.Event;
 import core.events.EventObserver;
+import core.events.EventOccurrence;
+import core.events.EventOccurrenceObserver;
+import core.fogofwar.events.SetVisibility;
+import core.fogofwar.events.SetVisibility.SetPositionVisibility;
 import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 
 @Slf4j
 @RequiredArgsConstructor
-public final class EventEntityBoard implements EventObserver {
+public final class EventEntityBoard implements EventObserver, EventOccurrenceObserver {
+
 
     public interface VisibilityPredicates {
         Predicate<PlayerID> isVisible(Position position);
+
         Predicate<PlayerID> isMoveVisible(Position from, Position to);
     }
 
@@ -41,6 +48,32 @@ public final class EventEntityBoard implements EventObserver {
             moveEntity(e);
         else if (event instanceof RemoveEntity e)
             removeEntity(e);
+    }
+
+    @Override
+    public void receive(EventOccurrence eventOccurrence) {
+        if (eventOccurrence.event() instanceof SetVisibility e)
+            handleSetVisibility(e.positions(), eventOccurrence.recipients());
+    }
+
+    private void handleSetVisibility(
+            List<SetPositionVisibility> positions, List<PlayerID> recipients
+    ) {
+        for (SetPositionVisibility positionVisibility : positions)
+            for (PlayerID player : recipients)
+                changeOnePosition(positionVisibility, player);
+    }
+
+    private void changeOnePosition(SetPositionVisibility positionVisibility, PlayerID player) {
+        for (Entity e : board.entitiesAt(positionVisibility.position())) {
+            Event event;
+            if (positionVisibility.isVisible()) {
+                event = new PlaceEntity(e, positionVisibility.position());
+            } else {
+                event = new RemoveEntity(e.id());
+            }
+            conditionalEventObserver.receive(event, player::equals);
+        }
     }
 
     private void removeEntity(RemoveEntity event) {
