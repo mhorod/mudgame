@@ -48,6 +48,6 @@ public final class GameServer implements NotificationProcessor<MessageToServer>,
     public void processAction(Action action, UserID userID) {
         Game game = gameMap.get(userID);
         if (game != null)
-            game.processAction(action, userID);
+            game.process(action, userID);
     }
 }

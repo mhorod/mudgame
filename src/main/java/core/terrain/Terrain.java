@@ -26,8 +26,10 @@ public class Terrain implements TerrainView, Serializable {
 
     public Terrain applyFogOfWar(PlayerFogOfWar fow) {
         var newMap = terrainMap.keySet().stream().collect(Collectors.toMap(p -> p, p -> {
-            if (fow.isVisible(p)) return terrainMap.get(p);
-            else return UNKNOWN;
+            if (fow.isVisible(p))
+                return terrainMap.get(p);
+            else
+                return UNKNOWN;
         }));
         return new Terrain(size, newMap);
     }
@@ -42,7 +44,11 @@ public class Terrain implements TerrainView, Serializable {
         return terrainMap.getOrDefault(position, VOID);
     }
 
-    public void setTerrainAt(Position position, TerrainType terrainType) {
+    public boolean contains(Position position) {
+        return terrainMap.containsKey(position);
+    }
+
+    void setTerrainAt(Position position, TerrainType terrainType) {
         terrainMap.computeIfPresent(position, (pos, old) -> terrainType);
     }
 }

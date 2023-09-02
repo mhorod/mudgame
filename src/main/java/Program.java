@@ -16,6 +16,7 @@ public class Program {
         config.setWindowedMode(596, 596);
         config.useVsync(true);
         config.setForegroundFPS(60);
+        config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 2);
         return config;
     }
 }

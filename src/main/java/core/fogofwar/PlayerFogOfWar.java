@@ -5,6 +5,7 @@ import core.entities.components.ComponentVisitor;
 import core.entities.components.Vision;
 import core.entities.model.Entity;
 import core.model.EntityID;
+import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.StandardException;
@@ -18,7 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public final class PlayerFogOfWar implements Serializable {
+public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
+
     private static final class VisionVisitor implements ComponentVisitor<Integer> {
         @Override
         public Integer visit(Vision vision) {
@@ -26,7 +28,7 @@ public final class PlayerFogOfWar implements Serializable {
         }
     }
 
-    private record VisionArea(Position center, Integer range) {
+    private record VisionArea(Position center, Integer range) implements Serializable {
         List<Position> positions() {
             List<Position> result = new ArrayList<>();
             for (int dx = -range; dx <= range; dx++)
@@ -44,6 +46,7 @@ public final class PlayerFogOfWar implements Serializable {
     private static final VisionVisitor visionVisitor = new VisionVisitor();
 
 
+    private final PlayerID playerID;
     private final Map<Position, Integer> visionCount = new HashMap<>();
     private final Map<EntityID, VisionArea> entityVision = new HashMap<>();
 
@@ -51,8 +54,15 @@ public final class PlayerFogOfWar implements Serializable {
         return visionCount.getOrDefault(position, 0) > 0;
     }
 
-    Set<Position> placeEntity(Entity entity, Position position) {
-        if (!hasVision(entity))
+    public List<Position> visiblePositions() {
+        return visionCount.keySet()
+                .stream()
+                .filter(this::isVisible)
+                .toList();
+    }
+
+    public Set<Position> placeEntity(Entity entity, Position position) {
+        if (!entity.owner().equals(playerID) || !hasVision(entity))
             return Set.of();
 
         VisionArea area = new VisionArea(position, getVisionRange(entity));
@@ -61,7 +71,7 @@ public final class PlayerFogOfWar implements Serializable {
         return changed;
     }
 
-    Set<Position> removeEntity(EntityID entityID) {
+    public Set<Position> removeEntity(EntityID entityID) {
         if (!entityVision.containsKey(entityID))
             return Set.of();
 
@@ -71,7 +81,7 @@ public final class PlayerFogOfWar implements Serializable {
         return changed;
     }
 
-    Set<Position> moveEntity(EntityID entityID, Position destination) {
+    public Set<Position> moveEntity(EntityID entityID, Position destination) {
         if (!entityVision.containsKey(entityID))
             return Set.of();
 

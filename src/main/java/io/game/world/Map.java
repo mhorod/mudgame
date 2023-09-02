@@ -1,55 +1,160 @@
 package io.game.world;
 
+import core.entities.EntityBoardView;
+import core.model.EntityID;
+import core.model.Position;
 import core.terrain.TerrainView;
+import core.terrain.model.TerrainType;
+import io.animation.Animation;
+import io.animation.Finishable;
 import io.game.Camera;
 import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
 import io.game.world.arrow.ArrowKind;
-import io.game.world.arrow.Direction;
+import io.game.world.entity.*;
 import io.game.world.tile.Tile;
 import io.game.world.tile.TileKind;
-import io.game.world.unit.Unit;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.TextureBank;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-public class Map {
-    Tile[][] tiles;
+public class Map implements Animation {
     ArrowKind[][] arrows;
-    Unit unit = new Unit(new WorldPosition(2, 3, 1));
+    HashMap<EntityID, EntityAnimation> entityAnimations = new HashMap<>();
+    HashMap<Position, EntityAnimation> tileAnimations = new HashMap<>();
+    ArrayList<EntityAnimation> otherAnimations = new ArrayList<>();
     private final TerrainView terrain;
+    private final EntityBoardView entities;
+    private final ArrayList<Position> path = new ArrayList<>();
 
-    public Map(TerrainView terrain) {
+    public Map(TerrainView terrain, EntityBoardView entities) {
         this.terrain = terrain;
+        this.entities = entities;
         arrows = new ArrowKind[terrain.size().width()][terrain.size().height()];
-        arrows[2][3] = new ArrowKind(Direction.NONE, Direction.NE);
-        arrows[2][2] = new ArrowKind(Direction.SW, Direction.NE);
-        arrows[2][1] = new ArrowKind(Direction.SW, Direction.NONE);
     }
 
-    public void getEntityAt(ScreenPosition position, TextureBank textureBank, Camera camera) {
-        System.out.println(unit.contains(position, textureBank, camera));
+    public void setPath(List<Position> positions) {
+        path.clear();
+        path.addAll(positions);
+    }
+
+    private void setAnimation(EntityID entityID, EntityAnimation animation) {
+        animation.init(entityFromID(entityID));
+        entityAnimations.put(entityID, animation);
+    }
+
+    private WorldEntity entityFromID(EntityID id) {
+        if (entityAnimations.containsKey(id))
+            return entityAnimations.get(id).getEntity();
+        return new Entity(WorldPosition.from(entities.entityPosition(id)), id);
+    }
+
+    public void objectAt(ScreenPosition position, TextureBank textureBank, Camera camera, MapObserver listener) {
+        var clickedEntity = entities.allEntities().stream()
+                .map(core.entities.model.Entity::id)
+                .map(this::entityFromID)
+                .filter(entity -> entity.contains(position, textureBank, camera))
+                .findFirst();
+        if (clickedEntity.isPresent()) {
+            listener.onEntity(((Entity) clickedEntity.get()).getId());
+            return;
+        }
+        var tile = camera.getTile(position);
+        if (terrain.terrainAt(tile) != TerrainType.VOID)
+            listener.onTile(tile);
     }
 
     public void draw(Canvas canvas, Camera camera) {
         ArrayList<Tile> fogTiles = new ArrayList<>();
+        ArrayList<WorldEntity> entitiesToDraw = new ArrayList<>();
         camera.forAllVisibleTiles(canvas.getAspectRatio(), pos -> {
-            switch (terrain.terrainAt(pos)) {
-                case UNKNOWN -> new Tile(pos, TileKind.FOG).draw(canvas, camera);
-                case WATER -> new Tile(pos, TileKind.TILE_LIGHT);
-                case LAND -> new Tile(pos, TileKind.TILE_DARK).draw(canvas, camera);
+            if (tileAnimations.containsKey(pos)) {
+                tileAnimations.get(pos).getEntity().draw(canvas, camera);
+            } else {
+                switch (terrain.terrainAt(pos)) {
+                    case UNKNOWN -> fogTiles.add(new Tile(pos, TileKind.FOG));
+                    case WATER -> new Tile(pos, TileKind.TILE_LIGHT).draw(canvas, camera);
+                    case LAND -> new Tile(pos, TileKind.TILE_DARK).draw(canvas, camera);
+                }
             }
 
-            if (pos.x() < 0 || pos.x() >= terrain.size().width() || pos.y() < 0 || pos.y() >= terrain.size().height())
-                return;
-            if (arrows[pos.x()][pos.y()] != null) {
-                new Arrow(pos, arrows[pos.x()][pos.y()]).draw(canvas, camera);
-            }
+
+            entitiesToDraw.addAll(
+                    entities.entitiesAt(pos).stream()
+                            .filter(e -> !entityAnimations.containsKey(e.id()))
+                            .map(e -> entityFromID(e.id()))
+                            .toList()
+            );
         });
-        for (var tile : fogTiles)
-            tile.draw(canvas, camera);
-        unit.draw(canvas, camera);
+
+        Arrow.fromPositions(path).forEach(arrow -> arrow.draw(canvas, camera));
+
+        entitiesToDraw.addAll(entityAnimations.values().stream().map(EntityAnimation::getEntity).toList());
+        entitiesToDraw.addAll(otherAnimations.stream().map(EntityAnimation::getEntity).toList());
+        entitiesToDraw.sort((a, b) -> {
+            var valA = a.getPosition().x() + a.getPosition().y();
+            var valB = b.getPosition().x() + b.getPosition().y();
+            return (int) (100 * (valA - valB));
+        });
+        entitiesToDraw.forEach(entity -> entity.drawShadow(canvas, camera));
+        fogTiles.forEach(fog -> fog.draw(canvas, camera));
+        entitiesToDraw.forEach(entity -> entity.draw(canvas, camera));
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        otherAnimations.forEach(animation -> animation.update(deltaTime));
+        entityAnimations.values().forEach(animation -> animation.update(deltaTime));
+        tileAnimations.values().forEach(animation -> animation.update(deltaTime));
+
+        otherAnimations.removeIf(Animation::finished);
+        entityAnimations.entrySet().stream()
+                .filter((entry) -> entry.getValue().finished())
+                .toList()
+                .forEach(entry -> entityAnimations.remove(entry.getKey()));
+        tileAnimations.entrySet().stream()
+                .filter((entry) -> entry.getValue().finished())
+                .toList()
+                .forEach(entry -> tileAnimations.remove(entry.getKey()));
+    }
+
+    public void pickUp(EntityID entity) {
+        setAnimation(entity, new AnimationChain(List.of(new Raise(), new Hover())));
+    }
+
+    public void putDown(EntityID entity) {
+        setAnimation(entity, new Drop());
+    }
+
+    public Finishable removeFog(Position position) {
+        var animation = new Dissipate();
+        animation.init(new WorldEntity(WorldPosition.from(position), WorldTexture.FOG, false));
+        otherAnimations.add(animation);
+        return animation;
+    }
+
+    public Finishable addFog(Position position) {
+        var tileReplacement = new Exist(Condense.TIME);
+        tileReplacement.init(new WorldEntity(WorldPosition.from(position), WorldTexture.TILE_DARK, false));
+        var animation = new Condense();
+        animation.init(new WorldEntity(WorldPosition.from(position), WorldTexture.FOG, false));
+        otherAnimations.add(animation);
+        tileAnimations.put(position, tileReplacement);
+        return animation;
+    }
+
+    public Finishable moveAlongPath(EntityID entity, List<Position> path) {
+        var animation = new AnimationChain(List.of(new Drop(), new MoveAlong(path)));
+        setAnimation(entity, animation);
+        return animation;
+    }
+
+    @Override
+    public boolean finished() {
+        return false;
     }
 }

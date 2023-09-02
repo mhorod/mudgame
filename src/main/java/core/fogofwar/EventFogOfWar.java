@@ -1,17 +1,22 @@
 package core.fogofwar;
 
 import core.events.ConditionalEventObserver;
-import core.events.Event;
 import core.events.EventObserver;
+import core.events.EventOccurrence;
+import core.events.EventOccurrenceObserver;
 import core.model.PlayerID;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
+import java.util.Map;
 
-public final class EventFogOfWar implements EventObserver {
+import static java.util.stream.Collectors.toMap;
+
+@Slf4j
+public final class EventFogOfWar implements EventOccurrenceObserver {
 
     private final FogOfWar fow;
     private final ConditionalEventObserver eventObserver;
-    private final List<EventPlayerFogOfWar> eventFows;
+    private final Map<PlayerID, EventPlayerFogOfWar> eventFows;
 
 
     public EventFogOfWar(FogOfWar fow, ConditionalEventObserver eventObserver) {
@@ -19,8 +24,7 @@ public final class EventFogOfWar implements EventObserver {
         this.eventObserver = eventObserver;
         eventFows = fow.players()
                 .stream()
-                .map(this::mapToPlayerFow)
-                .toList();
+                .collect(toMap(p -> p, this::mapToPlayerFow));
     }
 
     private EventPlayerFogOfWar mapToPlayerFow(PlayerID id) {
@@ -34,8 +38,10 @@ public final class EventFogOfWar implements EventObserver {
         return e -> eventObserver.receive(e, i -> i == id);
     }
 
-
-    public void receive(Event event) {
-        eventFows.forEach(f -> f.receive(event));
+    @Override
+    public void receive(EventOccurrence eventOccurrence) {
+        log.info("Received event occurrence: {}", eventOccurrence);
+        for (PlayerID p : eventOccurrence.recipients())
+            eventFows.get(p).receive(eventOccurrence.event());
     }
 }

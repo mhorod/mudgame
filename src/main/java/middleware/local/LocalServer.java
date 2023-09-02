@@ -24,15 +24,16 @@ public final class LocalServer {
         core = new ServerCore(state, this::sendEvent);
     }
 
+    // TODO this is cursed, fix it
     public LocalServer(int playerCount) {
-        this(ServerCore.newGameState(playerCount));
+        this(new ServerCore(playerCount).state());
     }
 
     public ServerGameState state() {
         return core.state();
     }
 
-    public List<GameClient> clients() {
+    public List<GameClient> getClients() {
         return Collections.unmodifiableList(clients);
     }
 
