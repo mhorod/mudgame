@@ -39,7 +39,7 @@ public abstract class WorldState implements WorldBehavior {
 
     @Override
     public void onPlaceEntity(PlaceEntity event) {
-        state.map().createUnit(event.position(), event.entity().id());
+        state.map().createUnit(event.position(), event.entity());
         nextEvent();
     }
 

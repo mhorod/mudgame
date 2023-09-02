@@ -15,6 +15,7 @@ import io.game.world.tile.Tile;
 import io.game.world.tile.TileKind;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
+import io.model.engine.Color;
 import io.model.engine.TextureBank;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class Map implements Animation {
     private WorldEntity entityFromID(EntityID id) {
         if (entityAnimations.containsKey(id))
             return entityAnimations.get(id).getEntity();
-        return new Entity(WorldPosition.from(entities.entityPosition(id)), id);
+        return new Entity(WorldPosition.from(entities.entityPosition(id)), id, Color.fromPlayerId(entities.findEntityByID(id).owner()));
     }
 
     public void objectAt(ScreenPosition position, TextureBank textureBank, Camera camera, MapObserver listener) {
@@ -144,16 +145,16 @@ public class Map implements Animation {
         return animation;
     }
 
-    public Finishable createUnit(Position position, EntityID entity) {
+    public Finishable createUnit(Position position, core.entities.model.Entity entity) {
         var animation = new Condense();
-        animation.init(new Entity(WorldPosition.from(position), entity));
-        entityAnimations.put(entity, animation);
+        animation.init(new Entity(WorldPosition.from(position), entity.id(), Color.fromPlayerId(entity.owner())));
+        entityAnimations.put(entity.id(), animation);
         return animation;
     }
 
     public Finishable removeUnit(Position position, EntityID entity) {
         var animation = new Dissipate();
-        animation.init(new Entity(WorldPosition.from(position), entity));
+        animation.init(new Entity(WorldPosition.from(position), entity, Color.fromPlayerId(entities.findEntityByID(entity).owner())));
         entityAnimations.put(entity, animation);
         return animation;
     }
