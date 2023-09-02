@@ -13,7 +13,7 @@ public enum WorldTexture {
     TILE_LIGHT(Texture.TILE_LIGHT, new Center(0.5f, 0.58f), 1.0f),
     FOG(Texture.FOG, new Center(0.5f, 0.5f), 1.15f),
     SHADOW(Texture.SHADOW, new Center(0.5f, 0.5f), 1.0f),
-    UNIT(Texture.UNIT, new Center(0.5f, 0.37f), 1.0f),
+    UNIT(Texture.UNIT, new Center(0.5f, 0.35f), 1.0f),
     ARROW_NONE(Texture.ARROW_NONE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SW_NE(Texture.ARROW_SW_NE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SE_NW(Texture.ARROW_SE_NW, new Center(0.5f, 0.5f), 1.0f),
@@ -28,7 +28,8 @@ public enum WorldTexture {
     ARROW_SE_NE(Texture.ARROW_SE_NE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SW_SE(Texture.ARROW_SW_SE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SW_NW(Texture.ARROW_SW_NW, new Center(0.5f, 0.5f), 1.0f),
-    ARROW_NW_NE(Texture.ARROW_NW_NE, new Center(0.5f, 0.5f), 1.0f);
+    ARROW_NW_NE(Texture.ARROW_NW_NE, new Center(0.5f, 0.5f), 1.0f),
+    BASE(Texture.BASE, new Center(0.5f, 0.27f), 1.0f);
     private final Texture texture;
     private final Center center;
     private final float width;
