@@ -1,6 +1,6 @@
 package core.server.rules;
 
-import core.events.Event.Action;
+import core.events.Action;
 import core.model.PlayerID;
 
 import java.io.Serializable;

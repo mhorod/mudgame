@@ -1,5 +1,6 @@
 package core.turns;
 
-import core.events.Event.Action;
+import core.events.Action;
 
-public record CompleteTurn() implements Action { }
+public record CompleteTurn() implements Action {
+}

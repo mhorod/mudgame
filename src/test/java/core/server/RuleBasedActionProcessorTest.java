@@ -1,6 +1,6 @@
 package core.server;
 
-import core.events.Event.Action;
+import core.events.Action;
 import core.events.EventObserver;
 import core.model.PlayerID;
 import core.server.rules.ActionRule;

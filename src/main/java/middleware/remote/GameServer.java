@@ -1,6 +1,6 @@
-package middleware;
+package middleware.remote;
 
-import core.events.Event.Action;
+import core.events.Action;
 import middleware.communicators.MultiSender;
 import middleware.communicators.NotificationProcessor;
 import middleware.communicators.Sender;

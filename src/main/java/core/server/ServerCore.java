@@ -5,7 +5,7 @@ import core.entities.EntityBoardView;
 import core.entities.EventEntityBoard;
 import core.events.ConditionalEventObserver;
 import core.events.Event;
-import core.events.Event.Action;
+import core.events.Action;
 import core.events.EventObserver;
 import core.events.EventOccurrence;
 import core.fogofwar.EventFogOfWar;

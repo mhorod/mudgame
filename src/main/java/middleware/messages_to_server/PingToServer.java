@@ -1,8 +1,8 @@
 package middleware.messages_to_server;
 
-import middleware.GameServer;
-import middleware.UserID;
 import middleware.messages_to_client.PingToClient;
+import middleware.remote.GameServer;
+import middleware.remote.UserID;
 
 public record PingToServer(String pingText, Boolean requireResponse) implements MessageToServer {
     @Override

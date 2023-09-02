@@ -1,4 +1,4 @@
-package middleware;
+package middleware.remote;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

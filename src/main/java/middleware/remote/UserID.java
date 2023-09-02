@@ -1,4 +1,4 @@
-package middleware;
+package middleware.remote;
 
 public record UserID(long id) {
 }

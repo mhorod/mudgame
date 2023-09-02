@@ -13,7 +13,8 @@ import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import middleware.Client;
-import middleware.LocalServer;
+import middleware.GameClient;
+import middleware.local.LocalServer;
 import middleware.messages_to_server.ActionMessage;
 
 import java.util.List;
@@ -30,20 +31,18 @@ public class GameView extends SimpleView {
         }
     };
 
-    private final Client me;
+    private final GameClient me;
 
     public GameView() {
         animations.addAnimation(cameraController);
-        var clients = LocalServer.of(3);
+        var clients = new LocalServer(3).clients();
         me = clients.get(0);
-        me.processAllMessages();
-        me.sendMessage(new ActionMessage(new CreateEntity(
+        me.sendAction(new CreateEntity(
                 List.of(new Vision(2)),
                 me.myPlayerID(),
                 new Position(2, 2)
-        )));
-        me.processAllMessages();
-        map = new Map(me.getGameState().orElseThrow().terrain());
+        ));
+        map = new Map(me.getGameState().terrain());
     }
 
     @Override
@@ -53,7 +52,6 @@ public class GameView extends SimpleView {
 
     @Override
     public void update(Input input, TextureBank bank) {
-        me.processAllMessages();
         input.events().forEach(event -> event.accept(new EventHandler() {
             @Override
             public void onClick(Click click) {
