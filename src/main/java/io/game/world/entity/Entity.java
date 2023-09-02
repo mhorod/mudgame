@@ -1,5 +1,6 @@
 package io.game.world.entity;
 
+import core.model.EntityID;
 import io.game.Camera;
 import io.game.WorldPosition;
 import io.game.world.WorldEntity;
@@ -10,9 +11,15 @@ import io.model.engine.TextureBank;
 
 public class Entity implements WorldEntity {
     public WorldPosition position;
+    private final EntityID id;
 
-    public Entity(WorldPosition position) {
+    public Entity(WorldPosition position, EntityID id) {
         this.position = position;
+        this.id = id;
+    }
+
+    public EntityID getId() {
+        return id;
     }
 
     public boolean contains(ScreenPosition position, TextureBank bank, Camera camera) {
@@ -21,8 +28,11 @@ public class Entity implements WorldEntity {
 
     @Override
     public void draw(Canvas canvas, Camera camera) {
-        WorldTexture.SHADOW.draw(new WorldPosition(position.x(), position.y(), 0), canvas, camera);
         WorldTexture.UNIT.draw(getPosition(), canvas, camera);
+    }
+
+    public void drawShadow(Canvas canvas, Camera camera) {
+        WorldTexture.SHADOW.draw(new WorldPosition(position.x(), position.y(), 0), canvas, camera);
     }
 
 

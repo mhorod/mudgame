@@ -49,9 +49,9 @@ public record ArrowKind(Direction from, Direction to) {
     }
 
     public static List<ArrowKind> fromPositions(List<Position> positions) {
-        ArrayList<ArrowKind> result = new ArrayList<>();
-        if (positions.isEmpty()) return result;
+        if (positions.isEmpty()) return List.of();
         if (positions.size() == 1) return List.of(new ArrowKind(Direction.NONE, Direction.NONE));
+        ArrayList<ArrowKind> result = new ArrayList<>();
         result.add(new ArrowKind(Direction.NONE, Direction.between(positions.get(0), positions.get(1))));
         for (int i = 1; i < positions.size() - 1; i++) {
             var prev = positions.get(i - 1);

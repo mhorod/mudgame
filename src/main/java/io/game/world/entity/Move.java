@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Move extends AnimationChain {
-    private static final float SPEED = 2;
+    private static final float SPEED = 3;
 
 
     public Move(Position tile, Direction from, Direction to) {
