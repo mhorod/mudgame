@@ -40,10 +40,12 @@ public abstract class WorldState implements WorldBehavior {
     @Override
     public void onPlaceEntity(PlaceEntity event) {
         state.map().createUnit(event.position(), event.entity().id());
+        nextEvent();
     }
 
     @Override
     public void onRemoveEntity(RemoveEntity event) {
         state.map().removeUnit(state.entities().entityPosition(event.entityID()), event.entityID());
+        nextEvent();
     }
 }

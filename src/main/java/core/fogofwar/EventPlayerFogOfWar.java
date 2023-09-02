@@ -9,10 +9,12 @@ import core.fogofwar.events.SetVisibility;
 import core.fogofwar.events.SetVisibility.SetPositionVisibility;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @RequiredArgsConstructor
 public class EventPlayerFogOfWar implements EventObserver {
 

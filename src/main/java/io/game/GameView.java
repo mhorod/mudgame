@@ -1,8 +1,8 @@
 package io.game;
 
-import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
+import core.entities.events.RemoveEntity;
 import core.events.Event;
 import core.model.EntityID;
 import core.model.Position;
@@ -40,7 +40,7 @@ public class GameView extends SimpleView {
     private boolean eventObserved = false;
 
     public GameView() {
-        var clients = LocalServer.of(3);
+        var clients = LocalServer.of(5);
         me = clients.get(0);
         me.processAllMessages();
         map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
@@ -53,7 +53,8 @@ public class GameView extends SimpleView {
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
-                        me.getCommunicator().sendMessage(new ActionMessage(new MoveEntity(id, destination)));
+                        me.getCommunicator()
+                                .sendMessage(new ActionMessage(new MoveEntity(id, destination)));
                     }
 
                     @Override
@@ -78,11 +79,19 @@ public class GameView extends SimpleView {
         } else if (event instanceof PlaceEntity) {
             eventObserved = true;
             worldController.onPlaceEntity((PlaceEntity) event);
+        } else if (event instanceof RemoveEntity) {
+            eventObserved = true;
+            worldController.onRemoveEntity((RemoveEntity) event);
         }
     }
 
     private boolean canEatEvent() {
-        return me.peekEvent().stream().anyMatch(event -> !(event instanceof MoveEntity) && !(event instanceof SetTerrain) && !(event instanceof CreateEntity));
+        return me.peekEvent().stream().anyMatch(
+                event -> !(event instanceof MoveEntity)
+                        && !(event instanceof SetTerrain)
+                        && !(event instanceof PlaceEntity)
+                        && !(event instanceof RemoveEntity)
+        );
     }
 
     @Override

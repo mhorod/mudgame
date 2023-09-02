@@ -44,6 +44,10 @@ public class Terrain implements TerrainView, Serializable {
         return terrainMap.getOrDefault(position, VOID);
     }
 
+    public boolean contains(Position position) {
+        return terrainMap.containsKey(position);
+    }
+
     void setTerrainAt(Position position, TerrainType terrainType) {
         terrainMap.computeIfPresent(position, (pos, old) -> terrainType);
     }
