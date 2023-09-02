@@ -10,7 +10,6 @@ import io.animation.Finishable;
 import io.game.Camera;
 import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
-import io.game.world.arrow.ArrowKind;
 import io.game.world.entity.*;
 import io.game.world.tile.Tile;
 import io.game.world.tile.TileKind;
@@ -23,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Map implements Animation {
-    ArrowKind[][] arrows;
     HashMap<EntityID, EntityAnimation> entityAnimations = new HashMap<>();
     HashMap<Position, EntityAnimation> tileAnimations = new HashMap<>();
     ArrayList<EntityAnimation> otherAnimations = new ArrayList<>();
@@ -34,7 +32,6 @@ public class Map implements Animation {
     public Map(TerrainView terrain, EntityBoardView entities) {
         this.terrain = terrain;
         this.entities = entities;
-        arrows = new ArrowKind[terrain.size().width()][terrain.size().height()];
     }
 
     public void setPath(List<Position> positions) {
@@ -144,6 +141,20 @@ public class Map implements Animation {
         animation.init(new WorldEntity(WorldPosition.from(position), WorldTexture.FOG, false));
         otherAnimations.add(animation);
         tileAnimations.put(position, tileReplacement);
+        return animation;
+    }
+
+    public Finishable createUnit(Position position, EntityID entity) {
+        var animation = new Condense();
+        animation.init(new Entity(WorldPosition.from(position), entity));
+        entityAnimations.put(entity, animation);
+        return animation;
+    }
+
+    public Finishable removeUnit(Position position, EntityID entity) {
+        var animation = new Dissipate();
+        animation.init(new Entity(WorldPosition.from(position), entity));
+        entityAnimations.put(entity, animation);
         return animation;
     }
 
