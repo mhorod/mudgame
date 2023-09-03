@@ -1,11 +1,13 @@
 package io.game;
 
+import core.entities.events.CreateEntity;
 import core.entities.events.HideEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
 import core.entities.events.ShowEntity;
 import core.events.Event;
+import core.events.Event.Action;
 import core.model.EntityID;
 import core.model.Position;
 import core.terrain.events.SetTerrain;
@@ -25,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import middleware.Client;
 import middleware.LocalServer;
 import middleware.messages_to_server.ActionMessage;
+
+import static core.entities.model.EntityType.PAWN;
 
 @Slf4j
 public class GameView extends SimpleView {
@@ -59,6 +63,12 @@ public class GameView extends SimpleView {
                     public void moveEntity(EntityID id, Position destination) {
                         me.getCommunicator()
                                 .sendMessage(new ActionMessage(new MoveEntity(id, destination)));
+                    }
+
+                    @Override
+                    public void createEntity(Position position) {
+                        Action action = new CreateEntity(PAWN, me.myPlayerID(), position);
+                        me.getCommunicator().sendMessage(new ActionMessage(action));
                     }
 
                     @Override

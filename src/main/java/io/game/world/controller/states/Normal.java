@@ -22,6 +22,7 @@ public class Normal extends WorldState {
 
     @Override
     public void onTileClick(Position position) {
+        state.controls().createEntity(position);
     }
 
     @Override
@@ -46,10 +47,11 @@ public class Normal extends WorldState {
     public void onMoveEntity(MoveEntity event) {
         state.animatedEvents().add(event);
         onFinish(state.map().moveAlongPath(
-                        event.entityID(),
-                        Arrow.pathBetween(state.entities().entityPosition(event.entityID()), event.destination())
-                ),
-                () -> state.animatedEvents().remove(event));
+                         event.entityID(),
+                         Arrow.pathBetween(state.entities().entityPosition(event.entityID()),
+                                           event.destination())
+                 ),
+                 () -> state.animatedEvents().remove(event));
         nextEvent();
     }
 
@@ -57,10 +59,12 @@ public class Normal extends WorldState {
     public void onSetTerrain(SetTerrain event) {
         state.animatedEvents().add(event);
         var fogAdded = event.positions().stream()
-                .filter(spt -> spt.terrainType() == TerrainType.UNKNOWN && state.terrain().terrainAt(spt.position()) != TerrainType.UNKNOWN)
+                .filter(spt -> spt.terrainType() == TerrainType.UNKNOWN &&
+                               state.terrain().terrainAt(spt.position()) != TerrainType.UNKNOWN)
                 .map(spt -> state.map().addFog(spt.position()));
         var fogRemoved = event.positions().stream()
-                .filter(spt -> spt.terrainType() != TerrainType.UNKNOWN && state.terrain().terrainAt(spt.position()) == TerrainType.UNKNOWN)
+                .filter(spt -> spt.terrainType() != TerrainType.UNKNOWN &&
+                               state.terrain().terrainAt(spt.position()) == TerrainType.UNKNOWN)
                 .map(spt -> state.map().removeFog(spt.position()));
 
         onFinish(

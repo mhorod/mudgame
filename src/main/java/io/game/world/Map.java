@@ -161,8 +161,8 @@ public class Map implements Animation {
     }
 
     public Finishable createEntity(Position position, core.entities.model.Entity entity) {
-        var animation = new Condense();
-        animation.init(new Entity(WorldPosition.from(position), entity.id(),
+        var animation = new Drop();
+        animation.init(new Entity(WorldPosition.from(position, 2), entity.id(),
                                   Color.fromPlayerId(entity.owner())));
         entityAnimations.put(entity.id(), animation);
         return animation;
