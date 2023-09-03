@@ -10,6 +10,7 @@ import io.game.world.arrow.Arrow;
 import io.game.world.controller.CommonState;
 import io.game.world.controller.WorldState;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 public class UnitSelected extends WorldState {
@@ -18,6 +19,7 @@ public class UnitSelected extends WorldState {
     public UnitSelected(CommonState state, EntityID unit) {
         super(state);
         this.selectedUnit = unit;
+        state.map().setHighlightedTiles(state.pathfinder().reachablePositions(selectedUnit).getPositions().stream().toList());
     }
 
     @Override
@@ -41,10 +43,8 @@ public class UnitSelected extends WorldState {
 
     @Override
     public void onTileHover(Position position) {
-        state.map().setPath(Arrow.pathBetween(
-                state.entities().entityPosition(selectedUnit),
-                position
-        ));
+        if (!state.pathfinder().isReachable(selectedUnit, position)) return;
+        state.map().setPath(state.pathfinder().findPath(selectedUnit, position));
     }
 
     @Override
@@ -55,11 +55,15 @@ public class UnitSelected extends WorldState {
     @Override
     public void onMoveEntity(MoveEntity event) {
         state.animatedEvents().add(event);
-        onFinish(state.map().moveAlongPath(
-                        event.entityID(),
-                        Arrow.pathBetween(state.entities().entityPosition(event.entityID()), event.destination())
-                ),
-                () -> state.animatedEvents().remove(event));
+        List<Position> path;
+        if (state.pathfinder().isReachable(event.entityID(), event.destination()))
+            path = state.pathfinder().findPath(event.entityID(), event.destination());
+        else
+            path = Arrow.pathBetween(state.entities().entityPosition(event.entityID()), event.destination());
+        onFinish(
+                state.map().moveAlongPath(event.entityID(), path),
+                () -> state.animatedEvents().remove(event)
+        );
         if (event.entityID().equals(selectedUnit))
             change(new Normal(state));
         nextEvent();

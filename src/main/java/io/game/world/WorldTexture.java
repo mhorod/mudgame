@@ -11,8 +11,9 @@ import io.model.textures.TextureDrawData;
 
 public enum WorldTexture {
 
-    TILE_DARK(Texture.TILE_DARK, new Center(0.5f, 0.58f), 1.0f),
-    TILE_LIGHT(Texture.TILE_LIGHT, new Center(0.5f, 0.58f), 1.0f),
+    TILE_DARK(Texture.TILE_DARK, new Center(0.5f, 0.668f), 1.01f),
+    TILE_LIGHT(Texture.TILE_LIGHT, new Center(0.5f, 0.668f), 1.0f),
+    TILE_HIGHLIGHT(Texture.TILE_HIGHLIGHT, new Center(0.5f, 0.5f), 1f),
     FOG(Texture.FOG, new Center(0.5f, 0.5f), 1.15f),
     SHADOW(Texture.SHADOW, new Center(0.5f, 0.5f), 1.0f),
     ARROW_NONE(Texture.ARROW_NONE, new Center(0.5f, 0.5f), 1.0f),

@@ -18,6 +18,7 @@ import io.model.engine.Canvas;
 import io.model.engine.TextureBank;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class Map implements Animation {
     private final TerrainView terrain;
     private final EntityBoardView entities;
     private final ArrayList<Position> path = new ArrayList<>();
+    private Collection<Position> highlightedTiles = null;
 
     public Map(TerrainView terrain, EntityBoardView entities) {
         this.terrain = terrain;
@@ -37,6 +39,10 @@ public class Map implements Animation {
     public void setPath(List<Position> positions) {
         path.clear();
         path.addAll(positions);
+    }
+
+    public void setHighlightedTiles(List<Position> positions) {
+        highlightedTiles = positions;
     }
 
     private void setAnimation(EntityID entityID, EntityAnimation animation) {
@@ -69,16 +75,22 @@ public class Map implements Animation {
 
     public void draw(Canvas canvas, Camera camera) {
         ArrayList<Tile> fogTiles = new ArrayList<>();
+        ArrayList<WorldEntity> highlightTiles = new ArrayList<>();
         ArrayList<WorldEntity> entitiesToDraw = new ArrayList<>();
         camera.forAllVisibleTiles(canvas.getAspectRatio(), pos -> {
             if (tileAnimations.containsKey(pos)) {
                 tileAnimations.get(pos).getEntity().draw(canvas, camera);
             } else {
-                switch (terrain.terrainAt(pos)) {
+                var tile = terrain.terrainAt(pos);
+                switch (tile) {
                     case UNKNOWN -> fogTiles.add(new Tile(pos, TileKind.FOG));
                     case WATER -> new Tile(pos, TileKind.TILE_LIGHT).draw(canvas, camera);
                     case LAND -> new Tile(pos, TileKind.TILE_DARK).draw(canvas, camera);
                 }
+                if (highlightedTiles != null && !highlightedTiles.contains(pos) && tile == TerrainType.LAND)
+                    highlightTiles.add(
+                            new WorldEntity(WorldPosition.from(pos), WorldTexture.TILE_HIGHLIGHT, false)
+                    );
             }
 
 
@@ -89,6 +101,7 @@ public class Map implements Animation {
                             .toList()
             );
         });
+        highlightTiles.forEach(tile -> tile.draw(canvas, camera));
 
         Arrow.fromPositions(path).forEach(arrow -> arrow.draw(canvas, camera));
 

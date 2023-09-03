@@ -7,7 +7,7 @@ import io.model.ScreenPosition;
 import io.model.textures.TextureDrawData;
 
 public class TextureBank implements io.model.engine.TextureBank {
-    public final TextureRegion tileDark, tileLight, fog, unit, shadow, base, warrior, tower;
+    public final TextureRegion tileDark, tileLight, fog, unit, shadow, base, warrior, tower, tileHighlight;
     private final TextureRegion ARROW_NONE, ARROW_SW_NE, ARROW_SE_NW,
             ARROW_START_NE, ARROW_START_SE, ARROW_START_NW, ARROW_START_SW,
             ARROW_END_NE, ARROW_END_SE, ARROW_END_NW, ARROW_END_SW,
@@ -19,7 +19,7 @@ public class TextureBank implements io.model.engine.TextureBank {
     private static TextureRegion cutOut(
             Texture tex, int x, int y, float tile_width, float tile_height
     ) {
-        return new TextureRegion(tex, (int) (x * tile_width), (int) (y * tile_height),
+        return new TextureRegion(tex, x * (int) tile_width, y * (int) tile_height,
                 (int) tile_width, (int) tile_height);
     }
 
@@ -35,8 +35,9 @@ public class TextureBank implements io.model.engine.TextureBank {
         buttonSmallPressed = new TextureRegion(ui, 0, 181, 450, 181);
         logo = new TextureRegion(ui, 0, 362, 450, 544);
         fog = new TextureRegion(new Texture("fog.png"));
-        tileDark = new TextureRegion(tiles, 0, 0, 128, 89);
-        tileLight = new TextureRegion(tiles, 128, 0, 128, 89);
+        tileDark = new TextureRegion(tiles, 0, 0, 256, 222);
+        tileLight = new TextureRegion(tiles, 256, 0, 256, 222);
+        tileHighlight = new TextureRegion(tiles, 512, 0, 256, 148);
         unit = new TextureRegion(units, 88, 0, 80, 152);
         shadow = new TextureRegion(units, 0, 200, 256, 149);
         base = new TextureRegion(units, 24, 377, 208, 255);
@@ -65,6 +66,7 @@ public class TextureBank implements io.model.engine.TextureBank {
         return switch (texture) {
             case TILE_DARK -> tileDark;
             case TILE_LIGHT -> tileLight;
+            case TILE_HIGHLIGHT -> tileHighlight;
             case FOG -> fog;
             case PAWN -> unit;
             case SHADOW -> shadow;
