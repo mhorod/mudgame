@@ -2,7 +2,6 @@ package core.server;
 
 import core.client.ClientGameState;
 import core.entities.EntityBoard;
-import core.entities.EntityMovementManager;
 import core.fogofwar.FogOfWar;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
@@ -19,7 +18,6 @@ public record ServerGameState(
         EntityBoard entityBoard,
         FogOfWar fogOfWar,
         Terrain terrain,
-        EntityMovementManager entityMovementManager,
         List<ActionRule> rules
 ) implements Serializable {
     public ClientGameState toClientGameState(PlayerID playerID) {
@@ -33,7 +31,6 @@ public record ServerGameState(
                 entityBoard.applyFogOfWar(newFogOfWar),
                 newFogOfWar,
                 terrain.applyFogOfWar(newFogOfWar),
-                entityMovementManager.ofPlayer(playerID, entityBoard),
                 rules
         );
     }

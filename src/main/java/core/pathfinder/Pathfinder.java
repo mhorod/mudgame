@@ -1,7 +1,8 @@
 package core.pathfinder;
 
 import core.entities.EntityBoardView;
-import core.entities.EntityMovementManager;
+import core.entities.components.ComponentVisitor;
+import core.entities.components.Movement;
 import core.model.EntityID;
 import core.model.Position;
 import core.terrain.TerrainView;
@@ -15,6 +16,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -24,9 +27,17 @@ import static java.util.Comparator.comparing;
 public class Pathfinder {
     private final TerrainView terrain;
     private final EntityBoardView entityBoard;
-    private final EntityMovementManager entityMovementManager;
 
     private record PositionOnPath(Position position, int movementLeft) { }
+
+    private class MovementVisitor implements ComponentVisitor<Integer> {
+        @Override
+        public Integer visit(Movement m) {
+            return m.getCurrentMovement();
+        }
+    }
+
+    private final MovementVisitor movementVisitor = new MovementVisitor();
 
     @RequiredArgsConstructor
     public static class ReachablePositions {
@@ -37,6 +48,10 @@ public class Pathfinder {
         private ReachablePositions(Map<Position, Position> parents) {
             positions = parents.keySet();
             this.parents = parents;
+        }
+
+        private static ReachablePositions empty() {
+            return new ReachablePositions(Map.of());
         }
 
         public List<Position> getPath(Position destination) {
@@ -62,13 +77,17 @@ public class Pathfinder {
 
 
     public ReachablePositions reachablePositions(EntityID entityID) {
+        Optional<Integer> optionalMovement = getTurnMovement(entityID);
+        if (optionalMovement.isEmpty())
+            return ReachablePositions.empty();
+        int movement = optionalMovement.get();
+
         Map<Position, Position> parents = new HashMap<>();
         PriorityQueue<PositionOnPath> awaiting = new PriorityQueue<>(
                 comparing(p -> -p.movementLeft)
         );
 
         Position position = entityBoard.entityPosition(entityID);
-        int movement = entityMovementManager.getTurnMovement(entityID);
 
         parents.put(position, null);
         awaiting.add(new PositionOnPath(position, movement));
@@ -85,25 +104,35 @@ public class Pathfinder {
         return new ReachablePositions(parents);
     }
 
+    Optional<Integer> getTurnMovement(EntityID entityID) {
+        return entityBoard.findEntityByID(entityID)
+                .components()
+                .stream()
+                .map(movementVisitor::visit)
+                .filter(Objects::nonNull)
+                .findFirst();
+    }
+
+
     List<PositionOnPath> neighbors(EntityID entityID, PositionOnPath p) {
         List<PositionOnPath> result = new ArrayList<>();
         for (int dx = -1; dx <= 1; dx++)
             for (int dy = -1; dy <= 1; dy++) {
                 Position pos = p.position().plus(dx, dy);
                 int cost = terrain.terrainAt(pos).getMovementCost();
-                if (canMoveToPosition(entityID, p))
+                if (canMoveToPosition(entityID, p, pos))
                     result.add(new PositionOnPath(pos, p.movementLeft() - cost));
             }
         return result;
     }
 
-    boolean canMoveToPosition(EntityID entityID, PositionOnPath p) {
-        TerrainType t = terrain.terrainAt(p.position());
+    boolean canMoveToPosition(EntityID entityID, PositionOnPath current, Position target) {
+        TerrainType t = terrain.terrainAt(target);
         if (t.getMovementCost() == -1)
             return false;
-        else if (t.getMovementCost() > p.movementLeft())
+        else if (t.getMovementCost() > current.movementLeft())
             return false;
-        else if (!entityBoard.entitiesAt(p.position()).isEmpty())
+        else if (!entityBoard.entitiesAt(target).isEmpty())
             return false;
         else
             return true;

@@ -2,7 +2,7 @@ package core.entities.components;
 
 public interface ComponentVisitor<T> {
     default T visit(Component component) {
-        return null;
+        return component.accept(this);
     }
     default T visit(Vision component) {
         return null;

@@ -1,7 +1,6 @@
 package core.client;
 
 import core.entities.EntityBoard;
-import core.entities.EntityMovementManager;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
 import core.server.rules.ActionRule;
@@ -17,7 +16,6 @@ public record ClientGameState(
         EntityBoard entityBoard,
         PlayerFogOfWar fogOfWar,
         Terrain terrain,
-        EntityMovementManager entityMovementManager,
         List<ActionRule> rules
 ) implements Serializable {
 }

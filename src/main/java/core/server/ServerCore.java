@@ -2,7 +2,6 @@ package core.server;
 
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
-import core.entities.EntityMovementManager;
 import core.entities.EventEntityBoard;
 import core.entities.model.Entity;
 import core.events.ConditionalEventObserver;
@@ -116,8 +115,7 @@ public final class ServerCore {
         this.eventOccurrenceObserver = eventOccurrenceObserver;
         this.pathfinder = new Pathfinder(
                 state.terrain(),
-                state.entityBoard(),
-                state.entityMovementManager()
+                state.entityBoard()
         );
     }
 
@@ -161,8 +159,7 @@ public final class ServerCore {
         setUpEventHandling(state, actionProcessor);
         this.pathfinder = new Pathfinder(
                 state.terrain(),
-                state.entityBoard(),
-                state.entityMovementManager()
+                state.entityBoard()
         );
     }
 
@@ -170,14 +167,12 @@ public final class ServerCore {
         PlayerManager playerManager = new PlayerManager(playerCount);
         FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
         EntityBoard entityBoard = new EntityBoard();
-        EntityMovementManager entityMovementManager = new EntityMovementManager();
 
         return new ServerGameState(
                 playerManager,
                 entityBoard,
                 fow,
                 terrain,
-                entityMovementManager,
                 defaultRules(playerManager, entityBoard, fow)
         );
     }

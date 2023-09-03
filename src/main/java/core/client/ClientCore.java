@@ -64,8 +64,7 @@ public final class ClientCore implements EventObserver {
         eventTerrain = new EventTerrain(state.terrain(), eventSink);
         pathfinder = new Pathfinder(
                 state().terrain(),
-                state.entityBoard(),
-                state.entityMovementManager()
+                state.entityBoard()
         );
     }
 
