@@ -1,9 +1,9 @@
 package middleware.messages_to_client;
 
-import middleware.Client;
+import middleware.remote.RemoteNetworkClient;
 
 import java.io.Serializable;
 
 public interface MessageToClient extends Serializable {
-    void execute(Client client);
+    void execute(RemoteNetworkClient client);
 }

@@ -2,7 +2,7 @@ package core;
 
 import core.client.ClientCore;
 import core.events.Event;
-import core.events.Event.Action;
+import core.events.Action;
 import core.server.ServerCore;
 import lombok.experimental.UtilityClass;
 

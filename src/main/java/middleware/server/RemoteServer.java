@@ -1,9 +1,12 @@
-package middleware;
+package middleware.server;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import middleware.communicators.CommunicatorComposer;
-import middleware.communicators.ServerSideCommunicator;
+import middleware.communication.NotifyingMessageProcessor;
+import middleware.communication.SocketReceiver;
+import middleware.communication.SocketSender;
+import middleware.messages_to_server.MessageToServer;
+import middleware.model.UserID;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -38,9 +41,9 @@ public final class RemoteServer {
                     userID.toString()
             ));
 
-            synchronized (this) {
-                ServerSideCommunicator communicator = CommunicatorComposer.remote(server, userID, socket);
-                server.addConnection(userID, communicator);
+            synchronized (server) {
+                server.addConnection(userID, new SocketSender<>(socket));
+                new SocketReceiver<>(socket, MessageToServer.class, new NotifyingMessageProcessor<>(userID, server));
             }
         }
     }

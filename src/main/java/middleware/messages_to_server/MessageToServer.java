@@ -1,7 +1,7 @@
 package middleware.messages_to_server;
 
-import middleware.GameServer;
-import middleware.UserID;
+import middleware.model.UserID;
+import middleware.server.GameServer;
 
 import java.io.Serializable;
 

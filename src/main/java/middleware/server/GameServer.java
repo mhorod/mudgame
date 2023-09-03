@@ -1,41 +1,35 @@
-package middleware;
+package middleware.server;
 
-import core.events.Event.Action;
-import middleware.communicators.MultiSender;
-import middleware.communicators.ServerSideCommunicator;
+import core.events.Action;
+import middleware.communication.NotificationProcessor;
+import middleware.communication.Sender;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_server.MessageToServer;
+import middleware.model.UserID;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class GameServer implements NotificationProcessor, MultiSender<MessageToClient> {
-    private final Map<UserID, ServerSideCommunicator> communicatorMap = new HashMap<>();
+public final class GameServer implements NotificationProcessor<MessageToServer> {
+    private final Map<UserID, Sender<MessageToClient>> senderMap = new HashMap<>();
     private final Map<UserID, Game> gameMap = new HashMap<>();
 
     @Override
-    public synchronized void processNotification(UserID source) {
-        ServerSideCommunicator communicator = communicatorMap.get(source);
-        if (communicator == null)
-            return;
-        while (communicator.hasMessage()) {
-            MessageToServer message = communicator.removeMessage();
-            message.execute(this, source);
-        }
+    public synchronized void processMessage(UserID source, MessageToServer message) {
+        message.execute(this, source);
     }
 
-    public void addConnection(UserID userID, ServerSideCommunicator communicator) {
-        if (communicatorMap.containsKey(userID))
+    public void addConnection(UserID userID, Sender<MessageToClient> sender) {
+        if (senderMap.containsKey(userID))
             throw new IllegalArgumentException(userID + " is already connected");
-        communicatorMap.put(userID, communicator);
+        senderMap.put(userID, sender);
     }
 
-    @Override
     public void sendMessage(UserID destination, MessageToClient message) {
-        ServerSideCommunicator communicator = communicatorMap.get(destination);
-        if (communicator != null)
-            communicator.sendMessage(message);
+        Sender<MessageToClient> sender = senderMap.get(destination);
+        if (sender != null)
+            sender.sendMessage(message);
     }
 
     public void startGame(List<UserID> usersToPlay) {

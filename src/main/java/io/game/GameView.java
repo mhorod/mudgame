@@ -2,7 +2,7 @@ package io.game;
 
 import core.entities.events.*;
 import core.events.Event;
-import core.events.Event.Action;
+import core.events.Action;
 import core.model.EntityID;
 import core.model.Position;
 import core.terrain.events.SetTerrain;
@@ -19,9 +19,8 @@ import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
-import middleware.Client;
-import middleware.LocalServer;
-import middleware.messages_to_server.ActionMessage;
+import middleware.clients.GameClient;
+import middleware.local.LocalServer;
 
 import static core.entities.model.EntityType.PAWN;
 
@@ -39,13 +38,12 @@ public class GameView extends SimpleView {
     };
     private final WorldController worldController;
 
-    private final Client me;
+    private final GameClient me;
     private boolean eventObserved = false;
 
     public GameView() {
-        var clients = LocalServer.of(5);
-        me = clients.get(0);
-        me.processAllMessages();
+        var server = new LocalServer(5);
+        me = server.getClients().get(0);
         map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
@@ -57,14 +55,13 @@ public class GameView extends SimpleView {
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
-                        me.getCommunicator()
-                                .sendMessage(new ActionMessage(new MoveEntity(id, destination)));
+                        me.sendAction(new MoveEntity(id, destination));
                     }
 
                     @Override
                     public void createEntity(Position position) {
                         Action action = new CreateEntity(PAWN, me.myPlayerID(), position);
-                        me.getCommunicator().sendMessage(new ActionMessage(action));
+                        me.sendAction(action);
                     }
 
                     @Override
@@ -120,7 +117,6 @@ public class GameView extends SimpleView {
 
     @Override
     public void update(Input input, TextureBank bank) {
-        me.processAllMessages();
         worldController.update();
         if (!eventObserved) {
             while (canEatEvent())

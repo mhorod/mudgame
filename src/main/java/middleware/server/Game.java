@@ -1,30 +1,30 @@
-package middleware;
+package middleware.server;
 
-import core.events.Event.Action;
+import core.events.Action;
 import core.events.EventOccurrence;
 import core.model.PlayerID;
 import core.server.ServerCore;
-import middleware.communicators.MultiSender;
 import middleware.messages_to_client.EventMessage;
 import middleware.messages_to_client.GameStartedMessage;
 import middleware.messages_to_client.MessageToClient;
+import middleware.model.UserID;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class Game {
+public final class Game {
     private final ServerCore core;
 
     private final List<PlayerID> playerIDs;
     private final Map<UserID, PlayerID> toPlayerIDMap = new HashMap<>();
     private final Map<PlayerID, UserID> fromPlayerIDMap = new HashMap<>();
 
-    private final MultiSender<MessageToClient> sender;
+    private final GameServer server;
 
-    public Game(List<UserID> userIDs, MultiSender<MessageToClient> sender) {
-        this.sender = sender;
+    public Game(List<UserID> userIDs, GameServer server) {
+        this.server = server;
 
         core = new ServerCore(userIDs.size(), this::processEventOccurrence);
         playerIDs = core.state().playerManager().getPlayerIDs();
@@ -39,7 +39,7 @@ public class Game {
     }
 
     void sendMessage(PlayerID destination, MessageToClient message) {
-        sender.sendMessage(fromPlayerID(destination), message);
+        server.sendMessage(fromPlayerID(destination), message);
     }
 
     private void processEventOccurrence(EventOccurrence eventOccurrence) {
