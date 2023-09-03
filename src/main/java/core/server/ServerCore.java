@@ -4,13 +4,25 @@ import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
 import core.entities.EventEntityBoard;
 import core.entities.model.Entity;
-import core.events.*;
+import core.events.ConditionalEventObserver;
+import core.events.Event;
 import core.events.Event.Action;
+import core.events.EventObserver;
+import core.events.EventOccurrence;
+import core.events.EventOccurrenceObserver;
 import core.fogofwar.EventFogOfWar;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
-import core.server.rules.*;
+import core.pathfinder.Pathfinder;
+import core.server.rules.ActionRule;
+import core.server.rules.CreationPositionIsEmpty;
+import core.server.rules.MoveDestinationIsEmpty;
+import core.server.rules.PlayerOwnsCreatedEntity;
+import core.server.rules.PlayerOwnsMovedEntity;
+import core.server.rules.PlayerSeesCreationPosition;
+import core.server.rules.PlayerSeesMoveDestination;
+import core.server.rules.PlayerTakesActionDuringOwnTurn;
 import core.terrain.EventTerrain;
 import core.terrain.Terrain;
 import core.terrain.TerrainGenerator;
@@ -80,9 +92,10 @@ public final class ServerCore {
     // rule processing
     private final RuleBasedActionProcessor actionProcessor;
 
+    private final Pathfinder pathfinder;
+
     public ServerCore(int playerCount) {
-        this(playerCount, e -> {
-        });
+        this(playerCount, e -> { });
     }
 
     public ServerCore(int playerCount, EventOccurrenceObserver eventOccurrenceObserver) {
@@ -100,6 +113,10 @@ public final class ServerCore {
         placePlayerBases(generatedTerrain.startingLocations());
         setUpEventHandling(this.state, actionProcessor);
         this.eventOccurrenceObserver = eventOccurrenceObserver;
+        this.pathfinder = new Pathfinder(
+                state.terrain(),
+                state.entityBoard()
+        );
     }
 
     public List<PlayerID> players() {
@@ -140,6 +157,10 @@ public final class ServerCore {
         this.state = state;
         actionProcessor = new RuleBasedActionProcessor(state.rules());
         setUpEventHandling(state, actionProcessor);
+        this.pathfinder = new Pathfinder(
+                state.terrain(),
+                state.entityBoard()
+        );
     }
 
     private static ServerGameState newState(int playerCount, Terrain terrain) {
@@ -184,7 +205,7 @@ public final class ServerCore {
                 new PlayerTakesActionDuringOwnTurn(turnView),
 
                 // entity rules
-//                new PlayerOwnsMovedEntity(entityBoard),
+                new PlayerOwnsMovedEntity(entityBoard),
                 new PlayerSeesMoveDestination(fow),
                 new PlayerSeesCreationPosition(fow),
                 new CreationPositionIsEmpty(entityBoard),
