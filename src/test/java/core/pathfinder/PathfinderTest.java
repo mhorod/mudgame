@@ -21,6 +21,7 @@ import java.util.stream.IntStream;
 import static core.terrain.model.TerrainType.LAND;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 import static org.mockito.Mockito.mock;
 
 class PathfinderTest {
@@ -50,7 +51,7 @@ class PathfinderTest {
         ReachablePositions positions = pathfinder.reachablePositions(entity.id());
 
         // then
-        assertThat(positions.getPositions()).hasSize(9);
+        assertThat(positions.getPositions()).hasSize(6);
     }
 
     @Test
@@ -64,10 +65,14 @@ class PathfinderTest {
         );
 
         // when
-        List<Position> path = pathfinder.findPath(entity.id(), new Position(2, 2));
+        List<Position> path = pathfinder.findPath(entity.id(), new Position(1, 1));
 
         // then
         assertThat(path).hasSize(3);
+        assertThatPathIsContinuous(path);
+        assertThat(path)
+                .startsWith(new Position(0, 0))
+                .endsWith(new Position(1, 1));
     }
 
     @Test
@@ -82,9 +87,14 @@ class PathfinderTest {
 
         // when
         ReachablePositions positions = pathfinder.reachablePositions(entity.id());
+        List<Position> path = positions.getPath(new Position(1, 1));
 
         // then
-        assertThat(positions.getPath(new Position(1, 1))).hasSize(2);
+        assertThat(path).hasSize(3);
+        assertThatPathIsContinuous(path);
+        assertThat(path)
+                .startsWith(new Position(0, 0))
+                .endsWith(new Position(1, 1));
     }
 
 
@@ -107,6 +117,18 @@ class PathfinderTest {
                 mock(EntityType.class),
                 List.of(new Movement(movement))
         );
+    }
+
+    void assertThatPathIsContinuous(List<Position> path) {
+        for (int i = 1; i < path.size(); i++)
+            assertThatPositionsAreNeighboring(path.get(i - 1), path.get(i));
+    }
+
+    private void assertThatPositionsAreNeighboring(Position prev, Position next) {
+        int dx = next.x() - prev.x();
+        int dy = next.y() - prev.y();
+        if (dx * dy != 0 && Math.abs(dx + dy) != 1)
+            fail("Positions %s and %s are not neighboring", prev, next);
     }
 
 }
