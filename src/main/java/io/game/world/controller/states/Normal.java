@@ -18,10 +18,12 @@ public class Normal extends WorldState {
     public Normal(CommonState state) {
         super(state);
         state.map().setPath(List.of());
+        state.map().setHighlightedTiles(null);
     }
 
     @Override
     public void onTileClick(Position position) {
+        state.controls().createEntity(position);
     }
 
     @Override
@@ -45,11 +47,15 @@ public class Normal extends WorldState {
     @Override
     public void onMoveEntity(MoveEntity event) {
         state.animatedEvents().add(event);
-        onFinish(state.map().moveAlongPath(
-                        event.entityID(),
-                        Arrow.pathBetween(state.entities().entityPosition(event.entityID()), event.destination())
-                ),
-                () -> state.animatedEvents().remove(event));
+        List<Position> path;
+        if (state.pathfinder().isReachable(event.entityID(), event.destination()))
+            path = state.pathfinder().findPath(event.entityID(), event.destination());
+        else
+            path = Arrow.pathBetween(state.entities().entityPosition(event.entityID()), event.destination());
+        onFinish(
+                state.map().moveAlongPath(event.entityID(), path),
+                () -> state.animatedEvents().remove(event)
+        );
         nextEvent();
     }
 
@@ -57,10 +63,12 @@ public class Normal extends WorldState {
     public void onSetTerrain(SetTerrain event) {
         state.animatedEvents().add(event);
         var fogAdded = event.positions().stream()
-                .filter(spt -> spt.terrainType() == TerrainType.UNKNOWN && state.terrain().terrainAt(spt.position()) != TerrainType.UNKNOWN)
+                .filter(spt -> spt.terrainType() == TerrainType.UNKNOWN &&
+                        state.terrain().terrainAt(spt.position()) != TerrainType.UNKNOWN)
                 .map(spt -> state.map().addFog(spt.position()));
         var fogRemoved = event.positions().stream()
-                .filter(spt -> spt.terrainType() != TerrainType.UNKNOWN && state.terrain().terrainAt(spt.position()) == TerrainType.UNKNOWN)
+                .filter(spt -> spt.terrainType() != TerrainType.UNKNOWN &&
+                        state.terrain().terrainAt(spt.position()) == TerrainType.UNKNOWN)
                 .map(spt -> state.map().removeFog(spt.position()));
 
         onFinish(

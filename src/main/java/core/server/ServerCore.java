@@ -3,7 +3,6 @@ package core.server;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
 import core.entities.EventEntityBoard;
-import core.entities.model.Entities;
 import core.entities.model.Entity;
 import core.events.ConditionalEventObserver;
 import core.events.Event;
@@ -15,6 +14,7 @@ import core.fogofwar.EventFogOfWar;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
+import core.pathfinder.Pathfinder;
 import core.server.rules.ActionRule;
 import core.server.rules.CreationPositionIsEmpty;
 import core.server.rules.MoveDestinationIsEmpty;
@@ -36,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
+import static core.entities.model.EntityType.BASE;
 
 @Slf4j
 public final class ServerCore {
@@ -90,9 +92,10 @@ public final class ServerCore {
     // rule processing
     private final RuleBasedActionProcessor actionProcessor;
 
+    private final Pathfinder pathfinder;
+
     public ServerCore(int playerCount) {
-        this(playerCount, e -> {
-        });
+        this(playerCount, e -> { });
     }
 
     public ServerCore(int playerCount, EventOccurrenceObserver eventOccurrenceObserver) {
@@ -110,6 +113,10 @@ public final class ServerCore {
         placePlayerBases(generatedTerrain.startingLocations());
         setUpEventHandling(this.state, actionProcessor);
         this.eventOccurrenceObserver = eventOccurrenceObserver;
+        this.pathfinder = new Pathfinder(
+                state.terrain(),
+                state.entityBoard()
+        );
     }
 
     public List<PlayerID> players() {
@@ -150,6 +157,10 @@ public final class ServerCore {
         this.state = state;
         actionProcessor = new RuleBasedActionProcessor(state.rules());
         setUpEventHandling(state, actionProcessor);
+        this.pathfinder = new Pathfinder(
+                state.terrain(),
+                state.entityBoard()
+        );
     }
 
     private static ServerGameState newState(int playerCount, Terrain terrain) {
@@ -215,7 +226,7 @@ public final class ServerCore {
 
     private void placeBase(int i, Position position) {
         PlayerID owner = state.playerManager().getPlayerIDs().get(i);
-        Entity entity = state.entityBoard().createEntity(Entities.playerBase(), owner, position);
+        Entity entity = state.entityBoard().createEntity(BASE, owner, position);
         state.fogOfWar().playerFogOfWar(owner).placeEntity(entity, position);
     }
 }

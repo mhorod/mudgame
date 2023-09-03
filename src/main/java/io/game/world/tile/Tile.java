@@ -7,7 +7,7 @@ import io.game.world.WorldTexture;
 import io.model.engine.Canvas;
 
 public record Tile(Position position, TileKind kind) {
-    public static final float ASPECT_RATIO = 128.0f / 74.0f;
+    public static final float ASPECT_RATIO = 256.0f / 148f;
 
     public void draw(Canvas canvas, Camera camera) {
         switch (kind) {

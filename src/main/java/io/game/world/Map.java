@@ -10,7 +10,6 @@ import io.animation.Finishable;
 import io.game.Camera;
 import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
-import io.game.world.arrow.ArrowKind;
 import io.game.world.entity.*;
 import io.game.world.tile.Tile;
 import io.game.world.tile.TileKind;
@@ -19,27 +18,31 @@ import io.model.engine.Canvas;
 import io.model.engine.TextureBank;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 public class Map implements Animation {
-    ArrowKind[][] arrows;
     HashMap<EntityID, EntityAnimation> entityAnimations = new HashMap<>();
     HashMap<Position, EntityAnimation> tileAnimations = new HashMap<>();
     ArrayList<EntityAnimation> otherAnimations = new ArrayList<>();
     private final TerrainView terrain;
     private final EntityBoardView entities;
     private final ArrayList<Position> path = new ArrayList<>();
+    private Collection<Position> highlightedTiles = null;
 
     public Map(TerrainView terrain, EntityBoardView entities) {
         this.terrain = terrain;
         this.entities = entities;
-        arrows = new ArrowKind[terrain.size().width()][terrain.size().height()];
     }
 
     public void setPath(List<Position> positions) {
         path.clear();
         path.addAll(positions);
+    }
+
+    public void setHighlightedTiles(List<Position> positions) {
+        highlightedTiles = positions;
     }
 
     private void setAnimation(EntityID entityID, EntityAnimation animation) {
@@ -50,10 +53,12 @@ public class Map implements Animation {
     private WorldEntity entityFromID(EntityID id) {
         if (entityAnimations.containsKey(id))
             return entityAnimations.get(id).getEntity();
-        return new Entity(WorldPosition.from(entities.entityPosition(id)), id);
+        return new Entity(WorldPosition.from(entities.entityPosition(id)), entities.findEntityByID(id));
     }
 
-    public void objectAt(ScreenPosition position, TextureBank textureBank, Camera camera, MapObserver listener) {
+    public void objectAt(
+            ScreenPosition position, TextureBank textureBank, Camera camera, MapObserver listener
+    ) {
         var clickedEntity = entities.allEntities().stream()
                 .map(core.entities.model.Entity::id)
                 .map(this::entityFromID)
@@ -70,16 +75,22 @@ public class Map implements Animation {
 
     public void draw(Canvas canvas, Camera camera) {
         ArrayList<Tile> fogTiles = new ArrayList<>();
+        ArrayList<WorldEntity> highlightTiles = new ArrayList<>();
         ArrayList<WorldEntity> entitiesToDraw = new ArrayList<>();
         camera.forAllVisibleTiles(canvas.getAspectRatio(), pos -> {
             if (tileAnimations.containsKey(pos)) {
                 tileAnimations.get(pos).getEntity().draw(canvas, camera);
             } else {
-                switch (terrain.terrainAt(pos)) {
+                var tile = terrain.terrainAt(pos);
+                switch (tile) {
                     case UNKNOWN -> fogTiles.add(new Tile(pos, TileKind.FOG));
                     case WATER -> new Tile(pos, TileKind.TILE_LIGHT).draw(canvas, camera);
                     case LAND -> new Tile(pos, TileKind.TILE_DARK).draw(canvas, camera);
                 }
+                if (highlightedTiles != null && !highlightedTiles.contains(pos) && tile == TerrainType.LAND)
+                    highlightTiles.add(
+                            new WorldEntity(WorldPosition.from(pos), WorldTexture.TILE_HIGHLIGHT, false)
+                    );
             }
 
 
@@ -90,10 +101,12 @@ public class Map implements Animation {
                             .toList()
             );
         });
+        highlightTiles.forEach(tile -> tile.draw(canvas, camera));
 
         Arrow.fromPositions(path).forEach(arrow -> arrow.draw(canvas, camera));
 
-        entitiesToDraw.addAll(entityAnimations.values().stream().map(EntityAnimation::getEntity).toList());
+        entitiesToDraw.addAll(
+                entityAnimations.values().stream().map(EntityAnimation::getEntity).toList());
         entitiesToDraw.addAll(otherAnimations.stream().map(EntityAnimation::getEntity).toList());
         entitiesToDraw.sort((a, b) -> {
             var valA = a.getPosition().x() + a.getPosition().y();
@@ -139,11 +152,40 @@ public class Map implements Animation {
 
     public Finishable addFog(Position position) {
         var tileReplacement = new Exist(Condense.TIME);
-        tileReplacement.init(new WorldEntity(WorldPosition.from(position), WorldTexture.TILE_DARK, false));
+        tileReplacement.init(
+                new WorldEntity(WorldPosition.from(position), WorldTexture.TILE_DARK, false));
         var animation = new Condense();
         animation.init(new WorldEntity(WorldPosition.from(position), WorldTexture.FOG, false));
         otherAnimations.add(animation);
         tileAnimations.put(position, tileReplacement);
+        return animation;
+    }
+
+    public Finishable createEntity(Position position, core.entities.model.Entity entity) {
+        var animation = new Drop();
+        animation.init(new Entity(WorldPosition.from(position, 2), entity));
+        entityAnimations.put(entity.id(), animation);
+        return animation;
+    }
+
+    public Finishable removeEntity(Position position, EntityID entity) {
+        var animation = new Dissipate();
+        animation.init(new Entity(WorldPosition.from(position), entities.findEntityByID(entity)));
+        entityAnimations.put(entity, animation);
+        return animation;
+    }
+
+    public Finishable showEntity(Position position, core.entities.model.Entity entity) {
+        var animation = new Condense();
+        animation.init(new Entity(WorldPosition.from(position), entity));
+        entityAnimations.put(entity.id(), animation);
+        return animation;
+    }
+
+    public Finishable hideEntity(Position position, EntityID entity) {
+        var animation = new Dissipate();
+        animation.init(new Entity(WorldPosition.from(position), entities.findEntityByID(entity)));
+        entityAnimations.put(entity, animation);
         return animation;
     }
 

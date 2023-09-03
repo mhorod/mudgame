@@ -1,11 +1,14 @@
 package core.entities;
 
-import core.entities.components.Component;
 import core.entities.model.Entity;
+import core.entities.model.EntityData;
+import core.entities.model.EntityType;
+import core.fogofwar.PlayerFogOfWar;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,11 +23,14 @@ public final class EntityBoard implements EntityBoardView, Serializable {
     private final Map<EntityID, Entity> entitiesById = new HashMap<>();
     private long nextEntityID = 0;
 
-    public Entity createEntity(List<Component> components, PlayerID owner, Position position) {
-        EntityID entityID = newEntityID();
-        Entity entity = new Entity(components, entityID, owner);
+    public Entity createEntity(EntityData data, PlayerID owner, Position position) {
+        Entity entity = new Entity(data, newEntityID(), owner);
         placeEntity(entity, position);
         return entity;
+    }
+
+    public Entity createEntity(EntityType type, PlayerID owner, Position position) {
+        return createEntity(EntityData.ofType(type), owner, position);
     }
 
     @Override
@@ -47,6 +53,13 @@ public final class EntityBoard implements EntityBoardView, Serializable {
         if (!containsEntity(entityID))
             throw new EntityDoesNotExist(entityID);
         return entityPositions.get(entityID);
+    }
+
+    @Override
+    public PlayerID entityOwner(EntityID entityID) {
+        if (!containsEntity(entityID))
+            throw new EntityDoesNotExist(entityID);
+        return findEntityByID(entityID).owner();
     }
 
     public void removeEntity(EntityID entityID) {
@@ -90,5 +103,15 @@ public final class EntityBoard implements EntityBoardView, Serializable {
 
     private List<EntityID> mutableEntitiesAt(Position position) {
         return board.computeIfAbsent(position, key -> new ArrayList<>());
+    }
+
+    public EntityBoard applyFogOfWar(PlayerFogOfWar newFogOfWar) {
+        EntityBoard newEntityBoard = new EntityBoard();
+        for (Entity entity : allEntities()) {
+            Position position = entityPosition(entity.id());
+            if (newFogOfWar.isVisible(position))
+                newEntityBoard.placeEntity(SerializationUtils.clone(entity), position);
+        }
+        return newEntityBoard;
     }
 }

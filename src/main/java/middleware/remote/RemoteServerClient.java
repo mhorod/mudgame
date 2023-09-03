@@ -1,13 +1,12 @@
 package middleware.remote;
 
 import core.client.ClientGameState;
-import core.events.Action;
 import core.events.Event;
 import core.model.PlayerID;
 import core.server.ServerGameState;
 import lombok.extern.slf4j.Slf4j;
-import middleware.clients.ServerClient;
 import middleware.clients.GameClient;
+import middleware.clients.ServerClient;
 import middleware.messages_to_server.*;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
@@ -43,10 +42,6 @@ public final class RemoteServerClient implements ServerClient {
         return status;
     }
 
-    public void setRoomList(List<RoomInfo> roomList) {
-        this.roomList = roomList;
-    }
-
     public void sendMessage(MessageToServer message) {
         if (!isActive())
             throw new RuntimeException("Attempting to send message using inactive ServerClient");
@@ -70,6 +65,10 @@ public final class RemoteServerClient implements ServerClient {
     @Override
     public List<RoomInfo> getRoomList() {
         return Collections.unmodifiableList(roomList);
+    }
+
+    public void setRoomList(List<RoomInfo> roomList) {
+        this.roomList = roomList;
     }
 
     @Override

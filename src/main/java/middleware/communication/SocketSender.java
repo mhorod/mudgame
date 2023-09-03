@@ -1,7 +1,6 @@
 package middleware.communication;
 
 import lombok.SneakyThrows;
-import middleware.communication.Sender;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

@@ -1,19 +1,21 @@
 package io.game.world;
 
+import core.entities.model.EntityType;
 import io.game.Camera;
 import io.game.WorldPosition;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
+import io.model.engine.Color;
 import io.model.textures.Texture;
 import io.model.textures.TextureDrawData;
 
 public enum WorldTexture {
 
-    TILE_DARK(Texture.TILE_DARK, new Center(0.5f, 0.58f), 1.0f),
-    TILE_LIGHT(Texture.TILE_LIGHT, new Center(0.5f, 0.58f), 1.0f),
+    TILE_DARK(Texture.TILE_DARK, new Center(0.5f, 0.668f), 1.01f),
+    TILE_LIGHT(Texture.TILE_LIGHT, new Center(0.5f, 0.668f), 1.0f),
+    TILE_HIGHLIGHT(Texture.TILE_HIGHLIGHT, new Center(0.5f, 0.5f), 1f),
     FOG(Texture.FOG, new Center(0.5f, 0.5f), 1.15f),
     SHADOW(Texture.SHADOW, new Center(0.5f, 0.5f), 1.0f),
-    UNIT(Texture.UNIT, new Center(0.5f, 0.35f), 1.0f),
     ARROW_NONE(Texture.ARROW_NONE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SW_NE(Texture.ARROW_SW_NE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SE_NW(Texture.ARROW_SE_NW, new Center(0.5f, 0.5f), 1.0f),
@@ -29,7 +31,10 @@ public enum WorldTexture {
     ARROW_SW_SE(Texture.ARROW_SW_SE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SW_NW(Texture.ARROW_SW_NW, new Center(0.5f, 0.5f), 1.0f),
     ARROW_NW_NE(Texture.ARROW_NW_NE, new Center(0.5f, 0.5f), 1.0f),
-    BASE(Texture.BASE, new Center(0.5f, 0.27f), 1.0f);
+    BASE(Texture.BASE, new Center(0.5f, 0.23f), 0.8f),
+    TOWER(Texture.TOWER, new Center(0.5f, 0.187f), 0.8f),
+    WARRIOR(Texture.WARRIOR, new Center(0.5f, 0.23f), 0.5f),
+    PAWN(Texture.PAWN, new Center(0.5f, 0.15f), 0.38f);
     private final Texture texture;
     private final Center center;
     private final float width;
@@ -56,7 +61,16 @@ public enum WorldTexture {
         canvas.draw(getDrawData(position, camera));
     }
 
-    public void drawTransparent(WorldPosition position, Canvas canvas, Camera camera, float alpha) {
-        canvas.drawTransparent(getDrawData(position, camera), alpha);
+    public void drawColored(WorldPosition position, Canvas canvas, Camera camera, Color color, float alpha) {
+        canvas.drawColored(getDrawData(position, camera), alpha, color);
+    }
+
+    public static WorldTexture from(EntityType type) {
+        return switch (type) {
+            case BASE -> BASE;
+            case WARRIOR -> WARRIOR;
+            case TOWER -> TOWER;
+            case PAWN -> PAWN;
+        };
     }
 }

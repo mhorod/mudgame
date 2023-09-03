@@ -1,7 +1,7 @@
 package middleware.messages_to_server;
 
-import middleware.server.GameServer;
 import middleware.model.UserID;
+import middleware.server.GameServer;
 
 public record GetRoomListMessage() implements MessageToServer {
     @Override

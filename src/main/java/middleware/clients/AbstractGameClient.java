@@ -23,8 +23,8 @@ public abstract class AbstractGameClient implements GameClient {
     }
 
     @Override
-    public ClientGameState getGameState() {
-        return core.state();
+    public ClientCore getCore() {
+        return core;
     }
 
     @Override

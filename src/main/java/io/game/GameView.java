@@ -1,7 +1,8 @@
 package io.game;
 
-import core.entities.events.MoveEntity;
+import core.entities.events.*;
 import core.events.Event;
+import core.events.Action;
 import core.model.EntityID;
 import core.model.Position;
 import core.terrain.events.SetTerrain;
@@ -17,9 +18,13 @@ import io.model.input.events.Click;
 import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
+import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.local.LocalServer;
 
+import static core.entities.model.EntityType.PAWN;
+
+@Slf4j
 public class GameView extends SimpleView {
     private final AnimationController animations = new AnimationController();
     private final Map map;
@@ -37,19 +42,26 @@ public class GameView extends SimpleView {
     private boolean eventObserved = false;
 
     public GameView() {
-        var clients = new LocalServer(5).getClients();
-        me = clients.get(0);
-        map = new Map(me.getGameState().terrain(), me.getGameState().entityBoard());
+        var server = new LocalServer(5);
+        me = server.getClients().get(0);
+        map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
         worldController = new WorldController(
                 map,
-                me.getGameState().entityBoard(),
-                me.getGameState().terrain(),
+                me.getCore().state().entityBoard(),
+                me.getCore().state().terrain(),
+                me.getCore().pathfinder(),
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
                         me.sendAction(new MoveEntity(id, destination));
+                    }
+
+                    @Override
+                    public void createEntity(Position position) {
+                        Action action = new CreateEntity(PAWN, me.myPlayerID(), position);
+                        me.sendAction(action);
                     }
 
                     @Override
@@ -65,20 +77,37 @@ public class GameView extends SimpleView {
     }
 
     private void processEvent(Event event) {
-        if (event instanceof MoveEntity) {
+        log.debug("Processing event: {}", event);
+        if (event instanceof MoveEntity e) {
             eventObserved = true;
-            worldController.onMoveEntity((MoveEntity) event);
-        } else if (event instanceof SetTerrain) {
+            worldController.onMoveEntity(e);
+        } else if (event instanceof SetTerrain e) {
             eventObserved = true;
-            worldController.onSetTerrain((SetTerrain) event);
+            worldController.onSetTerrain(e);
+        } else if (event instanceof PlaceEntity e) {
+            eventObserved = true;
+            worldController.onPlaceEntity(e);
+        } else if (event instanceof RemoveEntity e) {
+            eventObserved = true;
+            worldController.onRemoveEntity(e);
+        } else if (event instanceof ShowEntity e) {
+            eventObserved = true;
+            worldController.onShowEntity(e);
+        } else if (event instanceof HideEntity e) {
+            eventObserved = true;
+            worldController.onHideEntity(e);
         }
     }
 
     private boolean canEatEvent() {
-        return me.peekEvent()
-                .stream()
-                .anyMatch(
-                        event -> !(event instanceof MoveEntity) && !(event instanceof SetTerrain));
+        return me.peekEvent().stream().anyMatch(
+                event -> !(event instanceof MoveEntity)
+                        && !(event instanceof SetTerrain)
+                        && !(event instanceof PlaceEntity)
+                        && !(event instanceof RemoveEntity)
+                        && !(event instanceof ShowEntity)
+                        && !(event instanceof HideEntity)
+        );
     }
 
     @Override

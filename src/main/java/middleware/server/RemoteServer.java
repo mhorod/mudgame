@@ -2,11 +2,11 @@ package middleware.server;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import middleware.model.UserID;
+import middleware.communication.NotifyingMessageProcessor;
 import middleware.communication.SocketReceiver;
 import middleware.communication.SocketSender;
-import middleware.communication.NotifyingMessageProcessor;
 import middleware.messages_to_server.MessageToServer;
+import middleware.model.UserID;
 
 import java.io.IOException;
 import java.net.ServerSocket;

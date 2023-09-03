@@ -1,5 +1,6 @@
 package middleware.clients;
 
+import core.client.ClientCore;
 import core.client.ClientGameState;
 import core.events.Action;
 import core.events.Event;
@@ -10,7 +11,7 @@ import java.util.Optional;
 public interface GameClient {
     PlayerID myPlayerID();
 
-    ClientGameState getGameState();
+    ClientCore getCore();
 
     Optional<Event> peekEvent();
 
