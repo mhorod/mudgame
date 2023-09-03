@@ -1,17 +1,15 @@
 package core;
 
-import core.entities.components.Component;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
 import core.entities.model.Entity;
+import core.entities.model.EntityType;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import lombok.experimental.UtilityClass;
-
-import java.util.List;
 
 @UtilityClass
 public class EntityEvents {
@@ -24,10 +22,8 @@ public class EntityEvents {
         return new RemoveEntity(entityID);
     }
 
-    public static CreateEntity create(
-            List<Component> components, long playerId, Position position
-    ) {
-        return new CreateEntity(components, new PlayerID(playerId), position);
+    public static CreateEntity create(EntityType type, long playerId, Position position) {
+        return new CreateEntity(type, new PlayerID(playerId), position);
     }
 
     public static MoveEntity move(EntityID entityID, Position destination) {

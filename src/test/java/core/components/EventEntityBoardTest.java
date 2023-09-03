@@ -2,12 +2,12 @@ package core.components;
 
 import core.entities.EntityBoard;
 import core.entities.EventEntityBoard;
-import core.entities.components.Component;
 import core.entities.events.CreateEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
 import core.entities.model.Entity;
+import core.entities.model.EntityData;
 import core.events.Event;
 import core.events.EventObserver;
 import core.events.PlayerEventObserver;
@@ -23,11 +23,12 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static core.entities.model.EntityType.PAWN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class EventEntityBoardTest {
-    final List<Component> COMPONENTS = List.of();
+    final EntityData DATA = EntityData.pawn();
 
     final PlayerID PLAYER_0 = new PlayerID(0);
     final PlayerID PLAYER_1 = new PlayerID(1);
@@ -62,7 +63,7 @@ class EventEntityBoardTest {
         @Test
         void creates_entity_on_board() {
             // given
-            Event event = new CreateEntity(COMPONENTS, PLAYER_0, POSITION_0);
+            Event event = new CreateEntity(PAWN, PLAYER_0, POSITION_0);
 
             // when
             testee.receive(event);
@@ -75,7 +76,7 @@ class EventEntityBoardTest {
         @Test
         void places_entity_on_board() {
             // given
-            Entity entity = new Entity(COMPONENTS, ENTITY_0, PLAYER_0);
+            Entity entity = new Entity(DATA, ENTITY_0, PLAYER_0);
             Position position = POSITION_0;
             Event event = new PlaceEntity(entity, position);
 
@@ -93,7 +94,7 @@ class EventEntityBoardTest {
             Position from = POSITION_0;
             Position to = POSITION_1;
 
-            Entity entity = new Entity(COMPONENTS, ENTITY_0, PLAYER_0);
+            Entity entity = new Entity(DATA, ENTITY_0, PLAYER_0);
             entityBoard.placeEntity(entity, from);
             Event event = new MoveEntity(entity.id(), to);
 
@@ -109,7 +110,7 @@ class EventEntityBoardTest {
         @Test
         void removes_entity_from_board() {
             // given
-            Entity entity = new Entity(COMPONENTS, ENTITY_0, PLAYER_0);
+            Entity entity = new Entity(DATA, ENTITY_0, PLAYER_0);
             entityBoard.placeEntity(entity, POSITION_0);
 
             Event event = new RemoveEntity(entity.id());
@@ -128,7 +129,7 @@ class EventEntityBoardTest {
         void creating_entity_produces_place_event() {
             // given
             Position position = POSITION_0;
-            Event event = new CreateEntity(COMPONENTS, PLAYER_0, position);
+            Event event = new CreateEntity(PAWN, PLAYER_0, position);
             EventObserver observer = mock(EventObserver.class);
             eventSender.addObserver(observer);
 
@@ -147,7 +148,7 @@ class EventEntityBoardTest {
             EventObserver observer = mock(EventObserver.class);
             eventSender.addObserver(observer);
 
-            Entity entity = new Entity(COMPONENTS, ENTITY_0, PLAYER_0);
+            Entity entity = new Entity(DATA, ENTITY_0, PLAYER_0);
             Event event = new PlaceEntity(entity, POSITION_0);
 
             // when
@@ -163,7 +164,7 @@ class EventEntityBoardTest {
             EventObserver observer = mock(EventObserver.class);
             eventSender.addObserver(observer);
 
-            Entity entity = new Entity(COMPONENTS, ENTITY_0, PLAYER_0);
+            Entity entity = new Entity(DATA, ENTITY_0, PLAYER_0);
             entityBoard.placeEntity(entity, POSITION_0);
 
             Event event = new RemoveEntity(entity.id());
@@ -181,7 +182,7 @@ class EventEntityBoardTest {
             EventObserver observer = mock(EventObserver.class);
             eventSender.addObserver(observer);
 
-            Entity entity = new Entity(COMPONENTS, ENTITY_0, PLAYER_0);
+            Entity entity = new Entity(DATA, ENTITY_0, PLAYER_0);
             entityBoard.placeEntity(entity, POSITION_0);
 
             Event event = new MoveEntity(entity.id(), POSITION_1);
@@ -208,7 +209,7 @@ class EventEntityBoardTest {
             eventSender.addObserver(new PlayerEventObserver(PLAYER_0, observerWithView));
             eventSender.addObserver(new PlayerEventObserver(PLAYER_1, observerWithoutView));
 
-            Event event = new CreateEntity(COMPONENTS, PLAYER_0, position);
+            Event event = new CreateEntity(PAWN, PLAYER_0, position);
 
             // when
             testee.receive(event);
@@ -231,7 +232,7 @@ class EventEntityBoardTest {
             sees(PLAYER_0, position);
             eventSender.addObserver(new PlayerEventObserver(PLAYER_0, observerWithView));
             eventSender.addObserver(new PlayerEventObserver(PLAYER_1, observerWithoutView));
-            Entity entity = new Entity(COMPONENTS, ENTITY_0, PLAYER_0);
+            Entity entity = new Entity(DATA, ENTITY_0, PLAYER_0);
             Event event = new PlaceEntity(entity, POSITION_0);
 
             // when
@@ -254,7 +255,7 @@ class EventEntityBoardTest {
             eventSender.addObserver(new PlayerEventObserver(PLAYER_0, observerWithView));
             eventSender.addObserver(new PlayerEventObserver(PLAYER_1, observerWithoutView));
 
-            Entity entity = new Entity(COMPONENTS, ENTITY_0, PLAYER_0);
+            Entity entity = new Entity(DATA, ENTITY_0, PLAYER_0);
             entityBoard.placeEntity(entity, POSITION_0);
 
             Event event = new RemoveEntity(entity.id());
@@ -284,7 +285,7 @@ class EventEntityBoardTest {
             eventSender.addObserver(new PlayerEventObserver(PLAYER_1, observerWithToView));
             eventSender.addObserver(new PlayerEventObserver(PLAYER_2, observerWithoutView));
 
-            Entity entity = new Entity(COMPONENTS, ENTITY_0, PLAYER_0);
+            Entity entity = new Entity(DATA, ENTITY_0, PLAYER_0);
             entityBoard.placeEntity(entity, from);
 
             Event event = new MoveEntity(entity.id(), to);

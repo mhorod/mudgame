@@ -106,7 +106,7 @@ public final class EventEntityBoard implements EventObserver, EventOccurrenceObs
     }
 
     private void createEntity(CreateEntity event) {
-        Entity entity = board.createEntity(event.components(), event.owner(), event.position());
+        Entity entity = board.createEntity(event.type(), event.owner(), event.position());
         PlaceEntity resultEvent = new PlaceEntity(entity, event.position());
         conditionalEventObserver.receive(resultEvent, isVisible(event.position()));
     }

@@ -5,6 +5,7 @@ import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
 import core.entities.model.Entity;
+import core.entities.model.EntityData;
 import core.events.EventObserver;
 import core.fogofwar.events.SetVisibility;
 import core.model.EntityID;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static core.entities.model.EntityType.PAWN;
 import static org.mockito.Mockito.*;
 
 class EventPlayerFogOfWarTest {
@@ -32,7 +34,8 @@ class EventPlayerFogOfWarTest {
     @Test
     void placing_entity_without_vision_does_not_generate_event() {
         // given
-        Entity entity = new Entity(List.of(), mock(EntityID.class), mock(PlayerID.class));
+        Entity entity = new Entity(mock(EntityData.class), mock(EntityID.class),
+                                   mock(PlayerID.class));
         PlaceEntity event = new PlaceEntity(entity, new Position(0, 0));
 
         // when
@@ -45,7 +48,8 @@ class EventPlayerFogOfWarTest {
     @Test
     void moving_entity_without_vision_does_not_generate_event() {
         // given
-        Entity entity = new Entity(List.of(), mock(EntityID.class), mock(PlayerID.class));
+        Entity entity = new Entity(mock(EntityData.class), mock(EntityID.class),
+                                   mock(PlayerID.class));
         PlaceEntity placeEvent = new PlaceEntity(entity, new Position(0, 0));
         MoveEntity moveEvent = new MoveEntity(entity.id(), new Position(0, 1));
 
@@ -60,7 +64,8 @@ class EventPlayerFogOfWarTest {
     @Test
     void removing_entity_without_vision_does_not_generate_event() {
         // given
-        Entity entity = new Entity(List.of(), mock(EntityID.class), mock(PlayerID.class));
+        Entity entity = new Entity(mock(EntityData.class), mock(EntityID.class),
+                                   mock(PlayerID.class));
         PlaceEntity placeEvent = new PlaceEntity(entity, new Position(0, 0));
         RemoveEntity removeEvent = new RemoveEntity(entity.id());
 
@@ -75,7 +80,7 @@ class EventPlayerFogOfWarTest {
     @Test
     void placing_entity_with_vision_generates_event() {
         // given
-        Entity entity = entityWithVision(1);
+        Entity entity = pawnWithVision(1);
         PlaceEntity event = new PlaceEntity(entity, new Position(0, 0));
 
         // when
@@ -89,7 +94,7 @@ class EventPlayerFogOfWarTest {
     @Test
     void moving_entity_with_vision_generates_event_with_changed_positions() {
         // given
-        Entity entity = entityWithVision(1);
+        Entity entity = pawnWithVision(1);
         fow.placeEntity(entity, new Position(0, 0));
 
         MoveEntity event = new MoveEntity(entity.id(), new Position(0, 1));
@@ -102,9 +107,9 @@ class EventPlayerFogOfWarTest {
         verify(observer).receive(argThat(e -> ((SetVisibility) e).positions().size() == 6));
     }
 
-    static Entity entityWithVision(int range) {
+    static Entity pawnWithVision(int range) {
         return new Entity(
-                List.of(new Vision(range)),
+                new EntityData(PAWN, List.of(new Vision(range))),
                 mock(EntityID.class),
                 new PlayerID(0)
         );

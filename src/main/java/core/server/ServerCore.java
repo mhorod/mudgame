@@ -3,7 +3,6 @@ package core.server;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
 import core.entities.EventEntityBoard;
-import core.entities.model.Entities;
 import core.entities.model.Entity;
 import core.events.ConditionalEventObserver;
 import core.events.Event;
@@ -36,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
+import static core.entities.model.EntityType.BASE;
 
 @Slf4j
 public final class ServerCore {
@@ -215,7 +216,7 @@ public final class ServerCore {
 
     private void placeBase(int i, Position position) {
         PlayerID owner = state.playerManager().getPlayerIDs().get(i);
-        Entity entity = state.entityBoard().createEntity(Entities.playerBase(), owner, position);
+        Entity entity = state.entityBoard().createEntity(BASE, owner, position);
         state.fogOfWar().playerFogOfWar(owner).placeEntity(entity, position);
     }
 }
