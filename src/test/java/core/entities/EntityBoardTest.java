@@ -1,8 +1,8 @@
 package core.entities;
 
 
-import core.entities.components.Component;
 import core.entities.model.Entity;
+import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -10,15 +10,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static core.entities.EntityBoardAssert.assertThat;
+import static core.entities.model.EntityType.PAWN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 class EntityBoardTest {
-    static final List<Component> COMPONENTS = List.of();
+    static final EntityData DATA = EntityData.pawn();
     static final PlayerID OWNER = new PlayerID(0);
     static final Position POSITION_0 = new Position(0, 0);
     static final Position POSITION_1 = new Position(0, 1);
@@ -41,21 +40,20 @@ class EntityBoardTest {
         @Test
         void board_creates_entity_with_given_arguments() {
             // given
-            List<Component> data = COMPONENTS;
             PlayerID owner = OWNER;
 
             // when
-            Entity entity = board.createEntity(data, owner, POSITION_0);
+            Entity entity = board.createEntity(PAWN, owner, POSITION_0);
 
             // then
-            assertThat(entity.components()).isEqualTo(data);
+            assertThat(entity.type()).isEqualTo(PAWN);
             assertThat(entity.owner()).isEqualTo(owner);
         }
 
         @Test
         void board_contains_created_entity() {
             // when
-            Entity entity = board.createEntity(COMPONENTS, OWNER, POSITION_0);
+            Entity entity = board.createEntity(DATA, OWNER, POSITION_0);
 
             // then
             assertThat(board).containsExactlyEntities(entity).containsEntityWithId(entity.id());
@@ -67,7 +65,7 @@ class EntityBoardTest {
             Position position = POSITION_0;
 
             // when
-            Entity entity = board.createEntity(COMPONENTS, OWNER, position);
+            Entity entity = board.createEntity(DATA, OWNER, position);
 
             // then
             assertThat(board.entitiesAt(position)).containsExactly(entity);
@@ -77,8 +75,8 @@ class EntityBoardTest {
         @Test
         void board_creates_different_entities_with_same_arguments() {
             // when
-            Entity firstEntity = board.createEntity(COMPONENTS, OWNER, POSITION_0);
-            Entity secondEntity = board.createEntity(COMPONENTS, OWNER, POSITION_0);
+            Entity firstEntity = board.createEntity(DATA, OWNER, POSITION_0);
+            Entity secondEntity = board.createEntity(DATA, OWNER, POSITION_0);
 
             // then
             assertThat(firstEntity).isNotEqualTo(secondEntity);
@@ -92,7 +90,7 @@ class EntityBoardTest {
         @Test
         void placing_same_entity_twice_throws_exception() {
             // given
-            Entity entity = new Entity(COMPONENTS, new EntityID(0), OWNER);
+            Entity entity = new Entity(DATA, new EntityID(0), OWNER);
 
             // when
             board.placeEntity(entity, POSITION_1);
@@ -109,7 +107,7 @@ class EntityBoardTest {
         void board_does_not_contain_removed_entity() {
             // given
             Position position = POSITION_0;
-            Entity entity = board.createEntity(COMPONENTS, OWNER, position);
+            Entity entity = board.createEntity(DATA, OWNER, position);
 
             // when
             board.removeEntity(entity.id());
@@ -122,7 +120,7 @@ class EntityBoardTest {
         @Test
         void removing_same_entity_twice_throws_exception() {
             // given
-            Entity entity = board.createEntity(COMPONENTS, OWNER, POSITION_0);
+            Entity entity = board.createEntity(DATA, OWNER, POSITION_0);
 
             // when
             board.removeEntity(entity.id());
@@ -138,7 +136,7 @@ class EntityBoardTest {
         @Test
         void board_contains_moved_entity() {
             // given
-            Entity entity = board.createEntity(COMPONENTS, OWNER, POSITION_0);
+            Entity entity = board.createEntity(DATA, OWNER, POSITION_0);
 
             // when
             board.moveEntity(entity.id(), POSITION_1);
@@ -152,7 +150,7 @@ class EntityBoardTest {
             // given
             Position from = POSITION_0;
             Position to = POSITION_1;
-            Entity entity = board.createEntity(COMPONENTS, OWNER, from);
+            Entity entity = board.createEntity(DATA, OWNER, from);
 
             // when
             board.moveEntity(entity.id(), to);

@@ -1,8 +1,10 @@
 package io.game.world.controller;
 
+import core.entities.events.HideEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
+import core.entities.events.ShowEntity;
 import core.model.EntityID;
 import io.animation.Finishable;
 
@@ -32,20 +34,34 @@ public abstract class WorldState implements WorldBehavior {
 
     protected boolean entityAnimated(EntityID entity) {
         return state.animatedEvents().stream().anyMatch(event -> {
-            if (!(event instanceof MoveEntity)) return false;
+            if (!(event instanceof MoveEntity))
+                return false;
             return ((MoveEntity) event).entityID() == entity;
         });
     }
 
     @Override
     public void onPlaceEntity(PlaceEntity event) {
-        state.map().createUnit(event.position(), event.entity());
+        state.map().createEntity(event.position(), event.entity());
         nextEvent();
     }
 
     @Override
     public void onRemoveEntity(RemoveEntity event) {
-        state.map().removeUnit(state.entities().entityPosition(event.entityID()), event.entityID());
+        state.map()
+                .removeEntity(state.entities().entityPosition(event.entityID()), event.entityID());
+        nextEvent();
+    }
+
+    @Override
+    public void onShowEntity(ShowEntity event) {
+        state.map().showEntity(event.position(), event.entity());
+        nextEvent();
+    }
+
+    @Override
+    public void onHideEntity(HideEntity event) {
+        state.map().hideEntity(state.entities().entityPosition(event.entityID()), event.entityID());
         nextEvent();
     }
 }

@@ -1,9 +1,11 @@
 package core.entities;
 
 import core.entities.events.CreateEntity;
+import core.entities.events.HideEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
+import core.entities.events.ShowEntity;
 import core.entities.model.Entity;
 import core.events.ConditionalEventObserver;
 import core.events.Event;
@@ -48,7 +50,12 @@ public final class EventEntityBoard implements EventObserver, EventOccurrenceObs
             moveEntity(e);
         else if (event instanceof RemoveEntity e)
             removeEntity(e);
+        else if (event instanceof ShowEntity e)
+            showEntity(e);
+        else if (event instanceof HideEntity e)
+            hideEntity(e);
     }
+
 
     @Override
     public void receive(EventOccurrence eventOccurrence) {
@@ -68,9 +75,9 @@ public final class EventEntityBoard implements EventObserver, EventOccurrenceObs
         for (Entity e : board.entitiesAt(positionVisibility.position())) {
             Event event;
             if (positionVisibility.isVisible()) {
-                event = new PlaceEntity(e, positionVisibility.position());
+                event = new ShowEntity(e, positionVisibility.position());
             } else {
-                event = new RemoveEntity(e.id());
+                event = new HideEntity(e.id());
             }
             conditionalEventObserver.receive(event, player::equals);
         }
@@ -106,9 +113,26 @@ public final class EventEntityBoard implements EventObserver, EventOccurrenceObs
     }
 
     private void createEntity(CreateEntity event) {
-        Entity entity = board.createEntity(event.components(), event.owner(), event.position());
+        Entity entity = board.createEntity(event.type(), event.owner(), event.position());
         PlaceEntity resultEvent = new PlaceEntity(entity, event.position());
         conditionalEventObserver.receive(resultEvent, isVisible(event.position()));
+    }
+
+    private void hideEntity(HideEntity event) {
+        if (!board.containsEntity(event.entityID()))
+            return;
+
+        Position position = board.entityPosition(event.entityID());
+        board.removeEntity(event.entityID());
+        conditionalEventObserver.receive(event, isVisible(position));
+    }
+
+    private void showEntity(ShowEntity event) {
+        if (board.containsEntity(event.entity().id()))
+            return;
+
+        board.placeEntity(event.entity(), event.position());
+        conditionalEventObserver.receive(event, isVisible(event.position()));
     }
 
     private Predicate<PlayerID> isVisible(Position position) {

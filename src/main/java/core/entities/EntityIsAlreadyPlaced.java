@@ -4,6 +4,6 @@ import core.entities.model.Entity;
 
 public final class EntityIsAlreadyPlaced extends RuntimeException {
     public EntityIsAlreadyPlaced(Entity entity) {
-        super("Entity with id " + entity.id() + " is already placed.");
+        super("Entity with entityID " + entity.id() + " is already placed.");
     }
 }

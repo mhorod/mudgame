@@ -114,15 +114,23 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
     }
 
     private Set<Position> addVisionArea(VisionArea area) {
-        for (Position position : area.positions())
+        Set<Position> changed = new HashSet<>();
+        for (Position position : area.positions()) {
+            if (visionCount.getOrDefault(position, 0) == 0)
+                changed.add(position);
             setCount(position, visionCount.getOrDefault(position, 0) + 1);
-        return new HashSet<>(area.positions());
+        }
+        return changed;
     }
 
     private Set<Position> removeVisionArea(VisionArea area) {
-        for (Position position : area.positions())
+        Set<Position> changed = new HashSet<>();
+        for (Position position : area.positions()) {
+            if (visionCount.get(position) == 1)
+                changed.add(position);
             setCount(position, visionCount.get(position) - 1);
-        return new HashSet<>(area.positions());
+        }
+        return changed;
     }
 
     private void setCount(Position position, Integer count) {

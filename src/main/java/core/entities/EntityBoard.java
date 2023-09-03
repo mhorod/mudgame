@@ -1,7 +1,8 @@
 package core.entities;
 
-import core.entities.components.Component;
 import core.entities.model.Entity;
+import core.entities.model.EntityData;
+import core.entities.model.EntityType;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -20,11 +21,14 @@ public final class EntityBoard implements EntityBoardView, Serializable {
     private final Map<EntityID, Entity> entitiesById = new HashMap<>();
     private long nextEntityID = 0;
 
-    public Entity createEntity(List<Component> components, PlayerID owner, Position position) {
-        EntityID entityID = newEntityID();
-        Entity entity = new Entity(components, entityID, owner);
+    public Entity createEntity(EntityData data, PlayerID owner, Position position) {
+        Entity entity = new Entity(data, newEntityID(), owner);
         placeEntity(entity, position);
         return entity;
+    }
+
+    public Entity createEntity(EntityType type, PlayerID owner, Position position) {
+        return createEntity(EntityData.ofType(type), owner, position);
     }
 
     @Override

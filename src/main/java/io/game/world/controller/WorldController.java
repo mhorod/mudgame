@@ -1,9 +1,11 @@
 package io.game.world.controller;
 
 import core.entities.EntityBoard;
+import core.entities.events.HideEntity;
 import core.entities.events.MoveEntity;
 import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
+import core.entities.events.ShowEntity;
 import core.model.EntityID;
 import core.model.Position;
 import core.terrain.Terrain;
@@ -75,5 +77,15 @@ public class WorldController implements WorldBehavior {
     @Override
     public void onRemoveEntity(RemoveEntity event) {
         state.onRemoveEntity(event);
+    }
+
+    @Override
+    public void onShowEntity(ShowEntity event) {
+        state.onShowEntity(event);
+    }
+
+    @Override
+    public void onHideEntity(HideEntity event) {
+        state.onHideEntity(event);
     }
 }

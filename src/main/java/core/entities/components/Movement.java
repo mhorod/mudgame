@@ -2,7 +2,7 @@ package core.entities.components;
 
 import lombok.Getter;
 
-public class Movement implements Component {
+public final class Movement implements Component {
 
     private final int movementPerTurn;
 
@@ -14,7 +14,7 @@ public class Movement implements Component {
         this.currentMovement = movementPerTurn;
     }
 
-    void newTurn() {
+    public void newTurn() {
         currentMovement = movementPerTurn;
     }
 
