@@ -21,7 +21,7 @@ public class WorldEntity {
     }
 
     public boolean contains(ScreenPosition position, TextureBank bank, Camera camera) {
-        return bank.contains(WorldTexture.UNIT.getDrawData(getPosition(), camera), position);
+        return bank.contains(texture.getDrawData(getPosition(), camera), position);
     }
 
     public void draw(Canvas canvas, Camera camera) {

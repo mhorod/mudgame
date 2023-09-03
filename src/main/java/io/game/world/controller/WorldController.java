@@ -1,13 +1,10 @@
 package io.game.world.controller;
 
 import core.entities.EntityBoard;
-import core.entities.events.HideEntity;
-import core.entities.events.MoveEntity;
-import core.entities.events.PlaceEntity;
-import core.entities.events.RemoveEntity;
-import core.entities.events.ShowEntity;
+import core.entities.events.*;
 import core.model.EntityID;
 import core.model.Position;
+import core.pathfinder.Pathfinder;
 import core.terrain.Terrain;
 import core.terrain.events.SetTerrain;
 import io.animation.Finishable;
@@ -21,8 +18,8 @@ public class WorldController implements WorldBehavior {
     private WorldState state;
     private final FutureExecutor executor = new FutureExecutor();
 
-    public WorldController(Map map, EntityBoard entities, Terrain terrain, Controls controls) {
-        state = new Normal(new CommonState(map, terrain, entities, controls, new HashSet<>()));
+    public WorldController(Map map, EntityBoard entities, Terrain terrain, Pathfinder pathfinder, Controls controls) {
+        state = new Normal(new CommonState(map, terrain, entities, pathfinder, controls, new HashSet<>()));
         state.init(this);
     }
 

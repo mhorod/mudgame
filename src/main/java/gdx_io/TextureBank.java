@@ -7,32 +7,42 @@ import io.model.ScreenPosition;
 import io.model.textures.TextureDrawData;
 
 public class TextureBank implements io.model.engine.TextureBank {
-    public final TextureRegion tileDark, tileLight, fog, unit, shadow, base;
+    public final TextureRegion tileDark, tileLight, fog, unit, shadow, base, warrior, tower, tileHighlight;
     private final TextureRegion ARROW_NONE, ARROW_SW_NE, ARROW_SE_NW,
             ARROW_START_NE, ARROW_START_SE, ARROW_START_NW, ARROW_START_SW,
             ARROW_END_NE, ARROW_END_SE, ARROW_END_NW, ARROW_END_SW,
             ARROW_SE_NE, ARROW_SW_SE, ARROW_SW_NW, ARROW_NW_NE;
+    public final TextureRegion buttonSmall, buttonSmallPressed, logo, scroll;
     private final Pixmap unitPixmap;
+    private final Texture units;
 
     private static TextureRegion cutOut(
             Texture tex, int x, int y, float tile_width, float tile_height
     ) {
-        return new TextureRegion(tex, (int) (x * tile_width), (int) (y * tile_height),
+        return new TextureRegion(tex, x * (int) tile_width, y * (int) tile_height,
                 (int) tile_width, (int) tile_height);
     }
 
     public TextureBank() {
         Texture tiles = new Texture("tiles.png");
-        Texture units = new Texture("unit.png");
+        units = new Texture("unit.png");
         Texture arrows = new Texture("arrows.png");
+        Texture ui = new Texture("ui.png");
         units.getTextureData().prepare();
         unitPixmap = units.getTextureData().consumePixmap();
+        buttonSmall = new TextureRegion(ui, 0, 0, 450, 181);
+        scroll = new TextureRegion(ui, 450, 0, 62, 181);
+        buttonSmallPressed = new TextureRegion(ui, 0, 181, 450, 181);
+        logo = new TextureRegion(ui, 0, 362, 450, 544);
         fog = new TextureRegion(new Texture("fog.png"));
-        tileDark = new TextureRegion(tiles, 0, 0, 128, 89);
-        tileLight = new TextureRegion(tiles, 128, 0, 128, 89);
-        unit = new TextureRegion(units, 0, 0, 256, 200);
+        tileDark = new TextureRegion(tiles, 0, 0, 256, 222);
+        tileLight = new TextureRegion(tiles, 256, 0, 256, 222);
+        tileHighlight = new TextureRegion(tiles, 512, 0, 256, 148);
+        unit = new TextureRegion(units, 88, 0, 80, 152);
         shadow = new TextureRegion(units, 0, 200, 256, 149);
-        base = new TextureRegion(new Texture("base.png"));
+        base = new TextureRegion(units, 24, 377, 208, 255);
+        warrior = new TextureRegion(units, 331, 22, 106, 137);
+        tower = new TextureRegion(units, 305, 229, 158, 241);
         float width = 256f;
         float height = 148f;
         ARROW_NONE = cutOut(arrows, 0, 0, width, height);
@@ -56,8 +66,9 @@ public class TextureBank implements io.model.engine.TextureBank {
         return switch (texture) {
             case TILE_DARK -> tileDark;
             case TILE_LIGHT -> tileLight;
+            case TILE_HIGHLIGHT -> tileHighlight;
             case FOG -> fog;
-            case UNIT -> unit;
+            case PAWN -> unit;
             case SHADOW -> shadow;
             case ARROW_NONE -> ARROW_NONE;
             case ARROW_SW_NE -> ARROW_SW_NE;
@@ -74,21 +85,27 @@ public class TextureBank implements io.model.engine.TextureBank {
             case ARROW_SW_SE -> ARROW_SW_SE;
             case ARROW_SW_NW -> ARROW_SW_NW;
             case ARROW_NW_NE -> ARROW_NW_NE;
+            case WARRIOR -> warrior;
             case BASE -> base;
+            case BUTTON_SMALL -> buttonSmall;
+            case BUTTON_SMALL_PRESSED -> buttonSmallPressed;
+            case SCROLL -> scroll;
+            case LOGO -> logo;
+            case TOWER -> tower;
         };
     }
 
     @Override
     public boolean contains(TextureDrawData texture, ScreenPosition pos) {
-        if (texture.texture() != io.model.textures.Texture.UNIT)
-            return false;
+        var tex = getTexture(texture.texture());
+        if (tex.getTexture() != units) return false;
         int x = (int) ((pos.x() - texture.position().x()) / texture.height() *
-                unit.getRegionHeight());
+                tex.getRegionHeight());
         int y = (int) ((pos.y() - texture.position().y()) / texture.height() *
-                unit.getRegionHeight());
-        if (x < 0 || x >= unit.getRegionWidth() || y < 0 || y >= unit.getRegionHeight())
+                tex.getRegionHeight());
+        if (x < 0 || x >= tex.getRegionWidth() || y < 0 || y >= tex.getRegionHeight())
             return false;
-        return (unitPixmap.getPixel(unit.getRegionX() + x,
-                unit.getRegionY() + unit.getRegionHeight() - y) & 0xff) != 0;
+        return (unitPixmap.getPixel(tex.getRegionX() + x,
+                tex.getRegionY() + tex.getRegionHeight() - y) & 0xff) != 0;
     }
 }
