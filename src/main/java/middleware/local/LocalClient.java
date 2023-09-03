@@ -2,7 +2,7 @@ package middleware.local;
 
 import core.client.ClientGameState;
 import core.events.Action;
-import middleware.AbstractGameClient;
+import middleware.clients.AbstractGameClient;
 
 public final class LocalClient extends AbstractGameClient {
     private final LocalServer server;

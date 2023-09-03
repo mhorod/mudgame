@@ -1,10 +1,11 @@
-package middleware.remote;
+package middleware.server;
 
 import core.events.Action;
 import middleware.communication.NotificationProcessor;
 import middleware.communication.Sender;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_server.MessageToServer;
+import middleware.model.UserID;
 
 import java.util.HashMap;
 import java.util.List;

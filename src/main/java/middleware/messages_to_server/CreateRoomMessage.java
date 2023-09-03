@@ -1,9 +1,10 @@
 package middleware.messages_to_server;
 
-import middleware.server.GameServer;
+import core.model.PlayerID;
 import middleware.model.UserID;
+import middleware.server.GameServer;
 
-public record StartGameMessage() implements MessageToServer {
+public record CreateRoomMessage(PlayerID myPlayerID, int playerCount) implements MessageToServer {
     @Override
     public void execute(GameServer server, UserID senderID) {
         throw new UnsupportedOperationException();

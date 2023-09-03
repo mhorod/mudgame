@@ -1,4 +1,4 @@
-package middleware.remote;
+package middleware.server;
 
 import core.events.Action;
 import core.events.EventOccurrence;
@@ -7,6 +7,7 @@ import core.server.ServerCore;
 import middleware.messages_to_client.EventMessage;
 import middleware.messages_to_client.GameStartedMessage;
 import middleware.messages_to_client.MessageToClient;
+import middleware.model.UserID;
 
 import java.util.HashMap;
 import java.util.List;

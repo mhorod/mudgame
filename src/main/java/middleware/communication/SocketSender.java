@@ -1,4 +1,4 @@
-package middleware.network;
+package middleware.communication;
 
 import lombok.SneakyThrows;
 import middleware.communication.Sender;

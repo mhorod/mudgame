@@ -1,11 +1,11 @@
 package middleware.messages_to_client;
 
-import core.events.Event;
+import middleware.model.UserID;
 import middleware.remote.RemoteNetworkClient;
 
-public record EventMessage(Event event) implements MessageToClient {
+public record SetUserIDMessage(UserID userID) implements MessageToClient {
     @Override
     public void execute(RemoteNetworkClient client) {
-        client.registerEvent(event);
+        client.setUserID(userID);
     }
 }

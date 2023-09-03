@@ -1,6 +1,6 @@
 package middleware.communication;
 
-import middleware.remote.UserID;
+import middleware.model.UserID;
 
 import java.io.Serializable;
 

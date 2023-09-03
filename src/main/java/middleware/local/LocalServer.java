@@ -5,7 +5,7 @@ import core.events.EventOccurrence;
 import core.model.PlayerID;
 import core.server.ServerCore;
 import core.server.ServerGameState;
-import middleware.GameClient;
+import middleware.clients.GameClient;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package middleware;
+package middleware.clients;
 
 import core.client.ClientCore;
 import core.client.ClientGameState;

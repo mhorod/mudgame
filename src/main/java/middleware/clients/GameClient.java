@@ -1,4 +1,4 @@
-package middleware;
+package middleware.clients;
 
 import core.client.ClientGameState;
 import core.events.Action;
@@ -17,4 +17,7 @@ public interface GameClient {
     void processEvent();
 
     void sendAction(Action action);
+
+    // TODO controls
+    // Controls getControls();
 }

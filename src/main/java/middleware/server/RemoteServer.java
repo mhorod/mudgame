@@ -1,9 +1,10 @@
-package middleware.remote;
+package middleware.server;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import middleware.network.SocketReceiver;
-import middleware.network.SocketSender;
+import middleware.model.UserID;
+import middleware.communication.SocketReceiver;
+import middleware.communication.SocketSender;
 import middleware.communication.NotifyingMessageProcessor;
 import middleware.messages_to_server.MessageToServer;
 

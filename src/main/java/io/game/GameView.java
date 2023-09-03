@@ -17,7 +17,7 @@ import io.model.input.events.Click;
 import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
-import middleware.GameClient;
+import middleware.clients.GameClient;
 import middleware.local.LocalServer;
 
 public class GameView extends SimpleView {
