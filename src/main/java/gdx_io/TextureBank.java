@@ -12,6 +12,7 @@ public class TextureBank implements io.model.engine.TextureBank {
             ARROW_START_NE, ARROW_START_SE, ARROW_START_NW, ARROW_START_SW,
             ARROW_END_NE, ARROW_END_SE, ARROW_END_NW, ARROW_END_SW,
             ARROW_SE_NE, ARROW_SW_SE, ARROW_SW_NW, ARROW_NW_NE;
+    public final TextureRegion buttonSmall, buttonSmallPressed, logo, scroll;
     private final Pixmap unitPixmap;
 
     private static TextureRegion cutOut(
@@ -25,8 +26,13 @@ public class TextureBank implements io.model.engine.TextureBank {
         Texture tiles = new Texture("tiles.png");
         Texture units = new Texture("unit.png");
         Texture arrows = new Texture("arrows.png");
+        Texture ui = new Texture("ui.png");
         units.getTextureData().prepare();
         unitPixmap = units.getTextureData().consumePixmap();
+        buttonSmall = new TextureRegion(ui, 0, 0, 450, 181);
+        scroll = new TextureRegion(ui, 450, 0, 62, 181);
+        buttonSmallPressed = new TextureRegion(ui, 0, 181, 450, 181);
+        logo = new TextureRegion(ui, 0, 362, 450, 544);
         fog = new TextureRegion(new Texture("fog.png"));
         tileDark = new TextureRegion(tiles, 0, 0, 128, 89);
         tileLight = new TextureRegion(tiles, 128, 0, 128, 89);
@@ -75,6 +81,10 @@ public class TextureBank implements io.model.engine.TextureBank {
             case ARROW_SW_NW -> ARROW_SW_NW;
             case ARROW_NW_NE -> ARROW_NW_NE;
             case BASE -> base;
+            case BUTTON_SMALL -> buttonSmall;
+            case BUTTON_SMALL_PRESSED -> buttonSmallPressed;
+            case SCROLL -> scroll;
+            case LOGO -> logo;
         };
     }
 

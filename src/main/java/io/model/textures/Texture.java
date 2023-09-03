@@ -21,8 +21,11 @@ public enum Texture {
     ARROW_SW_SE(74.f / 128.f),
     ARROW_SW_NW(74.f / 128.f),
     ARROW_NW_NE(74.f / 128.f),
-    BASE(134f / 128f);
-
+    BASE(134f / 128f),
+    BUTTON_SMALL(181f / 450f),
+    BUTTON_SMALL_PRESSED(181f / 450f),
+    SCROLL(361f / 62f),
+    LOGO(544f / 450f);
     private final float ratio;
 
     Texture(float aspectRatio) {
