@@ -17,14 +17,15 @@ public class EntityBoardAssert extends AbstractAssert<EntityBoardAssert, EntityB
     public EntityBoardAssert containsEntityWithId(EntityID entityID) {
         isNotNull();
         if (!actual.containsEntity(entityID))
-            failWithMessage("Expecting actual: {} to contain entity with id {}", actual, entityID);
+            failWithMessage("Expecting actual: {} to contain entity with entityID {}", actual,
+                            entityID);
         return this;
     }
 
     public EntityBoardAssert doesNotContainEntityWithId(EntityID entityID) {
         isNotNull();
         if (actual.containsEntity(entityID))
-            failWithMessage("Expecting actual: {} not to contain entity with id {}", actual,
+            failWithMessage("Expecting actual: {} not to contain entity with entityID {}", actual,
                             entityID);
         return this;
     }

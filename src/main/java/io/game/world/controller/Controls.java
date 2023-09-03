@@ -5,6 +5,7 @@ import core.model.Position;
 
 public interface Controls {
     void moveEntity(EntityID id, Position destination);
+    void createEntity(Position position);
 
     void nextEvent();
 }

@@ -2,6 +2,7 @@ package core.fogofwar;
 
 import core.entities.components.Vision;
 import core.entities.model.Entity;
+import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static core.entities.model.EntityType.PAWN;
 import static org.mockito.Mockito.mock;
 
 class PlayerFogOfWarTest {
@@ -46,7 +48,7 @@ class PlayerFogOfWarTest {
         PlayerFogOfWar testee = new PlayerFogOfWar(new PlayerID(0));
 
         // given
-        Entity entity = entityWithVision(1);
+        Entity entity = pawnWithVision(1);
         Position entityPosition = new Position(0, 0);
 
         // when
@@ -64,7 +66,7 @@ class PlayerFogOfWarTest {
         PlayerFogOfWar testee = new PlayerFogOfWar(new PlayerID(0));
 
         // given
-        Entity entity = entityWithVision(1);
+        Entity entity = pawnWithVision(1);
         Position entityPosition = new Position(0, 0);
 
         // when
@@ -83,10 +85,10 @@ class PlayerFogOfWarTest {
         PlayerFogOfWar testee = new PlayerFogOfWar(new PlayerID(0));
 
         // given
-        Entity firstEntity = entityWithVision(1);
+        Entity firstEntity = pawnWithVision(1);
         Position firstEntityPosition = new Position(0, 0);
 
-        Entity secondEntity = entityWithVision(1);
+        Entity secondEntity = pawnWithVision(1);
         Position secondEntityPosition = new Position(0, 1);
 
         // when
@@ -106,7 +108,7 @@ class PlayerFogOfWarTest {
         PlayerFogOfWar testee = new PlayerFogOfWar(new PlayerID(0));
 
         // given
-        Entity entity = entityWithVision(1);
+        Entity entity = pawnWithVision(1);
         Position entityPosition = new Position(0, 0);
         Position destination = new Position(1, 0);
 
@@ -122,9 +124,9 @@ class PlayerFogOfWarTest {
     }
 
 
-    Entity entityWithVision(int range) {
+    Entity pawnWithVision(int range) {
         return new Entity(
-                List.of(new Vision(range)),
+                new EntityData(PAWN, List.of(new Vision(range))),
                 mock(EntityID.class),
                 new PlayerID(0)
         );
