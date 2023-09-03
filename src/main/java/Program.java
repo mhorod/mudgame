@@ -14,7 +14,7 @@ public class Program {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         config.setTitle("Epic Game");
         config.setWindowedMode(596, 596);
-        config.useVsync(true);
+//        config.useVsync(true);
         config.setForegroundFPS(60);
         config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 2);
         return config;

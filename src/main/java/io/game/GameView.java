@@ -1,6 +1,10 @@
 package io.game;
 
+import core.entities.events.HideEntity;
 import core.entities.events.MoveEntity;
+import core.entities.events.PlaceEntity;
+import core.entities.events.RemoveEntity;
+import core.entities.events.ShowEntity;
 import core.events.Event;
 import core.model.EntityID;
 import core.model.Position;
@@ -17,10 +21,12 @@ import io.model.input.events.Click;
 import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
+import lombok.extern.slf4j.Slf4j;
 import middleware.Client;
 import middleware.LocalServer;
 import middleware.messages_to_server.ActionMessage;
 
+@Slf4j
 public class GameView extends SimpleView {
     private final AnimationController animations = new AnimationController();
     private final Map map;
@@ -68,20 +74,37 @@ public class GameView extends SimpleView {
     }
 
     private void processEvent(Event event) {
-        if (event instanceof MoveEntity) {
+        log.debug("Processing event: {}", event);
+        if (event instanceof MoveEntity e) {
             eventObserved = true;
-            worldController.onMoveEntity((MoveEntity) event);
-        } else if (event instanceof SetTerrain) {
+            worldController.onMoveEntity(e);
+        } else if (event instanceof SetTerrain e) {
             eventObserved = true;
-            worldController.onSetTerrain((SetTerrain) event);
+            worldController.onSetTerrain(e);
+        } else if (event instanceof PlaceEntity e) {
+            eventObserved = true;
+            worldController.onPlaceEntity(e);
+        } else if (event instanceof RemoveEntity e) {
+            eventObserved = true;
+            worldController.onRemoveEntity(e);
+        } else if (event instanceof ShowEntity e) {
+            eventObserved = true;
+            worldController.onShowEntity(e);
+        } else if (event instanceof HideEntity e) {
+            eventObserved = true;
+            worldController.onHideEntity(e);
         }
     }
 
     private boolean canEatEvent() {
-        return me.peekEvent()
-                .stream()
-                .anyMatch(
-                        event -> !(event instanceof MoveEntity) && !(event instanceof SetTerrain));
+        return me.peekEvent().stream().anyMatch(
+                event -> !(event instanceof MoveEntity)
+                         && !(event instanceof SetTerrain)
+                         && !(event instanceof PlaceEntity)
+                         && !(event instanceof RemoveEntity)
+                         && !(event instanceof ShowEntity)
+                         && !(event instanceof HideEntity)
+        );
     }
 
     @Override

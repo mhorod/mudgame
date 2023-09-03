@@ -4,6 +4,7 @@ import io.game.Camera;
 import io.game.WorldPosition;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
+import io.model.engine.Color;
 import io.model.textures.Texture;
 import io.model.textures.TextureDrawData;
 
@@ -56,7 +57,7 @@ public enum WorldTexture {
         canvas.draw(getDrawData(position, camera));
     }
 
-    public void drawTransparent(WorldPosition position, Canvas canvas, Camera camera, float alpha) {
-        canvas.drawTransparent(getDrawData(position, camera), alpha);
+    public void drawColored(WorldPosition position, Canvas canvas, Camera camera, Color color, float alpha) {
+        canvas.drawColored(getDrawData(position, camera), alpha, color);
     }
 }
