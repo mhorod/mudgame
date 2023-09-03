@@ -118,6 +118,8 @@ public class Pathfinder {
         List<PositionOnPath> result = new ArrayList<>();
         for (int dx = -1; dx <= 1; dx++)
             for (int dy = -1; dy <= 1; dy++) {
+                if (dx * dx == dy * dy)
+                    continue;
                 Position pos = p.position().plus(dx, dy);
                 int cost = terrain.terrainAt(pos).getMovementCost();
                 if (canMoveToPosition(entityID, p, pos))
