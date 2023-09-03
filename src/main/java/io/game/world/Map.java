@@ -10,12 +10,12 @@ import io.animation.Finishable;
 import io.game.Camera;
 import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
-import io.game.world.arrow.ArrowKind;
 import io.game.world.entity.*;
 import io.game.world.tile.Tile;
 import io.game.world.tile.TileKind;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
+import io.model.engine.Color;
 import io.model.engine.TextureBank;
 
 import java.util.ArrayList;
@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Map implements Animation {
-    ArrowKind[][] arrows;
     HashMap<EntityID, EntityAnimation> entityAnimations = new HashMap<>();
     HashMap<Position, EntityAnimation> tileAnimations = new HashMap<>();
     ArrayList<EntityAnimation> otherAnimations = new ArrayList<>();
@@ -34,7 +33,6 @@ public class Map implements Animation {
     public Map(TerrainView terrain, EntityBoardView entities) {
         this.terrain = terrain;
         this.entities = entities;
-        arrows = new ArrowKind[terrain.size().width()][terrain.size().height()];
     }
 
     public void setPath(List<Position> positions) {
@@ -50,7 +48,7 @@ public class Map implements Animation {
     private WorldEntity entityFromID(EntityID id) {
         if (entityAnimations.containsKey(id))
             return entityAnimations.get(id).getEntity();
-        return new Entity(WorldPosition.from(entities.entityPosition(id)), id);
+        return new Entity(WorldPosition.from(entities.entityPosition(id)), id, Color.fromPlayerId(entities.findEntityByID(id).owner()));
     }
 
     public void objectAt(ScreenPosition position, TextureBank textureBank, Camera camera, MapObserver listener) {
@@ -144,6 +142,20 @@ public class Map implements Animation {
         animation.init(new WorldEntity(WorldPosition.from(position), WorldTexture.FOG, false));
         otherAnimations.add(animation);
         tileAnimations.put(position, tileReplacement);
+        return animation;
+    }
+
+    public Finishable createUnit(Position position, core.entities.model.Entity entity) {
+        var animation = new Condense();
+        animation.init(new Entity(WorldPosition.from(position), entity.id(), Color.fromPlayerId(entity.owner())));
+        entityAnimations.put(entity.id(), animation);
+        return animation;
+    }
+
+    public Finishable removeUnit(Position position, EntityID entity) {
+        var animation = new Dissipate();
+        animation.init(new Entity(WorldPosition.from(position), entity, Color.fromPlayerId(entities.findEntityByID(entity).owner())));
+        entityAnimations.put(entity, animation);
         return animation;
     }
 

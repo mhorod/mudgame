@@ -1,6 +1,8 @@
 package io.game.world.controller;
 
 import core.entities.events.MoveEntity;
+import core.entities.events.PlaceEntity;
+import core.entities.events.RemoveEntity;
 import core.model.EntityID;
 import core.model.Position;
 import core.terrain.events.SetTerrain;
@@ -17,5 +19,9 @@ public interface WorldBehavior {
     void onMoveEntity(MoveEntity event);
 
     void onSetTerrain(SetTerrain event);
+
+    void onPlaceEntity(PlaceEntity event);
+
+    void onRemoveEntity(RemoveEntity event);
 
 }

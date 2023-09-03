@@ -1,6 +1,8 @@
 package io.game;
 
 import core.entities.events.MoveEntity;
+import core.entities.events.PlaceEntity;
+import core.entities.events.RemoveEntity;
 import core.events.Event;
 import core.model.EntityID;
 import core.model.Position;
@@ -74,14 +76,22 @@ public class GameView extends SimpleView {
         } else if (event instanceof SetTerrain) {
             eventObserved = true;
             worldController.onSetTerrain((SetTerrain) event);
+        } else if (event instanceof PlaceEntity) {
+            eventObserved = true;
+            worldController.onPlaceEntity((PlaceEntity) event);
+        } else if (event instanceof RemoveEntity) {
+            eventObserved = true;
+            worldController.onRemoveEntity((RemoveEntity) event);
         }
     }
 
     private boolean canEatEvent() {
-        return me.peekEvent()
-                .stream()
-                .anyMatch(
-                        event -> !(event instanceof MoveEntity) && !(event instanceof SetTerrain));
+        return me.peekEvent().stream().anyMatch(
+                event -> !(event instanceof MoveEntity)
+                        && !(event instanceof SetTerrain)
+                        && !(event instanceof PlaceEntity)
+                        && !(event instanceof RemoveEntity)
+        );
     }
 
     @Override

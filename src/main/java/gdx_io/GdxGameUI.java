@@ -79,8 +79,20 @@ public class GdxGameUI implements ApplicationListener, Canvas {
     }
 
     @Override
-    public void drawTransparent(TextureDrawData texture, float alpha) {
-        batch.setColor(1, 1, 1, alpha);
+    public void drawColored(TextureDrawData texture, float alpha, io.model.engine.Color color) {
+        var c = switch (color) {
+            case WHITE -> Color.WHITE;
+            case PINK -> new Color(0xff8ce1ff);
+            case GREEN -> Color.GREEN;
+            case BLUE -> Color.BLUE;
+            case RED -> Color.RED;
+            case CYAN -> Color.CYAN;
+            case MAGENTA -> Color.MAGENTA;
+            case YELLOW -> Color.YELLOW;
+            case ORANGE -> Color.ORANGE;
+            case PURPLE -> Color.PURPLE;
+        };
+        batch.setColor(new Color(c.r, c.g, c.b, alpha));
         var tex = textureBank.getTexture(texture.texture());
         batch.draw(
                 tex,
