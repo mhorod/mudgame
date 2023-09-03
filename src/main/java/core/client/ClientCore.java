@@ -8,6 +8,7 @@ import core.events.EventOccurrence;
 import core.events.EventOccurrenceObserver;
 import core.fogofwar.EventPlayerFogOfWar;
 import core.model.PlayerID;
+import core.pathfinder.Pathfinder;
 import core.terrain.EventTerrain;
 import core.turns.EventPlayerManager;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,8 @@ public final class ClientCore implements EventObserver {
     private final EventPlayerFogOfWar eventPlayerFogOfWar;
     private final EventTerrain eventTerrain;
 
+    private final Pathfinder pathfinder;
+
     public ClientCore(ClientGameState state) {
         this.state = state;
         ConditionalEventSink eventSink = new ConditionalEventSink();
@@ -59,9 +62,15 @@ public final class ClientCore implements EventObserver {
         );
         eventPlayerFogOfWar = new EventPlayerFogOfWar(state.fogOfWar(), eventSink);
         eventTerrain = new EventTerrain(state.terrain(), eventSink);
+        pathfinder = new Pathfinder(
+                state().terrain(),
+                state.entityBoard()
+        );
     }
 
     public ClientGameState state() { return state; }
+
+    public Pathfinder pathfinder() { return pathfinder; }
 
     @Override
     public void receive(Event event) {

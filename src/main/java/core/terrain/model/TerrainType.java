@@ -1,5 +1,7 @@
 package core.terrain.model;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 
 public enum TerrainType implements Serializable {
@@ -9,7 +11,11 @@ public enum TerrainType implements Serializable {
     LAND(1),
     MOUNTAIN(2);
 
+    @Getter
+    private final int movementCost;
 
     TerrainType(int movementCost) {
+        this.movementCost = movementCost;
     }
+
 }

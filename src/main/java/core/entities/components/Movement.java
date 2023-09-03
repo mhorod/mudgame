@@ -14,6 +14,10 @@ public final class Movement implements Component {
         this.currentMovement = movementPerTurn;
     }
 
+    public void move(int movementCost) {
+        currentMovement -= movementCost;
+    }
+
     public void newTurn() {
         currentMovement = movementPerTurn;
     }
