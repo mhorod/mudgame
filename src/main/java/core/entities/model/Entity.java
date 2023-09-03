@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Represents an existing, individual entity instance that has id and owner
+ * Represents an existing, individual entity instance that has entityID and owner
  */
 public record Entity(EntityData data, EntityID id, PlayerID owner)
         implements Serializable {
