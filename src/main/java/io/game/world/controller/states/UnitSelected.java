@@ -29,6 +29,7 @@ public class UnitSelected extends WorldState {
 
     @Override
     public void onEntityClick(EntityID entity) {
+        if (entityAnimated(entity)) return;
         state.map().putDown(selectedUnit);
         if (entity.equals(selectedUnit)) {
             change(new Normal(state));
