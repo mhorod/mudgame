@@ -2,9 +2,9 @@ package middleware.remote;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import middleware.communicators.NetworkReceiver;
-import middleware.communicators.NetworkSender;
-import middleware.communicators.NotifyingMessageProcessor;
+import middleware.network.SocketReceiver;
+import middleware.network.SocketSender;
+import middleware.communication.NotifyingMessageProcessor;
 import middleware.messages_to_server.MessageToServer;
 
 import java.io.IOException;
@@ -41,8 +41,8 @@ public final class RemoteServer {
             ));
 
             synchronized (server) {
-                server.addConnection(userID, new NetworkSender<>(socket));
-                new NetworkReceiver<>(new NotifyingMessageProcessor<>(userID, server), socket, MessageToServer.class);
+                server.addConnection(userID, new SocketSender<>(socket));
+                new SocketReceiver<>(socket, MessageToServer.class, new NotifyingMessageProcessor<>(userID, server));
             }
         }
     }

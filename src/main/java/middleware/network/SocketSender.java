@@ -1,6 +1,7 @@
-package middleware.communicators;
+package middleware.network;
 
 import lombok.SneakyThrows;
+import middleware.communication.Sender;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -9,11 +10,11 @@ import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public final class NetworkSender<T extends Serializable> implements Sender<T> {
+public final class SocketSender<T extends Serializable> implements Sender<T> {
     private final BlockingQueue<T> queue = new LinkedBlockingQueue<>();
     private final Socket socket;
 
-    public NetworkSender(Socket socket) {
+    public SocketSender(Socket socket) {
         this.socket = socket;
         new Thread(this::work).start();
     }
@@ -23,11 +24,13 @@ public final class NetworkSender<T extends Serializable> implements Sender<T> {
         queue.add(message);
     }
 
-    @SneakyThrows(IOException.class)
+    @SneakyThrows({IOException.class, InterruptedException.class})
     private void work() {
         final ObjectOutputStream stream = new ObjectOutputStream(socket.getOutputStream());
 
-        stream.writeObject(queue.remove());
-        throw new RuntimeException();
+        while (!socket.isClosed()) {
+            T message = queue.take();
+            stream.writeObject(message);
+        }
     }
 }

@@ -1,9 +1,8 @@
 package middleware.remote;
 
 import core.events.Action;
-import middleware.communicators.MultiSender;
-import middleware.communicators.NotificationProcessor;
-import middleware.communicators.Sender;
+import middleware.communication.NotificationProcessor;
+import middleware.communication.Sender;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_server.MessageToServer;
 
@@ -11,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class GameServer implements NotificationProcessor<MessageToServer>, MultiSender<MessageToClient> {
+public final class GameServer implements NotificationProcessor<MessageToServer> {
     private final Map<UserID, Sender<MessageToClient>> senderMap = new HashMap<>();
     private final Map<UserID, Game> gameMap = new HashMap<>();
 
@@ -26,7 +25,6 @@ public final class GameServer implements NotificationProcessor<MessageToServer>,
         senderMap.put(userID, sender);
     }
 
-    @Override
     public void sendMessage(UserID destination, MessageToClient message) {
         Sender<MessageToClient> sender = senderMap.get(destination);
         if (sender != null)

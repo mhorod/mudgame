@@ -1,4 +1,4 @@
-package middleware.communicators;
+package middleware.communication;
 
 import java.io.Serializable;
 

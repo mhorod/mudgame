@@ -19,7 +19,6 @@ import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import middleware.GameClient;
 import middleware.local.LocalServer;
-import middleware.messages_to_server.ActionMessage;
 
 public class GameView extends SimpleView {
     private final AnimationController animations = new AnimationController();

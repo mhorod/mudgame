@@ -1,5 +1,7 @@
 package middleware;
 
+import middleware.network.ConnectionStatus;
+
 import java.util.Optional;
 
 public interface Client {
@@ -8,4 +10,10 @@ public interface Client {
     boolean hasCoreChanged();
 
     Optional<GameClient> getGameClient();
+
+    ConnectionStatus getNetworkStatus();
+
+    void disconnect();
+
+    void connectAsynchronously(String host, int port);
 }
