@@ -12,7 +12,6 @@ import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
 import io.game.world.entity.*;
 import io.game.world.tile.Tile;
-import io.game.world.tile.TileKind;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.TextureBank;
@@ -74,10 +73,15 @@ public class Map implements Animation {
     }
 
     private Tile fog(Position pos) {
-        if (terrain.terrainAt(new Position(pos.x() + 1, pos.y())) == TerrainType.VOID
-                || terrain.terrainAt(new Position(pos.x(), pos.y() + 1)) == TerrainType.VOID)
-            return new Tile(pos, TileKind.FOG_TALL);
-        return new Tile(pos, TileKind.FOG);
+        var left = terrain.terrainAt(new Position(pos.x(), pos.y() + 1)) == TerrainType.VOID;
+        var right = terrain.terrainAt(new Position(pos.x() + 1, pos.y())) == TerrainType.VOID;
+        if (left && right)
+            return new Tile(pos, WorldTexture.FOG_TALL);
+        if (left)
+            return new Tile(pos, WorldTexture.FOG_LEFT);
+        if (right)
+            return new Tile(pos, WorldTexture.FOG_RIGHT);
+        return new Tile(pos, WorldTexture.FOG);
     }
 
     public void draw(Canvas canvas, Camera camera) {
@@ -91,8 +95,8 @@ public class Map implements Animation {
                 var tile = terrain.terrainAt(pos);
                 switch (tile) {
                     case UNKNOWN -> fogTiles.add(fog(pos));
-                    case WATER -> new Tile(pos, TileKind.TILE_LIGHT).draw(canvas, camera);
-                    case LAND -> new Tile(pos, TileKind.TILE_DARK).draw(canvas, camera);
+                    case WATER -> new Tile(pos, WorldTexture.TILE_LIGHT).draw(canvas, camera);
+                    case LAND -> new Tile(pos, WorldTexture.TILE_DARK).draw(canvas, camera);
                 }
                 if (highlightedTiles != null && !highlightedTiles.contains(pos) && tile == TerrainType.LAND)
                     highlightTiles.add(
@@ -159,7 +163,7 @@ public class Map implements Animation {
 
     public Finishable addFog(Position position) {
         var tileReplacement = new Exist(Condense.TIME);
-        tileReplacement.init(new Tile(position, TileKind.TILE_DARK));
+        tileReplacement.init(new Tile(position, WorldTexture.TILE_DARK));
         var animation = new Condense();
         animation.init(fog(position));
         otherAnimations.add(animation);

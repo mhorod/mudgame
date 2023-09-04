@@ -8,12 +8,7 @@ import io.game.world.entity.WorldEntity;
 public class Tile extends WorldEntity {
     public static final float ASPECT_RATIO = 256.0f / 148f;
 
-    public Tile(Position position, TileKind kind) {
-        super(WorldPosition.from(position), switch (kind) {
-            case TILE_DARK -> WorldTexture.TILE_DARK;
-            case TILE_LIGHT -> WorldTexture.TILE_LIGHT;
-            case FOG -> WorldTexture.FOG;
-            case FOG_TALL -> WorldTexture.FOG_TALL;
-        }, false);
+    public Tile(Position position, WorldTexture texture) {
+        super(WorldPosition.from(position), texture, false);
     }
 }

@@ -7,7 +7,7 @@ import io.model.ScreenPosition;
 import io.model.textures.TextureDrawData;
 
 public class TextureBank implements io.model.engine.TextureBank {
-    public final TextureRegion tileDark, tileLight, fog, fogTall, unit, shadow, base, warrior, tower, tileHighlight;
+    public final TextureRegion tileDark, tileLight, fog, fogTall, fogLeft, fogRight, unit, shadow, base, warrior, tower, tileHighlight;
     private final TextureRegion ARROW_NONE, ARROW_SW_NE, ARROW_SE_NW,
             ARROW_START_NE, ARROW_START_SE, ARROW_START_NW, ARROW_START_SW,
             ARROW_END_NE, ARROW_END_SE, ARROW_END_NW, ARROW_END_SW,
@@ -42,6 +42,8 @@ public class TextureBank implements io.model.engine.TextureBank {
         buttonSmallPressed = new TextureRegion(ui, 0, 181, 450, 181);
         logo = new TextureRegion(ui, 0, 362, 449, 544);
         fog = new TextureRegion(tiles, 5, 236, 326, 212);
+        fogLeft = new TextureRegion(tiles, 9, 498, 329, 282);
+        fogRight = new TextureRegion(tiles, 381, 530, 325, 282);
         fogTall = new TextureRegion(tiles, 384, 227, 328, 283);
         tileDark = new TextureRegion(tiles, 0, 0, 256, 222);
         tileLight = new TextureRegion(tiles, 256, 0, 256, 222);
@@ -77,6 +79,8 @@ public class TextureBank implements io.model.engine.TextureBank {
             case TILE_HIGHLIGHT -> tileHighlight;
             case FOG -> fog;
             case FOG_TALL -> fogTall;
+            case FOG_LEFT -> fogLeft;
+            case FOG_RIGHT -> fogRight;
             case PAWN -> unit;
             case SHADOW -> shadow;
             case ARROW_NONE -> ARROW_NONE;
