@@ -73,6 +73,13 @@ public class Map implements Animation {
             listener.onTile(tile);
     }
 
+    private Tile fog(Position pos) {
+        if (terrain.terrainAt(new Position(pos.x() + 1, pos.y())) == TerrainType.VOID
+                || terrain.terrainAt(new Position(pos.x(), pos.y() + 1)) == TerrainType.VOID)
+            return new Tile(pos, TileKind.FOG_TALL);
+        return new Tile(pos, TileKind.FOG);
+    }
+
     public void draw(Canvas canvas, Camera camera) {
         ArrayList<Tile> fogTiles = new ArrayList<>();
         ArrayList<WorldEntity> highlightTiles = new ArrayList<>();
@@ -83,7 +90,7 @@ public class Map implements Animation {
             } else {
                 var tile = terrain.terrainAt(pos);
                 switch (tile) {
-                    case UNKNOWN -> fogTiles.add(new Tile(pos, TileKind.FOG));
+                    case UNKNOWN -> fogTiles.add(fog(pos));
                     case WATER -> new Tile(pos, TileKind.TILE_LIGHT).draw(canvas, camera);
                     case LAND -> new Tile(pos, TileKind.TILE_DARK).draw(canvas, camera);
                 }
@@ -145,17 +152,16 @@ public class Map implements Animation {
 
     public Finishable removeFog(Position position) {
         var animation = new Dissipate();
-        animation.init(new WorldEntity(WorldPosition.from(position), WorldTexture.FOG, false));
+        animation.init(fog(position));
         otherAnimations.add(animation);
         return animation;
     }
 
     public Finishable addFog(Position position) {
         var tileReplacement = new Exist(Condense.TIME);
-        tileReplacement.init(
-                new WorldEntity(WorldPosition.from(position), WorldTexture.TILE_DARK, false));
+        tileReplacement.init(new Tile(position, TileKind.TILE_DARK));
         var animation = new Condense();
-        animation.init(new WorldEntity(WorldPosition.from(position), WorldTexture.FOG, false));
+        animation.init(fog(position));
         otherAnimations.add(animation);
         tileAnimations.put(position, tileReplacement);
         return animation;

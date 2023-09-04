@@ -5,6 +5,7 @@ public enum Texture {
     TILE_LIGHT(222.f / 256.f),
     TILE_HIGHLIGHT(148.f / 256.f),
     FOG(180.f / 275.f),
+    FOG_TALL(283.f / 328.f),
     PAWN(152f / 80f),
     WARRIOR(137f / 106f),
     BASE(255f / 208f),
