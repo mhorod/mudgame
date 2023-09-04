@@ -1,7 +1,6 @@
 package middleware.clients;
 
 import core.client.ClientCore;
-import core.client.ClientGameState;
 import core.events.Action;
 import core.events.Event;
 import core.model.PlayerID;

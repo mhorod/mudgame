@@ -1,4 +1,6 @@
 package middleware.model;
 
-public record UserID(long id) {
+import java.io.Serializable;
+
+public record UserID(long id) implements Serializable {
 }

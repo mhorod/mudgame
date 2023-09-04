@@ -2,6 +2,7 @@ package middleware.remote;
 
 import core.client.ClientGameState;
 import core.events.Event;
+import lombok.extern.slf4j.Slf4j;
 import middleware.clients.Connection;
 import middleware.clients.NetworkClient;
 import middleware.clients.ServerClient;
@@ -14,8 +15,6 @@ import middleware.messages_to_server.PingToServer;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.net.Socket;
 import java.time.Duration;
 import java.time.Instant;
@@ -25,59 +24,56 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@Slf4j
 public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkClient> {
-    private static final Duration IDLE_TIMEOUT = Duration.ofSeconds(30);
+    private static final Duration IDLE_TIMEOUT = Duration.ofSeconds(10);
     private static final Duration PING_TIMEOUT = Duration.ofSeconds(5);
     private static final Duration USED_ID_TIMEOUT = Duration.ofSeconds(5);
-
+    // TODO remove GLOBAL_CLIENT
+    public static RemoteNetworkClient GLOBAL_CLIENT = new RemoteNetworkClient();
     private final Queue<MessageToClient> messageQueue = new LinkedBlockingQueue<>();
     private Instant lastIncoming = Instant.EPOCH, lastPing = Instant.EPOCH, connectionBegan = Instant.EPOCH;
 
     private NetworkStatus networkStatus = NetworkStatus.DISCONNECTED;
-    private Closeable toClose;
     private Sender<MessageToServer> sender;
     private RemoteServerClient currentServerClient;
 
     private void verifyNetworkStatus() {
         if (networkStatus == NetworkStatus.OK) {
+            if (sender.isClosed()) {
+                clearStateAndSetStatus(NetworkStatus.FAILED);
+                return;
+            }
             if (Duration.between(lastIncoming, Instant.now()).compareTo(IDLE_TIMEOUT) < 0)
                 return;
             if (lastPing.compareTo(lastIncoming) <= 0) {
-                sendMessage(new PingToServer("ping", true));
+                sendMessage(new PingToServer("pingFromClient", true));
                 lastPing = Instant.now();
             } else if (Duration.between(lastPing, Instant.now()).compareTo(PING_TIMEOUT) > 0)
-                disconnect();
+                clearStateAndSetStatus(NetworkStatus.FAILED);
         }
         if (networkStatus == NetworkStatus.ATTEMPTING) {
             if (Duration.between(connectionBegan, Instant.now()).compareTo(USED_ID_TIMEOUT) < 0)
                 return;
-            disconnect();
-            networkStatus = NetworkStatus.FAILED;
+            clearStateAndSetStatus(NetworkStatus.FAILED);
         }
     }
 
-    public void disconnect() {
-        if (toClose != null) {
-            try {
-                toClose.close();
-            } catch (IOException ignored) {
-            }
-            toClose = null;
+    private void clearStateAndSetStatus(NetworkStatus status) {
+        if (sender != null) {
+            sender.close();
             sender = null;
             currentServerClient = null;
         }
-        networkStatus = NetworkStatus.DISCONNECTED;
+        networkStatus = status;
+    }
+
+    public void disconnect() {
+        clearStateAndSetStatus(NetworkStatus.DISCONNECTED);
     }
 
     public void reportConnectionAttempt() {
-        disconnect();
-        networkStatus = NetworkStatus.ATTEMPTING;
-    }
-
-    public void sendMessage(MessageToServer message) {
-        if (networkStatus != NetworkStatus.OK)
-            throw new RuntimeException("Attempting to send message using disconnected NetworkClient");
-        sender.sendMessage(message);
+        clearStateAndSetStatus(NetworkStatus.ATTEMPTING);
     }
 
     public void setSocketConnection(Socket socket) {
@@ -87,11 +83,23 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
             throw new RuntimeException("setSocketConnection() called with bad socket");
 
         connectionBegan = Instant.now();
-        toClose = socket;
         sender = new SocketSender<>(socket);
-        new SocketReceiver<>(socket, MessageToClient.class, this::registerIncomingMessage);
+        new SocketReceiver<>(socket, MessageToClient.class, this::registerMessage);
 
         networkStatus = NetworkStatus.ATTEMPTING;
+    }
+
+    public void sendMessage(MessageToServer message) {
+        if (networkStatus != NetworkStatus.OK)
+            throw new RuntimeException("Attempting to send message using disconnected NetworkClient");
+        log.info("[SND] " + message);
+        sender.sendMessage(message);
+    }
+
+    private void registerMessage(MessageToClient message) {
+        log.info("[REC] " + message);
+        lastIncoming = Instant.now();
+        messageQueue.add(message);
     }
 
     public void setUserID(UserID userID) {
@@ -102,11 +110,6 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
         networkStatus = NetworkStatus.OK;
     }
 
-    private void registerIncomingMessage(MessageToClient message) {
-        lastIncoming = Instant.now();
-        messageQueue.add(message);
-    }
-
     public void registerEvent(Event event) {
         Objects.requireNonNull(currentServerClient).registerEvent(event);
     }
@@ -115,9 +118,12 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
         Objects.requireNonNull(currentServerClient).setGameState(state);
     }
 
-
     public void setRoomList(List<RoomInfo> roomList) {
         Objects.requireNonNull(currentServerClient).setRoomList(roomList);
+    }
+
+    public void setCurrentRoom(RoomInfo roomInfo) {
+        Objects.requireNonNull(currentServerClient).setCurrentRoom(roomInfo);
     }
 
     @Override
@@ -138,6 +144,7 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
 
     @Override
     public void processAllMessages() {
+        verifyNetworkStatus();
         while (!messageQueue.isEmpty())
             messageQueue.remove().execute(this);
     }
