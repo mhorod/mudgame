@@ -33,7 +33,7 @@ public class TextureBank implements io.model.engine.TextureBank {
         buttonSmall = new TextureRegion(ui, 0, 0, 450, 181);
         scroll = new TextureRegion(ui, 450, 0, 62, 181);
         buttonSmallPressed = new TextureRegion(ui, 0, 181, 450, 181);
-        logo = new TextureRegion(ui, 0, 362, 450, 544);
+        logo = new TextureRegion(ui, 0, 362, 449, 544);
         fog = new TextureRegion(new Texture("fog.png"));
         tileDark = new TextureRegion(tiles, 0, 0, 256, 222);
         tileLight = new TextureRegion(tiles, 256, 0, 256, 222);

@@ -4,14 +4,17 @@ import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class ButtonBlock {
     private final float gap;
     List<Button> buttons;
 
-    public ButtonBlock(float gap, List<Runnable> handlers) {
+    public ButtonBlock(float gap, List<String> text, List<Runnable> handlers) {
         this.gap = gap;
-        buttons = handlers.stream().map(Button::new).toList();
+        buttons = IntStream.rangeClosed(1, text.size())
+                .mapToObj(i -> new Button(text.get(text.size() - i), handlers.get(handlers.size() - i)))
+                .toList();
     }
 
     public void fitInto(float x, float y, float width, float height) {
