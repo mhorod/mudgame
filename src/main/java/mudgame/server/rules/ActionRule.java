@@ -1,7 +1,7 @@
 package mudgame.server.rules;
 
 import core.model.PlayerID;
-import mudgame.events.Action;
+import core.event.Action;
 
 import java.io.Serializable;
 

@@ -2,7 +2,7 @@ package mudgame.server.rules;
 
 import core.model.PlayerID;
 import mudgame.controls.events.CreateEntity;
-import mudgame.events.Action;
+import core.event.Action;
 
 public final class PlayerOwnsCreatedEntity implements ActionRule {
     @Override

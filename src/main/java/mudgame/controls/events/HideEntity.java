@@ -1,7 +1,7 @@
 package mudgame.controls.events;
 
 import core.model.EntityID;
-import mudgame.events.Event;
+import core.event.Event;
 
 public record HideEntity(EntityID entityID) implements Event {
 }

@@ -1,8 +1,8 @@
 package middleware;
 
-import mudgame.client.ClientCore;
-import mudgame.events.Event;
+import core.event.Event;
 import middleware.messages_to_client.EventMessage;
+import mudgame.client.MudClientCore;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
@@ -23,7 +23,7 @@ class MessageToClientTest {
     void event_message_core_is_not_null() {
         // given
         Client client = mock(Client.class);
-        ClientCore core = mock(ClientCore.class);
+        MudClientCore core = mock(MudClientCore.class);
         Event event = mock(Event.class);
         EventMessage message = new EventMessage(event);
 

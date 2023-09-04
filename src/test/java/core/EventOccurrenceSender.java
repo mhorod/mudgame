@@ -1,7 +1,7 @@
 package core;
 
 import mudgame.events.EventObserver;
-import mudgame.events.EventOccurrence;
+import core.event.EventOccurrence;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.events.EventSource;
 import mudgame.events.PlayerEventObserver;

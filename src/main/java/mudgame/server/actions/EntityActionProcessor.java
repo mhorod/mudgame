@@ -1,6 +1,7 @@
 package mudgame.server.actions;
 
 import core.entities.model.Entity;
+import core.event.Event;
 import core.fogofwar.PlayerFogOfWar;
 import core.fogofwar.events.VisibilityChange;
 import core.model.EntityID;
@@ -14,7 +15,6 @@ import mudgame.controls.events.MoveEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.MoveEntityAlongPath.SingleMove;
 import mudgame.controls.events.SpawnEntity;
-import mudgame.events.Event;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.ServerGameState;
 

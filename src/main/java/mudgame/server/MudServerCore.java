@@ -3,10 +3,14 @@ package mudgame.server;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
 import core.entities.model.Entity;
+import core.event.Action;
+import core.event.Event;
+import core.event.EventOccurrence;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.Pathfinder;
+import core.server.ServerCore;
 import core.terrain.Terrain;
 import core.terrain.TerrainGenerator;
 import core.terrain.TerrainGenerator.GeneratedTerrain;
@@ -14,11 +18,8 @@ import core.terrain.generators.SimpleLandGenerator;
 import core.turns.PlayerManager;
 import core.turns.TurnView;
 import lombok.extern.slf4j.Slf4j;
-import mudgame.events.Action;
 import mudgame.events.ConditionalEventObserver;
-import mudgame.events.Event;
 import mudgame.events.EventObserver;
-import mudgame.events.EventOccurrence;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
@@ -37,7 +38,7 @@ import java.util.function.Predicate;
 import static core.entities.model.EntityType.BASE;
 
 @Slf4j
-public final class ServerCore {
+public final class MudServerCore implements ServerCore {
 
     private final class InternalSender
             implements EventObserver, ConditionalEventObserver, EventOccurrenceObserver {
@@ -55,7 +56,7 @@ public final class ServerCore {
 
         @Override
         public void receive(Event event, Predicate<PlayerID> shouldPlayerReceive) {
-            List<PlayerID> recipients = ServerCore.this
+            List<PlayerID> recipients = MudServerCore.this
                     .players()
                     .stream()
                     .filter(shouldPlayerReceive)
@@ -68,13 +69,13 @@ public final class ServerCore {
             log.info("Sending event occurrence: {}", occurrence);
             eventObservers.forEach(o -> o.receive(occurrence.event()));
             eventOccurrenceObservers.forEach(o -> o.receive(occurrence));
-            (ServerCore.this).eventOccurrenceObserver.receive(occurrence);
+            (MudServerCore.this).eventOccurrenceObserver.receive(occurrence);
         }
 
 
         @Override
         public void receive(Event event) {
-            receive(new EventOccurrence(event, ServerCore.this.players()));
+            receive(new EventOccurrence(event, MudServerCore.this.players()));
         }
 
         void addEventOccurrenceObserver(EventOccurrenceObserver o) {
@@ -91,15 +92,15 @@ public final class ServerCore {
 
     private final Pathfinder pathfinder;
 
-    public ServerCore(int playerCount) {
+    public MudServerCore(int playerCount) {
         this(playerCount, e -> { });
     }
 
-    public ServerCore(int playerCount, EventOccurrenceObserver eventOccurrenceObserver) {
+    public MudServerCore(int playerCount, EventOccurrenceObserver eventOccurrenceObserver) {
         this(playerCount, eventOccurrenceObserver, defaultTerrainGenerator());
     }
 
-    public ServerCore(
+    public MudServerCore(
             int playerCount,
             EventOccurrenceObserver eventOccurrenceObserver,
             TerrainGenerator terrainGenerator
@@ -119,7 +120,7 @@ public final class ServerCore {
         return state.playerManager().getPlayerIDs();
     }
 
-    public ServerCore(ServerGameState state, EventOccurrenceObserver eventOccurrenceObserver) {
+    public MudServerCore(ServerGameState state, EventOccurrenceObserver eventOccurrenceObserver) {
         this.eventOccurrenceObserver = eventOccurrenceObserver;
         this.state = state;
         this.actionProcessor = new ActionProcessor(state.rules(), state, eventOccurrenceObserver);

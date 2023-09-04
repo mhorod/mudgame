@@ -1,5 +1,6 @@
 package mudgame.events;
 
+import core.event.Event;
 import core.model.PlayerID;
 
 import java.util.function.Predicate;

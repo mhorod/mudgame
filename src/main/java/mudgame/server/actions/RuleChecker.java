@@ -3,7 +3,7 @@ package mudgame.server.actions;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mudgame.events.Action;
+import core.event.Action;
 import mudgame.server.rules.ActionRule;
 
 import java.util.List;

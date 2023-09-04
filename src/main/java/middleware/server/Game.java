@@ -1,13 +1,13 @@
 package middleware.server;
 
+import core.event.Action;
+import core.event.EventOccurrence;
 import core.model.PlayerID;
 import middleware.messages_to_client.EventMessage;
 import middleware.messages_to_client.GameStartedMessage;
 import middleware.messages_to_client.MessageToClient;
 import middleware.model.UserID;
-import mudgame.events.Action;
-import mudgame.events.EventOccurrence;
-import mudgame.server.ServerCore;
+import mudgame.server.MudServerCore;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class Game {
-    private final ServerCore core;
+    private final MudServerCore core;
 
     private final List<PlayerID> playerIDs;
     private final Map<UserID, PlayerID> toPlayerIDMap = new HashMap<>();
@@ -26,7 +26,7 @@ public final class Game {
     public Game(List<UserID> userIDs, GameServer server) {
         this.server = server;
 
-        core = new ServerCore(userIDs.size(), this::processEventOccurrence);
+        core = new MudServerCore(userIDs.size(), this::processEventOccurrence);
         playerIDs = core.state().playerManager().getPlayerIDs();
 
         for (int i = 0; i < playerCount(); ++i) {

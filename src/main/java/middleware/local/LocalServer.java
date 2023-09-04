@@ -1,10 +1,10 @@
 package middleware.local;
 
+import core.event.Action;
+import core.event.EventOccurrence;
 import core.model.PlayerID;
 import middleware.clients.GameClient;
-import mudgame.events.Action;
-import mudgame.events.EventOccurrence;
-import mudgame.server.ServerCore;
+import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class LocalServer {
-    private final ServerCore core;
+    private final MudServerCore core;
     private final List<GameClient> clients = new ArrayList<>();
     private final Map<PlayerID, LocalClient> clientMap = new HashMap<>();
 
@@ -25,12 +25,12 @@ public final class LocalServer {
             clientMap.put(playerID, client);
         }
 
-        core = new ServerCore(state, this::sendEvent);
+        core = new MudServerCore(state, this::sendEvent);
     }
 
     // TODO this is cursed, fix it
     public LocalServer(int playerCount) {
-        this(new ServerCore(playerCount).state());
+        this(new MudServerCore(playerCount).state());
     }
 
     public ServerGameState state() {

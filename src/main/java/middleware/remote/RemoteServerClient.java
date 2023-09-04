@@ -1,5 +1,6 @@
 package middleware.remote;
 
+import core.event.Event;
 import core.model.PlayerID;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
@@ -13,7 +14,6 @@ import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
 import mudgame.client.ClientGameState;
-import mudgame.events.Event;
 import mudgame.server.ServerGameState;
 
 import java.util.Collections;

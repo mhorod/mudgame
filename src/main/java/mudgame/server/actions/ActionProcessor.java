@@ -1,12 +1,12 @@
 package mudgame.server.actions;
 
+import core.event.Action;
+import core.event.Event;
+import core.event.EventOccurrence;
 import core.model.PlayerID;
 import core.turns.CompleteTurn;
 import mudgame.controls.events.CreateEntity;
 import mudgame.controls.events.MoveEntity;
-import mudgame.events.Action;
-import mudgame.events.Event;
-import mudgame.events.EventOccurrence;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.ServerGameState;
 import mudgame.server.rules.ActionRule;

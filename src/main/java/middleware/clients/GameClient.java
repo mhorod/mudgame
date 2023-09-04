@@ -1,16 +1,16 @@
 package middleware.clients;
 
+import core.event.Action;
+import core.event.Event;
 import core.model.PlayerID;
-import mudgame.client.ClientCore;
-import mudgame.events.Action;
-import mudgame.events.Event;
+import mudgame.client.MudClientCore;
 
 import java.util.Optional;
 
 public interface GameClient {
     PlayerID myPlayerID();
 
-    ClientCore getCore();
+    MudClientCore getCore();
 
     Optional<Event> peekEvent();
 

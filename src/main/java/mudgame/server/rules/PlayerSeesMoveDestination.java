@@ -4,7 +4,7 @@ import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.events.MoveEntity;
-import mudgame.events.Action;
+import core.event.Action;
 
 @RequiredArgsConstructor
 public final class PlayerSeesMoveDestination implements ActionRule {

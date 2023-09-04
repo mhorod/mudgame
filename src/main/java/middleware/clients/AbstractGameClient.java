@@ -1,9 +1,9 @@
 package middleware.clients;
 
+import core.event.Event;
 import core.model.PlayerID;
-import mudgame.client.ClientCore;
 import mudgame.client.ClientGameState;
-import mudgame.events.Event;
+import mudgame.client.MudClientCore;
 
 import java.util.ArrayDeque;
 import java.util.Optional;
@@ -11,10 +11,10 @@ import java.util.Queue;
 
 public abstract class AbstractGameClient implements GameClient {
     private final Queue<Event> eventQueue = new ArrayDeque<>();
-    private final ClientCore core;
+    private final MudClientCore core;
 
     public AbstractGameClient(ClientGameState state) {
-        core = new ClientCore(state);
+        core = new MudClientCore(state);
     }
 
     @Override
@@ -23,7 +23,7 @@ public abstract class AbstractGameClient implements GameClient {
     }
 
     @Override
-    public ClientCore getCore() {
+    public MudClientCore getCore() {
         return core;
     }
 

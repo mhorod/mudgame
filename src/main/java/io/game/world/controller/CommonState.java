@@ -4,7 +4,7 @@ import core.entities.EntityBoard;
 import core.pathfinder.Pathfinder;
 import core.terrain.Terrain;
 import io.game.world.Map;
-import mudgame.events.Event;
+import core.event.Event;
 
 import java.util.HashSet;
 

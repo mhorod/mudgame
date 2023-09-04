@@ -25,8 +25,8 @@ import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
-import mudgame.events.Action;
-import mudgame.events.Event;
+import core.event.Action;
+import core.event.Event;
 
 import static core.entities.model.EntityType.PAWN;
 

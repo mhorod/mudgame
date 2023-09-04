@@ -3,7 +3,7 @@ package mudgame.controls.events;
 import core.entities.model.Entity;
 import core.fogofwar.events.VisibilityChange;
 import core.model.Position;
-import mudgame.events.Event;
+import core.event.Event;
 
 /**
  * Emitted when a brand-new entity is spawned on the board.

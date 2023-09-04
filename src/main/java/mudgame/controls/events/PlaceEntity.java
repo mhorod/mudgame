@@ -3,7 +3,7 @@ package mudgame.controls.events;
 
 import core.entities.model.Entity;
 import core.model.Position;
-import mudgame.events.Event;
+import core.event.Event;
 
 /**
  * Emitted when an entity is placed under fog of war and will be seen due to subsequent events.

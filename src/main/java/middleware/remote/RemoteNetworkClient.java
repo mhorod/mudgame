@@ -1,5 +1,6 @@
 package middleware.remote;
 
+import core.event.Event;
 import middleware.clients.Connection;
 import middleware.clients.NetworkClient;
 import middleware.clients.ServerClient;
@@ -12,7 +13,6 @@ import middleware.messages_to_server.PingToServer;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
 import mudgame.client.ClientGameState;
-import mudgame.events.Event;
 
 import java.io.Closeable;
 import java.io.IOException;

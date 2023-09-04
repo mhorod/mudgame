@@ -1,7 +1,7 @@
 package core.fogofwar.events;
 
 import core.entities.model.Entity;
-import mudgame.events.Event;
+import core.event.Event;
 import core.model.Position;
 import core.terrain.Terrain;
 
