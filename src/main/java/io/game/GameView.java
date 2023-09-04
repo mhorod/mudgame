@@ -4,6 +4,7 @@ import core.entities.events.*;
 import core.events.Event;
 import core.events.Action;
 import core.model.EntityID;
+import core.model.PlayerID;
 import core.model.Position;
 import core.terrain.events.SetTerrain;
 import io.animation.AnimationController;
@@ -20,7 +21,10 @@ import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
+import middleware.clients.ServerClient;
 import middleware.local.LocalServer;
+import middleware.remote.RemoteNetworkClient;
+import middleware.remote.SocketConnection;
 
 import static core.entities.model.EntityType.PAWN;
 
@@ -43,7 +47,28 @@ public class GameView extends SimpleView {
 
     public GameView() {
         var server = new LocalServer(5);
-        me = server.getClients().get(0);
+
+        if (true) {
+            me = server.getClients().get(0);
+        } else {
+            // --------------------------------------------------
+            // if this causes many merge conflicts remove it
+            try {
+                RemoteNetworkClient.GLOBAL_CLIENT.connect(new SocketConnection("localhost", 6789));
+                Thread.sleep(200);
+                RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
+                ServerClient serverClient = RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().orElseThrow();
+                serverClient.createRoom(new PlayerID(0), 5);
+                serverClient.startGame();
+                Thread.sleep(200);
+                RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
+                me = serverClient.getGameClient().orElseThrow();
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+            // --------------------------------------------------
+        }
+
         map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
@@ -117,6 +142,7 @@ public class GameView extends SimpleView {
 
     @Override
     public void update(Input input, TextureBank bank) {
+        RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
         worldController.update();
         if (!eventObserved) {
             while (canEatEvent())

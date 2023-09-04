@@ -1,4 +1,6 @@
 package middleware.model;
 
-public record RoomID(long id) {
+import java.io.Serializable;
+
+public record RoomID(long id) implements Serializable {
 }
