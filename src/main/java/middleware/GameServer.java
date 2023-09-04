@@ -1,6 +1,6 @@
 package middleware;
 
-import core.events.Event.Action;
+import mudgame.events.Event.Action;
 import middleware.communicators.MultiSender;
 import middleware.communicators.ServerSideCommunicator;
 import middleware.messages_to_client.MessageToClient;

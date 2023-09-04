@@ -1,12 +1,10 @@
 package middleware;
 
-import core.client.ClientCore;
-import core.events.Event;
+import mudgame.client.ClientCore;
+import mudgame.events.Event;
 import middleware.messages_to_client.EventMessage;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class MessageToClientTest {

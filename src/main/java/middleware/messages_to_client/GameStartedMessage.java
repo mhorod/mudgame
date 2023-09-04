@@ -1,6 +1,6 @@
 package middleware.messages_to_client;
 
-import core.client.ClientGameState;
+import mudgame.client.ClientGameState;
 import middleware.Client;
 
 public record GameStartedMessage(ClientGameState state) implements MessageToClient {

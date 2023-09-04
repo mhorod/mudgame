@@ -1,6 +1,6 @@
 package middleware.messages_to_client;
 
-import core.events.Event;
+import mudgame.events.Event;
 import middleware.Client;
 
 public record EventMessage(Event event) implements MessageToClient {

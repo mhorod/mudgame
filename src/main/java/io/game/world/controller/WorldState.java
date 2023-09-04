@@ -2,9 +2,9 @@ package io.game.world.controller;
 
 import core.entities.events.HideEntity;
 import core.entities.events.MoveEntity;
-import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
 import core.entities.events.ShowEntity;
+import core.entities.events.SpawnEntity;
 import core.model.EntityID;
 import io.animation.Finishable;
 
@@ -41,7 +41,7 @@ public abstract class WorldState implements WorldBehavior {
     }
 
     @Override
-    public void onPlaceEntity(PlaceEntity event) {
+    public void onPlaceEntity(SpawnEntity event) {
         state.map().createEntity(event.position(), event.entity());
         nextEvent();
     }

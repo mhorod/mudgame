@@ -60,7 +60,7 @@ public class Pathfinder {
 
             List<Position> path = new ArrayList<>();
             Position current = destination;
-            while (current != null) {
+            while (parents.get(current) != null) {
                 path.add(current);
                 current = parents.get(current);
             }

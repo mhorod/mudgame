@@ -1,6 +1,6 @@
 package core.terrain.events;
 
-import core.events.Event;
+import mudgame.events.Event;
 import core.model.Position;
 import core.terrain.model.TerrainType;
 

@@ -1,8 +1,8 @@
 package middleware;
 
-import core.client.ClientCore;
-import core.client.ClientGameState;
-import core.events.Event;
+import mudgame.client.ClientCore;
+import mudgame.client.ClientGameState;
+import mudgame.events.Event;
 import core.model.PlayerID;
 import lombok.Getter;
 import middleware.communicators.ClientSideCommunicator;

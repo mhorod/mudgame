@@ -1,13 +1,10 @@
 package core.entities.model;
 
-import java.io.Serializable;
-
-public enum EntityType implements Serializable {
-    // units
+public enum EntityType {
     PAWN,
     WARRIOR,
+    MARSH_WIGGLE,
 
-    // buildings
     BASE,
     TOWER
 }

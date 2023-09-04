@@ -68,11 +68,9 @@ class PathfinderTest {
         List<Position> path = pathfinder.findPath(entity.id(), new Position(1, 1));
 
         // then
-        assertThat(path).hasSize(3);
+        assertThat(path).hasSize(2);
         assertThatPathIsContinuous(path);
-        assertThat(path)
-                .startsWith(new Position(0, 0))
-                .endsWith(new Position(1, 1));
+        assertThat(path).endsWith(new Position(1, 1));
     }
 
     @Test
@@ -90,11 +88,9 @@ class PathfinderTest {
         List<Position> path = positions.getPath(new Position(1, 1));
 
         // then
-        assertThat(path).hasSize(3);
+        assertThat(path).hasSize(2);
         assertThatPathIsContinuous(path);
-        assertThat(path)
-                .startsWith(new Position(0, 0))
-                .endsWith(new Position(1, 1));
+        assertThat(path).endsWith(new Position(1, 1));
     }
 
 

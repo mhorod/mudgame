@@ -1,7 +1,7 @@
 package core.turns;
 
-import core.events.Event;
-import core.events.EventObserver;
+import mudgame.events.Event;
+import mudgame.events.EventObserver;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

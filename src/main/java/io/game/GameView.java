@@ -3,11 +3,11 @@ package io.game;
 import core.entities.events.CreateEntity;
 import core.entities.events.HideEntity;
 import core.entities.events.MoveEntity;
-import core.entities.events.PlaceEntity;
 import core.entities.events.RemoveEntity;
 import core.entities.events.ShowEntity;
-import core.events.Event;
-import core.events.Event.Action;
+import core.entities.events.SpawnEntity;
+import mudgame.events.Event;
+import mudgame.events.Event.Action;
 import core.model.EntityID;
 import core.model.Position;
 import core.terrain.events.SetTerrain;
@@ -91,7 +91,7 @@ public class GameView extends SimpleView {
         } else if (event instanceof SetTerrain e) {
             eventObserved = true;
             worldController.onSetTerrain(e);
-        } else if (event instanceof PlaceEntity e) {
+        } else if (event instanceof SpawnEntity e) {
             eventObserved = true;
             worldController.onPlaceEntity(e);
         } else if (event instanceof RemoveEntity e) {
@@ -110,7 +110,7 @@ public class GameView extends SimpleView {
         return me.peekEvent().stream().anyMatch(
                 event -> !(event instanceof MoveEntity)
                          && !(event instanceof SetTerrain)
-                         && !(event instanceof PlaceEntity)
+                         && !(event instanceof SpawnEntity)
                          && !(event instanceof RemoveEntity)
                          && !(event instanceof ShowEntity)
                          && !(event instanceof HideEntity)

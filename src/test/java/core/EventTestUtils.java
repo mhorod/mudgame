@@ -1,9 +1,9 @@
 package core;
 
-import core.client.ClientCore;
-import core.events.Event;
-import core.events.Event.Action;
-import core.server.ServerCore;
+import mudgame.client.ClientCore;
+import mudgame.events.Event;
+import mudgame.events.Event.Action;
+import mudgame.server.ServerCore;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

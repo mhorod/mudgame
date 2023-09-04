@@ -1,7 +1,7 @@
 package io.game.world.controller;
 
 import core.entities.EntityBoard;
-import core.events.Event;
+import mudgame.events.Event;
 import core.terrain.Terrain;
 import io.game.world.Map;
 

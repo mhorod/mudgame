@@ -1,9 +1,9 @@
 package middleware;
 
-import core.events.Event.Action;
-import core.events.EventOccurrence;
+import mudgame.events.Event.Action;
+import mudgame.events.EventOccurrence;
 import core.model.PlayerID;
-import core.server.ServerCore;
+import mudgame.server.ServerCore;
 import middleware.communicators.MultiSender;
 import middleware.messages_to_client.EventMessage;
 import middleware.messages_to_client.GameStartedMessage;
