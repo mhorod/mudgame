@@ -1,10 +1,10 @@
 package mudgame.server.actions;
 
-import mudgame.events.Event.Action;
 import core.model.PlayerID;
-import mudgame.server.rules.ActionRule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mudgame.events.Action;
+import mudgame.server.rules.ActionRule;
 
 import java.util.List;
 

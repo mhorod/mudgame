@@ -1,19 +1,20 @@
 package io.game.world.controller;
 
 import core.entities.EntityBoard;
-import core.entities.events.HideEntity;
-import core.entities.events.MoveEntity;
-import core.entities.events.RemoveEntity;
-import core.entities.events.ShowEntity;
-import core.entities.events.SpawnEntity;
 import core.model.EntityID;
 import core.model.Position;
+import core.pathfinder.Pathfinder;
 import core.terrain.Terrain;
 import core.terrain.events.SetTerrain;
 import io.animation.Finishable;
 import io.animation.FutureExecutor;
 import io.game.world.Map;
 import io.game.world.controller.states.Normal;
+import mudgame.controls.events.HideEntity;
+import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.RemoveEntity;
+import mudgame.controls.events.ShowEntity;
+import mudgame.controls.events.SpawnEntity;
 
 import java.util.HashSet;
 
@@ -21,8 +22,11 @@ public class WorldController implements WorldBehavior {
     private WorldState state;
     private final FutureExecutor executor = new FutureExecutor();
 
-    public WorldController(Map map, EntityBoard entities, Terrain terrain, Controls controls) {
-        state = new Normal(new CommonState(map, terrain, entities, controls, new HashSet<>()));
+    public WorldController(
+            Map map, EntityBoard entities, Terrain terrain, Pathfinder pathfinder, Controls controls
+    ) {
+        state = new Normal(
+                new CommonState(map, terrain, entities, pathfinder, controls, new HashSet<>()));
         state.init(this);
     }
 
@@ -59,10 +63,6 @@ public class WorldController implements WorldBehavior {
         state.onEntityHover(entity);
     }
 
-    @Override
-    public void onMoveEntity(MoveEntity event) {
-        state.onMoveEntity(event);
-    }
 
     @Override
     public void onSetTerrain(SetTerrain event) {
@@ -87,5 +87,9 @@ public class WorldController implements WorldBehavior {
     @Override
     public void onHideEntity(HideEntity event) {
         state.onHideEntity(event);
+    }
+
+    @Override
+    public void onMoveEntityAlongPath(MoveEntityAlongPath e) {
     }
 }

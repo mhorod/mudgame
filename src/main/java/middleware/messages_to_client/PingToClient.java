@@ -1,12 +1,12 @@
 package middleware.messages_to_client;
 
-import middleware.Client;
 import middleware.messages_to_server.PingToServer;
+import middleware.remote.RemoteNetworkClient;
 
 public record PingToClient(String pingText, Boolean requireResponse) implements MessageToClient {
     @Override
-    public void execute(Client client) {
+    public void execute(RemoteNetworkClient client) {
         if (requireResponse)
-            client.getCommunicator().sendMessage(new PingToServer(pingText, false));
+            client.sendMessage(new PingToServer(pingText, false));
     }
 }

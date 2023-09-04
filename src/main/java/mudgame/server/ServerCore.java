@@ -3,16 +3,23 @@ package mudgame.server;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
 import core.entities.model.Entity;
-import mudgame.events.ConditionalEventObserver;
-import mudgame.events.Event;
-import mudgame.events.Event.Action;
-import mudgame.events.EventObserver;
-import mudgame.events.EventOccurrence;
-import mudgame.events.EventOccurrenceObserver;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.Pathfinder;
+import core.terrain.Terrain;
+import core.terrain.TerrainGenerator;
+import core.terrain.TerrainGenerator.GeneratedTerrain;
+import core.terrain.generators.SimpleLandGenerator;
+import core.turns.PlayerManager;
+import core.turns.TurnView;
+import lombok.extern.slf4j.Slf4j;
+import mudgame.events.Action;
+import mudgame.events.ConditionalEventObserver;
+import mudgame.events.Event;
+import mudgame.events.EventObserver;
+import mudgame.events.EventOccurrence;
+import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
 import mudgame.server.rules.CreationPositionIsEmpty;
@@ -22,13 +29,6 @@ import mudgame.server.rules.PlayerOwnsMovedEntity;
 import mudgame.server.rules.PlayerSeesCreationPosition;
 import mudgame.server.rules.PlayerSeesMoveDestination;
 import mudgame.server.rules.PlayerTakesActionDuringOwnTurn;
-import core.terrain.Terrain;
-import core.terrain.TerrainGenerator;
-import core.terrain.TerrainGenerator.GeneratedTerrain;
-import core.terrain.generators.SimpleLandGenerator;
-import core.turns.PlayerManager;
-import core.turns.TurnView;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,6 +153,7 @@ public final class ServerCore {
     ) {
         return new InternalSender(observers, eventOccurrenceObservers);
     }
+
 
     public void process(Action action, PlayerID actor) {
         actionProcessor.process(action, actor);

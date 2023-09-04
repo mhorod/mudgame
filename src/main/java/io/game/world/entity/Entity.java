@@ -8,21 +8,19 @@ import io.model.engine.Canvas;
 import io.model.engine.Color;
 
 public class Entity extends WorldEntity {
-    private final EntityID id;
-    private final Color color;
+    private final core.entities.model.Entity entity;
 
-    public Entity(WorldPosition position, EntityID id, Color color) {
-        super(position, WorldTexture.BASE, true);
-        this.color = color;
-        this.id = id;
+    public Entity(WorldPosition position, core.entities.model.Entity entity) {
+        super(position, WorldTexture.from(entity.type()), true);
+        this.entity = entity;
     }
 
     @Override
     public void draw(Canvas canvas, Camera camera) {
-        super.drawColored(canvas, camera, color);
+        super.drawColored(canvas, camera, Color.fromPlayerId(entity.owner()));
     }
 
     public EntityID getId() {
-        return id;
+        return entity.id();
     }
 }

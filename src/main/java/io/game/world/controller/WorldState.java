@@ -1,12 +1,12 @@
 package io.game.world.controller;
 
-import core.entities.events.HideEntity;
-import core.entities.events.MoveEntity;
-import core.entities.events.RemoveEntity;
-import core.entities.events.ShowEntity;
-import core.entities.events.SpawnEntity;
 import core.model.EntityID;
 import io.animation.Finishable;
+import mudgame.controls.events.HideEntity;
+import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.RemoveEntity;
+import mudgame.controls.events.ShowEntity;
+import mudgame.controls.events.SpawnEntity;
 
 public abstract class WorldState implements WorldBehavior {
     private WorldController controller;
@@ -34,9 +34,9 @@ public abstract class WorldState implements WorldBehavior {
 
     protected boolean entityAnimated(EntityID entity) {
         return state.animatedEvents().stream().anyMatch(event -> {
-            if (!(event instanceof MoveEntity))
+            if (!(event instanceof MoveEntityAlongPath))
                 return false;
-            return ((MoveEntity) event).entityID() == entity;
+            return ((MoveEntityAlongPath) event).entityID() == entity;
         });
     }
 

@@ -1,11 +1,11 @@
 package mudgame.server.rules;
 
 import core.entities.EntityBoardView;
-import core.entities.events.MoveEntity;
-import mudgame.events.Event.Action;
 import core.model.EntityID;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
+import mudgame.controls.events.MoveEntity;
+import mudgame.events.Action;
 
 @RequiredArgsConstructor
 public final class PlayerOwnsMovedEntity implements ActionRule {

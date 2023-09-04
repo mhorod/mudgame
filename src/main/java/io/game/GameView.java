@@ -1,13 +1,5 @@
 package io.game;
 
-import core.entities.events.CreateEntity;
-import core.entities.events.HideEntity;
-import core.entities.events.MoveEntity;
-import core.entities.events.RemoveEntity;
-import core.entities.events.ShowEntity;
-import core.entities.events.SpawnEntity;
-import mudgame.events.Event;
-import mudgame.events.Event.Action;
 import core.model.EntityID;
 import core.model.Position;
 import core.terrain.events.SetTerrain;
@@ -24,9 +16,17 @@ import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
-import middleware.Client;
-import middleware.LocalServer;
-import middleware.messages_to_server.ActionMessage;
+import middleware.clients.GameClient;
+import middleware.local.LocalServer;
+import mudgame.controls.events.CreateEntity;
+import mudgame.controls.events.HideEntity;
+import mudgame.controls.events.MoveEntity;
+import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.RemoveEntity;
+import mudgame.controls.events.ShowEntity;
+import mudgame.controls.events.SpawnEntity;
+import mudgame.events.Action;
+import mudgame.events.Event;
 
 import static core.entities.model.EntityType.PAWN;
 
@@ -44,13 +44,12 @@ public class GameView extends SimpleView {
     };
     private final WorldController worldController;
 
-    private final Client me;
+    private final GameClient me;
     private boolean eventObserved = false;
 
     public GameView() {
-        var clients = LocalServer.of(5);
-        me = clients.get(0);
-        me.processAllMessages();
+        var server = new LocalServer(5);
+        me = server.getClients().get(0);
         map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
@@ -58,17 +57,17 @@ public class GameView extends SimpleView {
                 map,
                 me.getCore().state().entityBoard(),
                 me.getCore().state().terrain(),
+                me.getCore().pathfinder(),
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
-                        me.getCommunicator()
-                                .sendMessage(new ActionMessage(new MoveEntity(id, destination)));
+                        me.sendAction(new MoveEntity(id, destination));
                     }
 
                     @Override
                     public void createEntity(Position position) {
                         Action action = new CreateEntity(PAWN, me.myPlayerID(), position);
-                        me.getCommunicator().sendMessage(new ActionMessage(action));
+                        me.sendAction(action);
                     }
 
                     @Override
@@ -85,9 +84,9 @@ public class GameView extends SimpleView {
 
     private void processEvent(Event event) {
         log.debug("Processing event: {}", event);
-        if (event instanceof MoveEntity e) {
+        if (event instanceof MoveEntityAlongPath e) {
             eventObserved = true;
-            worldController.onMoveEntity(e);
+            worldController.onMoveEntityAlongPath(e);
         } else if (event instanceof SetTerrain e) {
             eventObserved = true;
             worldController.onSetTerrain(e);
@@ -108,7 +107,7 @@ public class GameView extends SimpleView {
 
     private boolean canEatEvent() {
         return me.peekEvent().stream().anyMatch(
-                event -> !(event instanceof MoveEntity)
+                event -> !(event instanceof MoveEntityAlongPath)
                          && !(event instanceof SetTerrain)
                          && !(event instanceof SpawnEntity)
                          && !(event instanceof RemoveEntity)
@@ -124,7 +123,6 @@ public class GameView extends SimpleView {
 
     @Override
     public void update(Input input, TextureBank bank) {
-        me.processAllMessages();
         worldController.update();
         if (!eventObserved) {
             while (canEatEvent())

@@ -1,15 +1,15 @@
 package mudgame.server.actions;
 
-import core.entities.events.CreateEntity;
-import core.entities.events.MoveEntity;
+import core.model.PlayerID;
+import core.turns.CompleteTurn;
+import mudgame.controls.events.CreateEntity;
+import mudgame.controls.events.MoveEntity;
+import mudgame.events.Action;
 import mudgame.events.Event;
-import mudgame.events.Event.Action;
 import mudgame.events.EventOccurrence;
 import mudgame.events.EventOccurrenceObserver;
-import core.model.PlayerID;
 import mudgame.server.ServerGameState;
 import mudgame.server.rules.ActionRule;
-import core.turns.CompleteTurn;
 
 import java.util.List;
 

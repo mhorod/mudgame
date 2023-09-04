@@ -10,25 +10,15 @@ import io.animation.Finishable;
 import io.game.Camera;
 import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
-import io.game.world.entity.AnimationChain;
-import io.game.world.entity.Condense;
-import io.game.world.entity.Dissipate;
-import io.game.world.entity.Drop;
-import io.game.world.entity.Entity;
-import io.game.world.entity.EntityAnimation;
-import io.game.world.entity.Exist;
-import io.game.world.entity.Hover;
-import io.game.world.entity.MoveAlong;
-import io.game.world.entity.Raise;
-import io.game.world.entity.WorldEntity;
+import io.game.world.entity.*;
 import io.game.world.tile.Tile;
 import io.game.world.tile.TileKind;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
-import io.model.engine.Color;
 import io.model.engine.TextureBank;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,6 +29,7 @@ public class Map implements Animation {
     private final TerrainView terrain;
     private final EntityBoardView entities;
     private final ArrayList<Position> path = new ArrayList<>();
+    private Collection<Position> highlightedTiles = null;
 
     public Map(TerrainView terrain, EntityBoardView entities) {
         this.terrain = terrain;
@@ -50,6 +41,10 @@ public class Map implements Animation {
         path.addAll(positions);
     }
 
+    public void setHighlightedTiles(List<Position> positions) {
+        highlightedTiles = positions;
+    }
+
     private void setAnimation(EntityID entityID, EntityAnimation animation) {
         animation.init(entityFromID(entityID));
         entityAnimations.put(entityID, animation);
@@ -58,8 +53,7 @@ public class Map implements Animation {
     private WorldEntity entityFromID(EntityID id) {
         if (entityAnimations.containsKey(id))
             return entityAnimations.get(id).getEntity();
-        return new Entity(WorldPosition.from(entities.entityPosition(id)), id,
-                          Color.fromPlayerId(entities.findEntityByID(id).owner()));
+        return new Entity(WorldPosition.from(entities.entityPosition(id)), entities.findEntityByID(id));
     }
 
     public void objectAt(
@@ -81,16 +75,22 @@ public class Map implements Animation {
 
     public void draw(Canvas canvas, Camera camera) {
         ArrayList<Tile> fogTiles = new ArrayList<>();
+        ArrayList<WorldEntity> highlightTiles = new ArrayList<>();
         ArrayList<WorldEntity> entitiesToDraw = new ArrayList<>();
         camera.forAllVisibleTiles(canvas.getAspectRatio(), pos -> {
             if (tileAnimations.containsKey(pos)) {
                 tileAnimations.get(pos).getEntity().draw(canvas, camera);
             } else {
-                switch (terrain.terrainAt(pos)) {
+                var tile = terrain.terrainAt(pos);
+                switch (tile) {
                     case UNKNOWN -> fogTiles.add(new Tile(pos, TileKind.FOG));
                     case WATER -> new Tile(pos, TileKind.TILE_LIGHT).draw(canvas, camera);
                     case LAND -> new Tile(pos, TileKind.TILE_DARK).draw(canvas, camera);
                 }
+                if (highlightedTiles != null && !highlightedTiles.contains(pos) && tile == TerrainType.LAND)
+                    highlightTiles.add(
+                            new WorldEntity(WorldPosition.from(pos), WorldTexture.TILE_HIGHLIGHT, false)
+                    );
             }
 
 
@@ -101,6 +101,7 @@ public class Map implements Animation {
                             .toList()
             );
         });
+        highlightTiles.forEach(tile -> tile.draw(canvas, camera));
 
         Arrow.fromPositions(path).forEach(arrow -> arrow.draw(canvas, camera));
 
@@ -162,32 +163,28 @@ public class Map implements Animation {
 
     public Finishable createEntity(Position position, core.entities.model.Entity entity) {
         var animation = new Drop();
-        animation.init(new Entity(WorldPosition.from(position, 2), entity.id(),
-                                  Color.fromPlayerId(entity.owner())));
+        animation.init(new Entity(WorldPosition.from(position, 2), entity));
         entityAnimations.put(entity.id(), animation);
         return animation;
     }
 
     public Finishable removeEntity(Position position, EntityID entity) {
         var animation = new Dissipate();
-        animation.init(new Entity(WorldPosition.from(position), entity,
-                                  Color.fromPlayerId(entities.findEntityByID(entity).owner())));
+        animation.init(new Entity(WorldPosition.from(position), entities.findEntityByID(entity)));
         entityAnimations.put(entity, animation);
         return animation;
     }
 
     public Finishable showEntity(Position position, core.entities.model.Entity entity) {
         var animation = new Condense();
-        animation.init(new Entity(WorldPosition.from(position), entity.id(),
-                                  Color.fromPlayerId(entity.owner())));
+        animation.init(new Entity(WorldPosition.from(position), entity));
         entityAnimations.put(entity.id(), animation);
         return animation;
     }
 
     public Finishable hideEntity(Position position, EntityID entity) {
         var animation = new Dissipate();
-        animation.init(new Entity(WorldPosition.from(position), entity,
-                                  Color.fromPlayerId(entities.findEntityByID(entity).owner())));
+        animation.init(new Entity(WorldPosition.from(position), entities.findEntityByID(entity)));
         entityAnimations.put(entity, animation);
         return animation;
     }

@@ -1,10 +1,10 @@
 package mudgame.server.rules;
 
 import core.entities.EntityBoardView;
-import core.entities.events.CreateEntity;
-import mudgame.events.Event.Action;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
+import mudgame.controls.events.CreateEntity;
+import mudgame.events.Action;
 
 @RequiredArgsConstructor
 public final class CreationPositionIsEmpty implements ActionRule {

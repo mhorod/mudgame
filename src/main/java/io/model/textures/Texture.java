@@ -1,10 +1,14 @@
 package io.model.textures;
 
 public enum Texture {
-    TILE_DARK(89.f / 128.f),
-    TILE_LIGHT(89.f / 128.f),
+    TILE_DARK(222.f / 256.f),
+    TILE_LIGHT(222.f / 256.f),
+    TILE_HIGHLIGHT(148.f / 256.f),
     FOG(180.f / 275.f),
-    UNIT(200.f / 256.f),
+    PAWN(152f / 80f),
+    WARRIOR(137f / 106f),
+    BASE(255f / 208f),
+    TOWER(241f / 158f),
     SHADOW(149.f / 256.f),
     ARROW_NONE(74.f / 128.f),
     ARROW_SW_NE(74.f / 128.f),
@@ -21,8 +25,10 @@ public enum Texture {
     ARROW_SW_SE(74.f / 128.f),
     ARROW_SW_NW(74.f / 128.f),
     ARROW_NW_NE(74.f / 128.f),
-    BASE(134f / 128f);
-
+    BUTTON_SMALL(181f / 450f),
+    BUTTON_SMALL_PRESSED(181f / 450f),
+    SCROLL(361f / 62f),
+    LOGO(544f / 450f);
     private final float ratio;
 
     Texture(float aspectRatio) {

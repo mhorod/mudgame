@@ -1,22 +1,22 @@
 package mudgame.server.actions;
 
-import core.entities.events.CreateEntity;
-import core.entities.events.MoveEntity;
-import core.entities.events.MoveEntityAlongPath;
-import core.entities.events.MoveEntityAlongPath.SingleMove;
-import core.entities.events.SpawnEntity;
 import core.entities.model.Entity;
-import mudgame.events.Event;
-import mudgame.events.EventOccurrenceObserver;
 import core.fogofwar.PlayerFogOfWar;
 import core.fogofwar.events.VisibilityChange;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.Pathfinder;
-import mudgame.server.ServerGameState;
 import core.terrain.events.SetTerrain;
 import core.terrain.events.SetTerrain.SetPositionTerrain;
+import mudgame.controls.events.CreateEntity;
+import mudgame.controls.events.MoveEntity;
+import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.MoveEntityAlongPath.SingleMove;
+import mudgame.controls.events.SpawnEntity;
+import mudgame.events.Event;
+import mudgame.events.EventOccurrenceObserver;
+import mudgame.server.ServerGameState;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,5 +1,7 @@
 package core.turns;
 
-import mudgame.events.Event.Action;
+import mudgame.events.Action;
+import mudgame.events.Event;
 
-public record CompleteTurn() implements Action { }
+public record CompleteTurn() implements Action, Event {
+}

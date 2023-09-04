@@ -1,8 +1,8 @@
 package middleware.messages_to_server;
 
-import mudgame.events.Event.Action;
-import middleware.GameServer;
-import middleware.UserID;
+import middleware.model.UserID;
+import middleware.server.GameServer;
+import mudgame.events.Action;
 
 public record ActionMessage(Action action) implements MessageToServer {
     @Override

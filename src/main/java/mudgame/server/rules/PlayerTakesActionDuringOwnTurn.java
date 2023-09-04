@@ -1,9 +1,9 @@
 package mudgame.server.rules;
 
-import mudgame.events.Event.Action;
 import core.model.PlayerID;
 import core.turns.TurnView;
 import lombok.RequiredArgsConstructor;
+import mudgame.events.Action;
 
 @RequiredArgsConstructor
 public final class PlayerTakesActionDuringOwnTurn implements ActionRule {

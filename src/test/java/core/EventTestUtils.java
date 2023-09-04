@@ -1,10 +1,10 @@
 package core;
 
-import mudgame.client.ClientCore;
-import mudgame.events.Event;
-import mudgame.events.Event.Action;
-import mudgame.server.ServerCore;
 import lombok.experimental.UtilityClass;
+import mudgame.client.ClientCore;
+import mudgame.events.Action;
+import mudgame.events.Event;
+import mudgame.server.ServerCore;
 
 @UtilityClass
 public class EventTestUtils {
