@@ -12,7 +12,9 @@ public class TextureBank implements io.model.engine.TextureBank {
             ARROW_START_NE, ARROW_START_SE, ARROW_START_NW, ARROW_START_SW,
             ARROW_END_NE, ARROW_END_SE, ARROW_END_NW, ARROW_END_SW,
             ARROW_SE_NE, ARROW_SW_SE, ARROW_SW_NW, ARROW_NW_NE;
-    public final TextureRegion buttonSmall, buttonSmallPressed, logo, scroll;
+    public final TextureRegion buttonSmall, buttonSmallPressed, logo,
+            scrollTop, scrollMid, scrollBot,
+            scrollBackTop, scrollBackMid, scrollBackBot;
     private final Pixmap unitPixmap;
     private final Texture units;
 
@@ -31,7 +33,12 @@ public class TextureBank implements io.model.engine.TextureBank {
         units.getTextureData().prepare();
         unitPixmap = units.getTextureData().consumePixmap();
         buttonSmall = new TextureRegion(ui, 0, 0, 450, 181);
-        scroll = new TextureRegion(ui, 450, 0, 62, 181);
+        scrollTop = new TextureRegion(ui, 450, 0, 62, 34);
+        scrollMid = new TextureRegion(ui, 450, 34, 62, 294);
+        scrollBot = new TextureRegion(ui, 450, 328, 62, 33);
+        scrollBackTop = new TextureRegion(ui, 450, 362, 62, 33);
+        scrollBackMid = new TextureRegion(ui, 450, 395, 62, 294);
+        scrollBackBot = new TextureRegion(ui, 450, 689, 62, 34);
         buttonSmallPressed = new TextureRegion(ui, 0, 181, 450, 181);
         logo = new TextureRegion(ui, 0, 362, 449, 544);
         fog = new TextureRegion(new Texture("fog.png"));
@@ -89,7 +96,12 @@ public class TextureBank implements io.model.engine.TextureBank {
             case BASE -> base;
             case BUTTON_SMALL -> buttonSmall;
             case BUTTON_SMALL_PRESSED -> buttonSmallPressed;
-            case SCROLL -> scroll;
+            case SCROLL_TOP -> scrollTop;
+            case SCROLL_MID -> scrollMid;
+            case SCROLL_BOT -> scrollBot;
+            case SCROLL_BACK_TOP -> scrollBackTop;
+            case SCROLL_BACK_MID -> scrollBackMid;
+            case SCROLL_BACK_BOT -> scrollBackBot;
             case LOGO -> logo;
             case TOWER -> tower;
         };
