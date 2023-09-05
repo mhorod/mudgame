@@ -14,6 +14,6 @@
     <!--    <logger name="core" level="OFF"/>-->
     <!--    <logger name="middleware" level="OFF"/>-->
 
-    <logger name="middleware.communication.SocketReceiver" level="OFF"/>
-    <logger name="middleware.communication.SocketSender" level="OFF"/>
+    <logger name="middleware.communication.SocketReceiver" level="INFO"/>
+    <logger name="middleware.communication.SocketSender" level="INFO"/>
 </configuration>

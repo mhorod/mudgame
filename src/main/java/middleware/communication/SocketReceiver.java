@@ -3,6 +3,7 @@ package middleware.communication;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.Socket;
@@ -30,10 +31,14 @@ public final class SocketReceiver<T extends Serializable> {
                 processor.processMessage(message);
             }
         } catch (IOException | ClassNotFoundException exception) {
-            log.debug(exception.toString());
+            if (exception instanceof NotSerializableException || exception.getCause() instanceof NotSerializableException)
+                log.warn(exception.toString());
+            else
+                log.debug(exception.toString());
             try {
                 socket.close();
-            } catch (IOException ignored) {
+            } catch (IOException innerException) {
+                log.debug(innerException.toString());
             }
         }
     }

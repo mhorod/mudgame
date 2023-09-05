@@ -123,7 +123,7 @@ public class EntityActionProcessor {
             VisibilityChange visibilityChange = visibilityChange(
                     fow.moveEntity(owner, a.entityID(), next));
             state.entityBoard().moveEntity(a.entityID(), next);
-            result.add(new SingleMove(Optional.of(next), visibilityChange));
+            result.add(new SingleMove(next, visibilityChange));
         }
         return result;
     }

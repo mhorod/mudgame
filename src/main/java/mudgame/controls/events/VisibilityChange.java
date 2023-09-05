@@ -14,7 +14,7 @@ public record VisibilityChange(List<PositionVisibilityChange> positions)
         return new VisibilityChange(List.of(ps));
     }
 
-    public sealed interface PositionVisibilityChange {
+    public sealed interface PositionVisibilityChange extends Serializable {
         Position position();
     }
 

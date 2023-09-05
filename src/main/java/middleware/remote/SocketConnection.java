@@ -6,12 +6,11 @@ import middleware.clients.Connection;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.time.Duration;
+
+import static middleware.remote.RemoteNetworkClient.SOCKET_CONNECTION_TIMEOUT;
 
 @AllArgsConstructor
 public final class SocketConnection implements Connection<RemoteNetworkClient> {
-    private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(1);
-
     private final String address;
     private final int port;
 
@@ -24,7 +23,7 @@ public final class SocketConnection implements Connection<RemoteNetworkClient> {
         try {
             client.reportConnectionAttempt();
             Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(address, port), (int) CONNECTION_TIMEOUT.toMillis());
+            socket.connect(new InetSocketAddress(address, port), (int) SOCKET_CONNECTION_TIMEOUT.toMillis());
             client.setSocketConnection(socket);
         } catch (IOException ignored) {
             client.disconnect();
