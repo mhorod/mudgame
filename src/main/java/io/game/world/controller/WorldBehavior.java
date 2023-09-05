@@ -2,12 +2,12 @@ package io.game.world.controller;
 
 import core.model.EntityID;
 import core.model.Position;
-import core.terrain.events.SetTerrain;
 import mudgame.controls.events.HideEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
+import mudgame.controls.events.VisibilityChange;
 
 public interface WorldBehavior {
     void onTileClick(Position position);
@@ -18,9 +18,9 @@ public interface WorldBehavior {
 
     void onEntityHover(EntityID entity);
 
-    void onSetTerrain(SetTerrain event);
+    void onVisibilityChange(VisibilityChange event);
 
-    void onPlaceEntity(SpawnEntity event);
+    void onSpawnEntity(SpawnEntity event);
 
     void onRemoveEntity(RemoveEntity event);
 

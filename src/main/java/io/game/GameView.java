@@ -1,8 +1,9 @@
 package io.game;
 
+import core.event.Action;
+import core.event.Event;
 import core.model.EntityID;
 import core.model.Position;
-import core.terrain.events.SetTerrain;
 import io.animation.AnimationController;
 import io.game.world.Map;
 import io.game.world.MapObserver;
@@ -18,15 +19,14 @@ import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.local.LocalServer;
-import mudgame.controls.events.CreateEntity;
+import mudgame.controls.actions.CreateEntity;
+import mudgame.controls.actions.MoveEntity;
 import mudgame.controls.events.HideEntity;
-import mudgame.controls.events.MoveEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
-import core.event.Action;
-import core.event.Event;
+import mudgame.controls.events.VisibilityChange;
 
 import static core.entities.model.EntityType.PAWN;
 
@@ -87,12 +87,12 @@ public class GameView extends SimpleView {
         if (event instanceof MoveEntityAlongPath e) {
             eventObserved = true;
             worldController.onMoveEntityAlongPath(e);
-        } else if (event instanceof SetTerrain e) {
+        } else if (event instanceof VisibilityChange e) {
             eventObserved = true;
-            worldController.onSetTerrain(e);
+            worldController.onVisibilityChange(e);
         } else if (event instanceof SpawnEntity e) {
             eventObserved = true;
-            worldController.onPlaceEntity(e);
+            worldController.onSpawnEntity(e);
         } else if (event instanceof RemoveEntity e) {
             eventObserved = true;
             worldController.onRemoveEntity(e);
@@ -108,7 +108,7 @@ public class GameView extends SimpleView {
     private boolean canEatEvent() {
         return me.peekEvent().stream().anyMatch(
                 event -> !(event instanceof MoveEntityAlongPath)
-                         && !(event instanceof SetTerrain)
+                         && !(event instanceof VisibilityChange)
                          && !(event instanceof SpawnEntity)
                          && !(event instanceof RemoveEntity)
                          && !(event instanceof ShowEntity)

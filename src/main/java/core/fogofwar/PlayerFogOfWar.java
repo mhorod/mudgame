@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
+
 @RequiredArgsConstructor
 public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
 
@@ -45,6 +47,8 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
 
     private static final VisionVisitor visionVisitor = new VisionVisitor();
 
+    public record PositionVisibility(Position position, boolean isVisible) { }
+
 
     private final PlayerID playerID;
     private final Map<Position, Integer> visionCount = new HashMap<>();
@@ -61,27 +65,33 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
                 .toList();
     }
 
-    public Set<Position> placeEntity(Entity entity, Position position) {
+    public Set<PositionVisibility> placeEntity(Entity entity, Position position) {
         if (!entity.owner().equals(playerID) || !hasVision(entity))
             return Set.of();
 
         VisionArea area = new VisionArea(position, getVisionRange(entity));
         Set<Position> changed = addVisionArea(area);
         entityVision.put(entity.id(), area);
-        return changed;
+        return visibilities(changed);
     }
 
-    public Set<Position> removeEntity(EntityID entityID) {
+    public Set<PositionVisibility> removeEntity(EntityID entityID) {
         if (!entityVision.containsKey(entityID))
             return Set.of();
 
         VisionArea area = entityVision.get(entityID);
         Set<Position> changed = removeVisionArea(area);
         entityVision.remove(entityID);
-        return changed;
+        return visibilities(changed);
     }
 
-    public Set<Position> moveEntity(EntityID entityID, Position destination) {
+    private Set<PositionVisibility> visibilities(Set<Position> changed) {
+        return changed.stream()
+                .map(p -> new PositionVisibility(p, isVisible(p)))
+                .collect(toSet());
+    }
+
+    public Set<PositionVisibility> moveEntity(EntityID entityID, Position destination) {
         if (!entityVision.containsKey(entityID))
             return Set.of();
 
@@ -92,7 +102,7 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
         Set<Position> removed = removeVisionArea(currentArea);
         Set<Position> added = addVisionArea(newArea);
 
-        return xor(removed, added);
+        return visibilities(xor(removed, added));
     }
 
     private <T> Set<T> xor(Set<T> s1, Set<T> s2) {
@@ -118,7 +128,7 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
         for (Position position : area.positions()) {
             if (visionCount.getOrDefault(position, 0) == 0)
                 changed.add(position);
-            setCount(position, visionCount.getOrDefault(position, 0) + 1);
+            visionCount.put(position, visionCount.getOrDefault(position, 0) + 1);
         }
         return changed;
     }
@@ -128,13 +138,9 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
         for (Position position : area.positions()) {
             if (visionCount.get(position) == 1)
                 changed.add(position);
-            setCount(position, visionCount.get(position) - 1);
+            visionCount.put(position, visionCount.get(position) - 1);
         }
         return changed;
-    }
-
-    private void setCount(Position position, Integer count) {
-        visionCount.put(position, count);
     }
 
     private Integer getVisionRange(Entity e) {

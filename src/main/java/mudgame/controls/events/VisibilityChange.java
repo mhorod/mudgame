@@ -1,9 +1,9 @@
-package core.fogofwar.events;
+package mudgame.controls.events;
 
 import core.entities.model.Entity;
 import core.event.Event;
 import core.model.Position;
-import core.terrain.Terrain;
+import core.terrain.model.TerrainType;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,11 +14,13 @@ public record VisibilityChange(List<PositionVisibilityChange> positions)
         return new VisibilityChange(List.of(ps));
     }
 
-    public sealed interface PositionVisibilityChange { }
+    public sealed interface PositionVisibilityChange {
+        Position position();
+    }
 
     public record ShowPosition(
             Position position,
-            Terrain terrain,
+            TerrainType terrain,
             List<Entity> entities
     ) implements PositionVisibilityChange {
     }

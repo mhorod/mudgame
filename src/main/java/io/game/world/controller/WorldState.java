@@ -7,6 +7,11 @@ import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
+import mudgame.controls.events.VisibilityChange;
+import mudgame.controls.events.VisibilityChange.HidePosition;
+import mudgame.controls.events.VisibilityChange.ShowPosition;
+
+import java.util.stream.Stream;
 
 public abstract class WorldState implements WorldBehavior {
     private WorldController controller;
@@ -41,9 +46,26 @@ public abstract class WorldState implements WorldBehavior {
     }
 
     @Override
-    public void onPlaceEntity(SpawnEntity event) {
+    public void onSpawnEntity(SpawnEntity event) {
         state.map().createEntity(event.position(), event.entity());
+        changeVisibility(event.visibilityChange());
         nextEvent();
+    }
+
+    protected void changeVisibility(VisibilityChange event) {
+        state.animatedEvents().add(event);
+        var fogAdded = event.positions().stream()
+                .filter(HidePosition.class::isInstance)
+                .map(p -> state.map().addFog(p.position()));
+
+        var fogRemoved = event.positions().stream()
+                .filter(ShowPosition.class::isInstance)
+                .map(p -> state.map().removeFog(p.position()));
+
+        onFinish(
+                Finishable.all(Stream.concat(fogAdded, fogRemoved).toList()),
+                () -> state.animatedEvents().remove(event)
+        );
     }
 
     @Override

@@ -4,13 +4,10 @@ import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
 import core.entities.model.Entity;
 import core.event.Action;
-import core.event.Event;
-import core.event.EventOccurrence;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.Pathfinder;
-import core.server.ServerCore;
 import core.terrain.Terrain;
 import core.terrain.TerrainGenerator;
 import core.terrain.TerrainGenerator.GeneratedTerrain;
@@ -18,70 +15,24 @@ import core.terrain.generators.SimpleLandGenerator;
 import core.turns.PlayerManager;
 import core.turns.TurnView;
 import lombok.extern.slf4j.Slf4j;
-import mudgame.events.ConditionalEventObserver;
-import mudgame.events.EventObserver;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
 import mudgame.server.rules.CreationPositionIsEmpty;
 import mudgame.server.rules.MoveDestinationIsEmpty;
+import mudgame.server.rules.MoveDestinationIsReachable;
 import mudgame.server.rules.PlayerOwnsCreatedEntity;
 import mudgame.server.rules.PlayerOwnsMovedEntity;
 import mudgame.server.rules.PlayerSeesCreationPosition;
 import mudgame.server.rules.PlayerSeesMoveDestination;
 import mudgame.server.rules.PlayerTakesActionDuringOwnTurn;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static core.entities.model.EntityType.BASE;
 
 @Slf4j
-public final class MudServerCore implements ServerCore {
-
-    private final class InternalSender
-            implements EventObserver, ConditionalEventObserver, EventOccurrenceObserver {
-
-        private final List<EventObserver> eventObservers;
-        private final List<EventOccurrenceObserver> eventOccurrenceObservers;
-
-        public InternalSender(
-                List<EventObserver> eventObservers,
-                List<EventOccurrenceObserver> eventOccurrenceObservers
-        ) {
-            this.eventObservers = new ArrayList<>(eventObservers);
-            this.eventOccurrenceObservers = new ArrayList<>(eventOccurrenceObservers);
-        }
-
-        @Override
-        public void receive(Event event, Predicate<PlayerID> shouldPlayerReceive) {
-            List<PlayerID> recipients = MudServerCore.this
-                    .players()
-                    .stream()
-                    .filter(shouldPlayerReceive)
-                    .toList();
-            receive(new EventOccurrence(event, recipients));
-        }
-
-        @Override
-        public void receive(EventOccurrence occurrence) {
-            log.info("Sending event occurrence: {}", occurrence);
-            eventObservers.forEach(o -> o.receive(occurrence.event()));
-            eventOccurrenceObservers.forEach(o -> o.receive(occurrence));
-            (MudServerCore.this).eventOccurrenceObserver.receive(occurrence);
-        }
-
-
-        @Override
-        public void receive(Event event) {
-            receive(new EventOccurrence(event, MudServerCore.this.players()));
-        }
-
-        void addEventOccurrenceObserver(EventOccurrenceObserver o) {
-            eventOccurrenceObservers.add(o);
-        }
-    }
+public final class MudServerCore {
 
     private final ServerGameState state;
 
@@ -134,25 +85,15 @@ public final class MudServerCore implements ServerCore {
         PlayerManager playerManager = new PlayerManager(playerCount);
         FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
         EntityBoard entityBoard = new EntityBoard();
+        Pathfinder pathfinder = new Pathfinder(terrain, entityBoard);
 
         return new ServerGameState(
                 playerManager,
                 entityBoard,
                 fow,
                 terrain,
-                defaultRules(playerManager, entityBoard, fow)
+                defaultRules(playerManager, entityBoard, fow, pathfinder)
         );
-    }
-
-    private InternalSender sender() {
-        return new InternalSender(List.of(), List.of());
-    }
-
-    private InternalSender sender(
-            List<EventObserver> observers,
-            List<EventOccurrenceObserver> eventOccurrenceObservers
-    ) {
-        return new InternalSender(observers, eventOccurrenceObservers);
     }
 
 
@@ -167,7 +108,8 @@ public final class MudServerCore implements ServerCore {
     static List<ActionRule> defaultRules(
             TurnView turnView,
             EntityBoardView entityBoard,
-            FogOfWar fow
+            FogOfWar fow,
+            Pathfinder pathfinder
     ) {
         return List.of(
                 new PlayerTakesActionDuringOwnTurn(turnView),
@@ -178,7 +120,8 @@ public final class MudServerCore implements ServerCore {
                 new PlayerSeesCreationPosition(fow),
                 new CreationPositionIsEmpty(entityBoard),
                 new PlayerOwnsCreatedEntity(),
-                new MoveDestinationIsEmpty(entityBoard)
+                new MoveDestinationIsEmpty(entityBoard),
+                new MoveDestinationIsReachable(pathfinder)
         );
     }
 

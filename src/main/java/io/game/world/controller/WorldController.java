@@ -5,7 +5,6 @@ import core.model.EntityID;
 import core.model.Position;
 import core.pathfinder.Pathfinder;
 import core.terrain.Terrain;
-import core.terrain.events.SetTerrain;
 import io.animation.Finishable;
 import io.animation.FutureExecutor;
 import io.game.world.Map;
@@ -15,6 +14,7 @@ import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
+import mudgame.controls.events.VisibilityChange;
 
 import java.util.HashSet;
 
@@ -65,13 +65,13 @@ public class WorldController implements WorldBehavior {
 
 
     @Override
-    public void onSetTerrain(SetTerrain event) {
-        state.onSetTerrain(event);
+    public void onVisibilityChange(VisibilityChange event) {
+        state.onVisibilityChange(event);
     }
 
     @Override
-    public void onPlaceEntity(SpawnEntity event) {
-        state.onPlaceEntity(event);
+    public void onSpawnEntity(SpawnEntity event) {
+        state.onSpawnEntity(event);
     }
 
     @Override
@@ -91,5 +91,6 @@ public class WorldController implements WorldBehavior {
 
     @Override
     public void onMoveEntityAlongPath(MoveEntityAlongPath e) {
+        state.onMoveEntityAlongPath(e);
     }
 }

@@ -1,9 +1,8 @@
 package mudgame.controls.events;
 
-import core.fogofwar.events.VisibilityChange;
+import core.event.Event;
 import core.model.EntityID;
 import core.model.Position;
-import core.event.Event;
 
 import java.util.List;
 import java.util.Optional;
