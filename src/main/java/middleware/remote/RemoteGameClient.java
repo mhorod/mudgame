@@ -1,9 +1,9 @@
 package middleware.remote;
 
-import core.client.ClientGameState;
-import core.events.Action;
+import core.event.Action;
 import middleware.clients.AbstractGameClient;
 import middleware.messages_to_server.ActionMessage;
+import mudgame.client.ClientGameState;
 
 public final class RemoteGameClient extends AbstractGameClient {
     private final RemoteServerClient client;

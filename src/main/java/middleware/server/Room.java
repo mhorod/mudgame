@@ -1,17 +1,17 @@
 package middleware.server;
 
-import core.client.ClientGameState;
-import core.events.Action;
-import core.events.EventOccurrence;
+import core.event.Action;
+import core.event.EventOccurrence;
 import core.model.PlayerID;
-import core.server.ServerCore;
-import core.server.ServerGameState;
 import middleware.messages_to_client.EventMessage;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_client.SetGameStateMessage;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
+import mudgame.client.ClientGameState;
+import mudgame.server.MudServerCore;
+import mudgame.server.ServerGameState;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,7 +23,7 @@ public final class Room {
 
     private final GameServer server;
     private final RoomID roomID;
-    private final ServerCore core;
+    private final MudServerCore core;
 
     private final Map<UserID, PlayerID> toPlayerIDMap = new LinkedHashMap<>();
     private final Map<PlayerID, UserID> toUserIDMap = new HashMap<>();
@@ -37,7 +37,7 @@ public final class Room {
     public Room(ServerGameState state, GameServer server) {
         this.server = server;
         this.roomID = new RoomID(nextRoomID++);
-        this.core = new ServerCore(state, this::eventObserver);
+        this.core = new MudServerCore(state, this::eventObserver);
 
         server.addRoom(this);
         for (PlayerID playerID : state.playerManager().getPlayerIDs())
@@ -51,7 +51,8 @@ public final class Room {
 
     private void sendMessageToPlayer(PlayerID destination, MessageToClient message) {
         if (!validPlayerIDs.contains(destination))
-            throw new IllegalArgumentException(destination + " is not valid PlayerID for this room");
+            throw new IllegalArgumentException(
+                    destination + " is not valid PlayerID for this room");
         UserID userID = toUserIDMap.get(destination);
         if (userID != null)
             server.sendMessage(userID, message);

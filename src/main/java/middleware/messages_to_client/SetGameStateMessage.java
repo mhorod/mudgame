@@ -1,7 +1,7 @@
 package middleware.messages_to_client;
 
-import core.client.ClientGameState;
 import middleware.remote.RemoteNetworkClient;
+import mudgame.client.ClientGameState;
 
 public record SetGameStateMessage(ClientGameState state) implements MessageToClient {
     @Override

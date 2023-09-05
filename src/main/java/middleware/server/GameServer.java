@@ -1,16 +1,20 @@
 package middleware.server;
 
-import core.events.Action;
+import core.event.Action;
 import core.model.PlayerID;
-import core.server.ServerCore;
-import core.server.ServerGameState;
 import lombok.extern.slf4j.Slf4j;
 import middleware.communication.Sender;
-import middleware.messages_to_client.*;
+import middleware.messages_to_client.ErrorMessage;
+import middleware.messages_to_client.MessageToClient;
+import middleware.messages_to_client.RoomListMessage;
+import middleware.messages_to_client.SetCurrentRoomMessage;
+import middleware.messages_to_client.SetUserIDMessage;
 import middleware.messages_to_server.MessageToServer;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
+import mudgame.server.MudServerCore;
+import mudgame.server.ServerGameState;
 
 import java.util.HashMap;
 import java.util.List;
@@ -81,13 +85,14 @@ public final class GameServer {
         }
 
         // TODO fix this + check if playerCount is valid correctly
-        ServerGameState state = new ServerCore(playerCount).state();
+        ServerGameState state = new MudServerCore(playerCount).state();
         createRoom(userID, asPlayerID, state);
     }
 
     public void sendMessage(UserID destination, MessageToClient message) {
         Sender<MessageToClient> sender = senderMap.get(destination);
-        log.info("[to: " + destination + ", sender is working: " + (sender != null) + "]: " + message);
+        log.info("[to: " + destination + ", sender is working: " + (sender != null) + "]: " +
+                 message);
         if (sender != null)
             sender.sendMessage(message);
     }

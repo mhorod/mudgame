@@ -1,10 +1,10 @@
 package middleware.clients;
 
 import core.model.PlayerID;
-import core.server.ServerGameState;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
+import mudgame.server.ServerGameState;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,16 +1,17 @@
 package middleware.clients;
 
-import core.client.ClientCore;
-import core.events.Action;
-import core.events.Event;
+import core.event.Action;
+import core.event.Event;
 import core.model.PlayerID;
+import mudgame.client.MudClientCore;
+import mudgame.controls.Controls;
 
 import java.util.Optional;
 
 public interface GameClient {
     PlayerID myPlayerID();
 
-    ClientCore getCore();
+    MudClientCore getCore();
 
     Optional<Event> peekEvent();
 
@@ -18,6 +19,5 @@ public interface GameClient {
 
     void sendAction(Action action);
 
-    // TODO controls
-    // Controls getControls();
+    Controls getControls();
 }

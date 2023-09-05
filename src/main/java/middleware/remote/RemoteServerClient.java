@@ -1,15 +1,21 @@
 package middleware.remote;
 
-import core.client.ClientGameState;
-import core.events.Event;
+import core.event.Event;
 import core.model.PlayerID;
-import core.server.ServerGameState;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
-import middleware.messages_to_server.*;
+import middleware.messages_to_server.CreateRoomFromStateMessage;
+import middleware.messages_to_server.CreateRoomMessage;
+import middleware.messages_to_server.GetRoomListMessage;
+import middleware.messages_to_server.JoinRoomMessage;
+import middleware.messages_to_server.LeaveRoomMessage;
+import middleware.messages_to_server.MessageToServer;
+import middleware.messages_to_server.StartGameMessage;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
+import mudgame.client.ClientGameState;
+import mudgame.server.ServerGameState;
 
 import java.util.Collections;
 import java.util.List;

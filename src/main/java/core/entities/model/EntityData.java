@@ -17,10 +17,12 @@ public record EntityData(
         return switch (type) {
             case PAWN -> pawn();
             case WARRIOR -> warrior();
+            case MARSH_WIGGLE -> marshWiggle();
             case BASE -> base();
             case TOWER -> tower();
         };
     }
+
 
     public static EntityData pawn() {
         return new EntityData(
@@ -39,7 +41,19 @@ public record EntityData(
                 List.of(
                         new Vision(2),
                         new Movement(5),
-                        new Attack(3)
+                        new Attack(3),
+                        new Health(12)
+                )
+        );
+    }
+
+    public static EntityData marshWiggle() {
+        return new EntityData(
+                EntityType.MARSH_WIGGLE,
+                List.of(
+                        new Vision(3),
+                        new Movement(6),
+                        new Health(10)
                 )
         );
     }

@@ -1,12 +1,9 @@
 package io.game;
 
-import core.entities.events.*;
-import core.events.Event;
-import core.events.Action;
+import core.event.Event;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
-import core.terrain.events.SetTerrain;
 import io.animation.AnimationController;
 import io.game.world.Map;
 import io.game.world.MapObserver;
@@ -25,8 +22,12 @@ import middleware.clients.ServerClient;
 import middleware.local.LocalServer;
 import middleware.remote.RemoteNetworkClient;
 import middleware.remote.SocketConnection;
-
-import static core.entities.model.EntityType.PAWN;
+import mudgame.controls.events.HideEntity;
+import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.RemoveEntity;
+import mudgame.controls.events.ShowEntity;
+import mudgame.controls.events.SpawnEntity;
+import mudgame.controls.events.VisibilityChange;
 
 @Slf4j
 public class GameView extends SimpleView {
@@ -57,7 +58,8 @@ public class GameView extends SimpleView {
                 RemoteNetworkClient.GLOBAL_CLIENT.connect(new SocketConnection("localhost", 6789));
                 Thread.sleep(200);
                 RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
-                ServerClient serverClient = RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().orElseThrow();
+                ServerClient serverClient = RemoteNetworkClient.GLOBAL_CLIENT.getServerClient()
+                        .orElseThrow();
                 serverClient.createRoom(new PlayerID(0), 5);
                 serverClient.startGame();
                 Thread.sleep(200);
@@ -80,13 +82,12 @@ public class GameView extends SimpleView {
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
-                        me.sendAction(new MoveEntity(id, destination));
+                        me.getControls().moveEntity(id, destination);
                     }
 
                     @Override
                     public void createEntity(Position position) {
-                        Action action = new CreateEntity(PAWN, me.myPlayerID(), position);
-                        me.sendAction(action);
+                        me.getControls().createEntity(position);
                     }
 
                     @Override
@@ -103,15 +104,15 @@ public class GameView extends SimpleView {
 
     private void processEvent(Event event) {
         log.debug("Processing event: {}", event);
-        if (event instanceof MoveEntity e) {
+        if (event instanceof MoveEntityAlongPath e) {
             eventObserved = true;
-            worldController.onMoveEntity(e);
-        } else if (event instanceof SetTerrain e) {
+            worldController.onMoveEntityAlongPath(e);
+        } else if (event instanceof VisibilityChange e) {
             eventObserved = true;
-            worldController.onSetTerrain(e);
-        } else if (event instanceof PlaceEntity e) {
+            worldController.onVisibilityChange(e);
+        } else if (event instanceof SpawnEntity e) {
             eventObserved = true;
-            worldController.onPlaceEntity(e);
+            worldController.onSpawnEntity(e);
         } else if (event instanceof RemoveEntity e) {
             eventObserved = true;
             worldController.onRemoveEntity(e);
@@ -126,12 +127,12 @@ public class GameView extends SimpleView {
 
     private boolean canEatEvent() {
         return me.peekEvent().stream().anyMatch(
-                event -> !(event instanceof MoveEntity)
-                        && !(event instanceof SetTerrain)
-                        && !(event instanceof PlaceEntity)
-                        && !(event instanceof RemoveEntity)
-                        && !(event instanceof ShowEntity)
-                        && !(event instanceof HideEntity)
+                event -> !(event instanceof MoveEntityAlongPath)
+                         && !(event instanceof VisibilityChange)
+                         && !(event instanceof SpawnEntity)
+                         && !(event instanceof RemoveEntity)
+                         && !(event instanceof ShowEntity)
+                         && !(event instanceof HideEntity)
         );
     }
 

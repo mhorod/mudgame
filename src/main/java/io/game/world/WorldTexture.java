@@ -51,7 +51,8 @@ public enum WorldTexture {
                 texture,
                 new ScreenPosition(
                         centerPosition.x() - width * center.x() * camera.getTileWidth(),
-                        centerPosition.y() - width * center.y() * camera.getTileWidth() * texture.aspectRatio()
+                        centerPosition.y() -
+                        width * center.y() * camera.getTileWidth() * texture.aspectRatio()
                 ),
                 camera.getTileWidth() * width * texture.aspectRatio()
         );
@@ -61,16 +62,18 @@ public enum WorldTexture {
         canvas.draw(getDrawData(position, camera));
     }
 
-    public void drawColored(WorldPosition position, Canvas canvas, Camera camera, Color color, float alpha) {
+    public void drawColored(
+            WorldPosition position, Canvas canvas, Camera camera, Color color, float alpha
+    ) {
         canvas.drawColored(getDrawData(position, camera), alpha, color);
     }
 
     public static WorldTexture from(EntityType type) {
         return switch (type) {
+            case MARSH_WIGGLE, PAWN -> PAWN;
             case BASE -> BASE;
             case WARRIOR -> WARRIOR;
             case TOWER -> TOWER;
-            case PAWN -> PAWN;
         };
     }
 }

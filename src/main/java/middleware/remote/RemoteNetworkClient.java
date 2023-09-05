@@ -1,7 +1,6 @@
 package middleware.remote;
 
-import core.client.ClientGameState;
-import core.events.Event;
+import core.event.Event;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.Connection;
 import middleware.clients.NetworkClient;
@@ -14,6 +13,7 @@ import middleware.messages_to_server.MessageToServer;
 import middleware.messages_to_server.PingToServer;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
+import mudgame.client.ClientGameState;
 
 import java.net.Socket;
 import java.time.Duration;
@@ -78,7 +78,8 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
 
     public void setSocketConnection(Socket socket) {
         if (networkStatus != NetworkStatus.ATTEMPTING)
-            throw new RuntimeException("reportConnectionAttempt() should be called before setSocketConnection()");
+            throw new RuntimeException(
+                    "reportConnectionAttempt() should be called before setSocketConnection()");
         if (!socket.isConnected() || socket.isClosed())
             throw new RuntimeException("setSocketConnection() called with bad socket");
 
@@ -91,7 +92,8 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
 
     public void sendMessage(MessageToServer message) {
         if (networkStatus != NetworkStatus.OK)
-            throw new RuntimeException("Attempting to send message using disconnected NetworkClient");
+            throw new RuntimeException(
+                    "Attempting to send message using disconnected NetworkClient");
         log.info("[SND] " + message);
         sender.sendMessage(message);
     }
@@ -104,7 +106,8 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
 
     public void setUserID(UserID userID) {
         if (networkStatus != NetworkStatus.ATTEMPTING)
-            throw new RuntimeException("setUsedId() should only be called when network status is ATTEMPTING");
+            throw new RuntimeException(
+                    "setUsedId() should only be called when network status is ATTEMPTING");
 
         currentServerClient = new RemoteServerClient(userID, this);
         networkStatus = NetworkStatus.OK;

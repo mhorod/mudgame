@@ -1,8 +1,8 @@
 package middleware.local;
 
-import core.client.ClientGameState;
-import core.events.Action;
+import core.event.Action;
 import middleware.clients.AbstractGameClient;
+import mudgame.client.ClientGameState;
 
 public final class LocalClient extends AbstractGameClient {
     private final LocalServer server;
