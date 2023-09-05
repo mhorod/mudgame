@@ -7,6 +7,6 @@ import middleware.server.GameServer;
 public record CreateRoomMessage(PlayerID myPlayerID, int playerCount) implements MessageToServer {
     @Override
     public void execute(GameServer server, UserID senderID) {
-        throw new UnsupportedOperationException();
+        server.createRoom(senderID, myPlayerID, playerCount);
     }
 }

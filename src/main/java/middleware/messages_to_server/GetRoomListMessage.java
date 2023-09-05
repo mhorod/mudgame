@@ -6,6 +6,6 @@ import middleware.server.GameServer;
 public record GetRoomListMessage() implements MessageToServer {
     @Override
     public void execute(GameServer server, UserID senderID) {
-        throw new UnsupportedOperationException();
+        server.sendRoomList(senderID);
     }
 }

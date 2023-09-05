@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.time.Duration;
 
 @AllArgsConstructor
-public class SocketConnection implements Connection<RemoteNetworkClient> {
+public final class SocketConnection implements Connection<RemoteNetworkClient> {
     private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(1);
 
     private final String address;

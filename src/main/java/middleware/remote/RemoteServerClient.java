@@ -2,14 +2,15 @@ package middleware.remote;
 
 import core.event.Event;
 import core.model.PlayerID;
-import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
 import middleware.messages_to_server.CreateRoomFromStateMessage;
 import middleware.messages_to_server.CreateRoomMessage;
 import middleware.messages_to_server.GetRoomListMessage;
 import middleware.messages_to_server.JoinRoomMessage;
+import middleware.messages_to_server.LeaveRoomMessage;
 import middleware.messages_to_server.MessageToServer;
+import middleware.messages_to_server.StartGameMessage;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
@@ -21,15 +22,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j
 public final class RemoteServerClient implements ServerClient {
     private final UserID myUserID;
     private final RemoteNetworkClient client;
 
-    private RemoteGameClient currentGameClient;
-    private boolean coreChanged = false;
     private List<RoomInfo> roomList = List.of();
     private RoomInfo currentRoom;
+
+    private boolean coreChanged = false;
+    private RemoteGameClient currentGameClient;
 
     public RemoteServerClient(UserID myUserID, RemoteNetworkClient client) {
         this.myUserID = myUserID;
@@ -57,6 +58,10 @@ public final class RemoteServerClient implements ServerClient {
         coreChanged = true;
     }
 
+    public void setCurrentRoom(RoomInfo roomInfo) {
+        currentRoom = roomInfo;
+    }
+
     public void registerEvent(Event event) {
         Objects.requireNonNull(currentGameClient).registerEvent(event);
     }
@@ -81,13 +86,23 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     @Override
+    public UserID myUsedID() {
+        return myUserID;
+    }
+
+    @Override
+    public void leaveCurrentRoom() {
+        sendMessage(new LeaveRoomMessage());
+    }
+
+    @Override
     public void refreshRoomList() {
         sendMessage(new GetRoomListMessage());
     }
 
     @Override
     public void joinRoom(RoomID roomID, PlayerID playerID) {
-        sendMessage(new JoinRoomMessage(roomID, playerID));
+        sendMessage(new JoinRoomMessage(playerID, roomID));
     }
 
     @Override
@@ -98,5 +113,10 @@ public final class RemoteServerClient implements ServerClient {
     @Override
     public void createRoom(PlayerID myPlayerID, ServerGameState state) {
         sendMessage(new CreateRoomFromStateMessage(myPlayerID, state));
+    }
+
+    @Override
+    public void startGame() {
+        sendMessage(new StartGameMessage());
     }
 }

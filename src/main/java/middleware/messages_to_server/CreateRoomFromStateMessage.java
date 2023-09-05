@@ -9,6 +9,6 @@ public record CreateRoomFromStateMessage(PlayerID myPlayerID, ServerGameState st
         implements MessageToServer {
     @Override
     public void execute(GameServer server, UserID senderID) {
-        throw new UnsupportedOperationException();
+        server.createRoom(senderID, myPlayerID, state);
     }
 }
