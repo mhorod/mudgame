@@ -1,6 +1,5 @@
 package middleware.clients;
 
-import core.event.Action;
 import core.event.Event;
 import core.model.PlayerID;
 import mudgame.client.MudClientCore;
@@ -16,8 +15,6 @@ public interface GameClient {
     Optional<Event> peekEvent();
 
     void processEvent();
-
-    void sendAction(Action action);
 
     Controls getControls();
 }

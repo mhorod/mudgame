@@ -3,9 +3,6 @@ package middleware.server;
 import core.event.Action;
 import core.event.EventOccurrence;
 import core.model.PlayerID;
-import middleware.messages_to_client.EventMessage;
-import middleware.messages_to_client.MessageToClient;
-import middleware.messages_to_client.SetGameStateMessage;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
@@ -13,10 +10,7 @@ import mudgame.client.ClientGameState;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class Room {
     private static long nextRoomID = 0;
@@ -25,13 +19,12 @@ public final class Room {
     private final RoomID roomID;
     private final MudServerCore core;
 
-    private final Map<UserID, PlayerID> toPlayerIDMap = new LinkedHashMap<>();
-    private final Map<PlayerID, UserID> toUserIDMap = new HashMap<>();
+    private final Map<PlayerID, User> toUserMap = new LinkedHashMap<>();
+    private final Set<PlayerID> validPlayerIDs = toUserMap.keySet();
 
-    private final Set<UserID> connectedUserIDs = toPlayerIDMap.keySet();
-    private final Set<PlayerID> validPlayerIDs = toUserIDMap.keySet();
+    private final Set<User> connectedUsers = new LinkedHashSet<>();
 
-    private UserID ownerID;
+    private User owner;
     private boolean isRunning = false;
 
     public Room(ServerGameState state, GameServer server) {
@@ -39,125 +32,110 @@ public final class Room {
         this.roomID = new RoomID(nextRoomID++);
         this.core = new MudServerCore(state, this::eventObserver);
 
-        server.addRoom(this);
+        server.putRoom(this);
         for (PlayerID playerID : state.playerManager().getPlayerIDs())
-            toUserIDMap.put(playerID, null);
+            toUserMap.put(playerID, null);
     }
 
     private void eventObserver(EventOccurrence eventOccurrence) {
-        for (PlayerID playerID : eventOccurrence.recipients())
-            sendMessageToPlayer(playerID, new EventMessage(eventOccurrence.event()));
-    }
-
-    private void sendMessageToPlayer(PlayerID destination, MessageToClient message) {
-        if (!validPlayerIDs.contains(destination))
-            throw new IllegalArgumentException(
-                    destination + " is not valid PlayerID for this room");
-        UserID userID = toUserIDMap.get(destination);
-        if (userID != null)
-            server.sendMessage(userID, message);
+        eventOccurrence
+                .recipients()
+                .stream()
+                .map(toUserMap::get)
+                .filter(Objects::nonNull)
+                .forEach(user -> user.registerEvent(eventOccurrence.event()));
     }
 
     private void sendUpdatedInfo() {
-        for (UserID userID : connectedUserIDs)
-            server.sendCurrentRoomInfo(userID);
+        connectedUsers.forEach(User::sendCurrentRoom);
     }
 
-    public void checkDeletion() {
-        if (connectedUserIDs.size() == 0)
-            server.removeRoom(roomID);
-    }
-
-    public void sendClientGameState(UserID userID) {
+    public void sendGameStateIfRunning(User user) {
         if (!isRunning)
-            throw new RuntimeException("This room is not stated");
-        if (!connectedUserIDs.contains(userID))
-            throw new IllegalArgumentException("This user is not part of this game");
-
-        PlayerID playerID = toPlayerIDMap.get(userID);
-        ClientGameState state = core.state().toClientGameState(playerID);
-
-        server.sendMessage(userID, new SetGameStateMessage(state));
+            return;
+        ClientGameState state = core.state().toClientGameState(user.getPlayerID());
+        user.setGameState(state);
     }
 
-    public void sendServerGameState(UserID userID) {
-        if (ownerID != userID) {
-            server.sendError(userID, "You are not owner of this room");
-            return;
+    private boolean sendErrorIfNotOwner(User user) {
+        if (!user.equals(owner)) {
+            user.sendError("You are not owner of this room");
+            return true;
         }
+        return false;
+    }
+
+    public void sendServerGameState(User user) {
+        if (sendErrorIfNotOwner(user))
+            return;
 
         throw new UnsupportedOperationException();
     }
 
-    public boolean joinRoom(UserID userID, PlayerID asPlayerID) {
-        if (server.getRoomOfUser(userID) != null) {
-            server.sendError(userID, "You are already connected to some room");
-            return false;
-        }
+    public boolean joinRoom(PlayerID asPlayerID, User user) {
         if (!validPlayerIDs.contains(asPlayerID)) {
-            server.sendError(userID, "This PlayedID is not valid");
+            user.sendError("This PlayedID is not valid");
             return false;
         }
-        if (toUserIDMap.get(asPlayerID) != null) {
-            server.sendError(userID, "This PlayedID is already taken");
+        if (toUserMap.get(asPlayerID) != null) {
+            user.sendError("This PlayedID is already taken");
             return false;
         }
 
-        if (ownerID == null)
-            ownerID = userID;
-        toPlayerIDMap.put(userID, asPlayerID);
-        toUserIDMap.put(asPlayerID, userID);
+        if (owner == null)
+            owner = user;
 
-        server.setRoomOfUser(userID, roomID);
+        user.setRoom(this, asPlayerID);
+        toUserMap.put(asPlayerID, user);
+        connectedUsers.add(user);
+
         sendUpdatedInfo();
-        if (isRunning)
-            sendClientGameState(userID);
+        sendGameStateIfRunning(user);
         return true;
     }
 
-    public void leaveRoom(UserID userID) {
-        if (!connectedUserIDs.contains(userID))
-            throw new IllegalArgumentException(userID + " is not in this room");
-        PlayerID playerID = toPlayerIDMap.get(userID);
-        connectedUserIDs.remove(userID);
-        toUserIDMap.put(playerID, null);
+    public void leaveRoom(User user) {
+        PlayerID playerID = user.getPlayerID();
 
-        if (userID == ownerID && !connectedUserIDs.isEmpty())
-            ownerID = connectedUserIDs.iterator().next();
+        user.clearRoom();
+        toUserMap.put(playerID, null);
+        connectedUsers.remove(user);
 
-        server.clearRoomOfUser(userID);
+        if (user.equals(owner) && !connectedUsers.isEmpty())
+            owner = connectedUsers.iterator().next();
+
         sendUpdatedInfo();
-        server.sendCurrentRoomInfo(userID);
-        checkDeletion();
+        if (connectedUsers.isEmpty())
+            server.removeRoom(this);
     }
 
-    public RoomInfo getRoomInfo() {
-        return new RoomInfo(roomID, toUserIDMap, ownerID, isRunning);
+    public UserID getOwnerID() {
+        return owner == null ? null : owner.getUserID();
     }
 
     public RoomID getRoomID() {
         return roomID;
     }
 
-    public void start(UserID actorID) {
-        if (isRunning) {
-            server.sendError(actorID, "You can not start game twice");
-            return;
-        }
-        if (ownerID != actorID) {
-            server.sendError(actorID, "Only room owner can start the game");
-            return;
-        }
-
-        isRunning = true;
-        for (UserID userID : connectedUserIDs)
-            sendClientGameState(userID);
+    public RoomInfo getRoomInfo() {
+        Map<PlayerID, UserID> toUserIDMap = new LinkedHashMap<>();
+        for (var entry : toUserMap.entrySet())
+            toUserIDMap.put(entry.getKey(), entry.getValue().getUserID());
+        return new RoomInfo(roomID, toUserIDMap, getOwnerID(), isRunning);
     }
 
-    public void processAction(Action action, UserID actor) {
-        if (!connectedUserIDs.contains(actor))
-            throw new IllegalArgumentException("This user is not in this room");
+    public void start(User actor) {
+        if (isRunning)
+            return;
+        if (sendErrorIfNotOwner(actor))
+            return;
 
-        core.process(action, toPlayerIDMap.get(actor));
+        isRunning = true;
+        for (User user : connectedUsers)
+            sendGameStateIfRunning(user);
+    }
+
+    public void processAction(Action action, User actor) {
+        core.process(action, actor.getPlayerID());
     }
 }
