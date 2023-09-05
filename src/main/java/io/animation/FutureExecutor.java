@@ -11,6 +11,7 @@ public class FutureExecutor {
     public void update() {
         subscribers.stream()
                 .filter(subscriber -> subscriber.finishable.finished())
+                .toList()
                 .forEach(subscriber -> subscriber.f().run());
         subscribers.removeIf(subscriber -> subscriber.finishable.finished());
     }

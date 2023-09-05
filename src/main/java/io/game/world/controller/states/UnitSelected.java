@@ -7,9 +7,6 @@ import io.game.world.controller.WorldState;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.VisibilityChange;
 
-import java.util.List;
-import java.util.Optional;
-
 public class UnitSelected extends WorldState {
     private final EntityID selectedUnit;
 
@@ -18,10 +15,10 @@ public class UnitSelected extends WorldState {
         this.selectedUnit = unit;
         state.map()
                 .setHighlightedTiles(state.pathfinder()
-                                             .reachablePositions(selectedUnit)
-                                             .getPositions()
-                                             .stream()
-                                             .toList());
+                        .reachablePositions(selectedUnit)
+                        .getPositions()
+                        .stream()
+                        .toList());
     }
 
     @Override
@@ -58,19 +55,9 @@ public class UnitSelected extends WorldState {
 
     @Override
     public void onMoveEntityAlongPath(MoveEntityAlongPath event) {
-        state.animatedEvents().add(event);
-        List<Position> path = event.moves()
-                .stream()
-                .map(move -> move.destination())
-                .flatMap(Optional::stream)
-                .toList();
-
-        onFinish(
-                state.map().moveAlongPath(event.entityID(), path),
-                () -> state.animatedEvents().remove(event)
-        );
         if (event.entityID().equals(selectedUnit))
             change(new Normal(state));
+        moveEntity(event);
         nextEvent();
     }
 
