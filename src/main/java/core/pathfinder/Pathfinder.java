@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.StandardException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,13 +25,13 @@ import java.util.Set;
 import static java.util.Comparator.comparing;
 
 @RequiredArgsConstructor
-public class Pathfinder {
+public class Pathfinder implements Serializable {
     private final TerrainView terrain;
     private final EntityBoardView entityBoard;
 
     private record PositionOnPath(Position position, int movementLeft) { }
 
-    private class MovementVisitor implements ComponentVisitor<Integer> {
+    private class MovementVisitor implements ComponentVisitor<Integer>, Serializable {
         @Override
         public Integer visit(Movement m) {
             return m.getCurrentMovement();
