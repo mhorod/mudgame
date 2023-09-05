@@ -1,6 +1,5 @@
 package io.game;
 
-import core.event.Action;
 import core.event.Event;
 import core.model.EntityID;
 import core.model.PlayerID;
@@ -23,16 +22,12 @@ import middleware.clients.ServerClient;
 import middleware.local.LocalServer;
 import middleware.remote.RemoteNetworkClient;
 import middleware.remote.SocketConnection;
-import mudgame.controls.actions.CreateEntity;
-import mudgame.controls.actions.MoveEntity;
 import mudgame.controls.events.HideEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
-
-import static core.entities.model.EntityType.PAWN;
 
 @Slf4j
 public class GameView extends SimpleView {
@@ -87,13 +82,12 @@ public class GameView extends SimpleView {
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
-                        me.sendAction(new MoveEntity(id, destination));
+                        me.getControls().moveEntity(id, destination);
                     }
 
                     @Override
                     public void createEntity(Position position) {
-                        Action action = new CreateEntity(PAWN, me.myPlayerID(), position);
-                        me.sendAction(action);
+                        me.getControls().createEntity(position);
                     }
 
                     @Override

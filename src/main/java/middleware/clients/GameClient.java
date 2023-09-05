@@ -4,6 +4,7 @@ import core.event.Action;
 import core.event.Event;
 import core.model.PlayerID;
 import mudgame.client.MudClientCore;
+import mudgame.controls.Controls;
 
 import java.util.Optional;
 
@@ -18,6 +19,5 @@ public interface GameClient {
 
     void sendAction(Action action);
 
-    // TODO controls
-    // Controls getControls();
+    Controls getControls();
 }

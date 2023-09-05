@@ -4,6 +4,7 @@ import core.event.Event;
 import core.model.PlayerID;
 import mudgame.client.ClientGameState;
 import mudgame.client.MudClientCore;
+import mudgame.controls.Controls;
 
 import java.util.ArrayDeque;
 import java.util.Optional;
@@ -40,5 +41,9 @@ public abstract class AbstractGameClient implements GameClient {
 
     public void registerEvent(Event event) {
         eventQueue.add(event);
+    }
+
+    public Controls getControls() {
+        return new Controls(myPlayerID(), this::sendAction);
     }
 }
