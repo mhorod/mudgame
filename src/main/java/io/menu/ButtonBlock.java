@@ -6,7 +6,7 @@ import io.model.engine.Canvas;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class ButtonBlock {
+public class ButtonBlock implements UIComponent {
     private final float gap;
     List<Button> buttons;
 
@@ -17,13 +17,13 @@ public class ButtonBlock {
                 .toList();
     }
 
-    public void fitInto(float x, float y, float width, float height) {
+    public void fitInto(Rectangle rect) {
         float noButtons = buttons.size() * (1 + gap) - gap;
         float aspect = noButtons * Button.ASPECT_RATIO;
-        float myHeight = Math.min(height, width * aspect);
+        float myHeight = Math.min(rect.height, rect.width() * aspect);
         var position = new ScreenPosition(
-                x + width / 2 - myHeight / aspect / 2,
-                y + height / 2 - myHeight / 2
+                rect.position.x() + rect.width() / 2 - myHeight / aspect / 2,
+                rect.position.y() + rect.height / 2 - myHeight / 2
         );
         for (int i = 0; i < buttons.size(); i++) {
             buttons.get(i).position = new ScreenPosition(position.x(), position.y() + i * (myHeight / noButtons) * (1 + gap));
@@ -39,9 +39,15 @@ public class ButtonBlock {
         buttons.forEach(button -> button.click(pos));
     }
 
+    @Override
     public void draw(Canvas canvas) {
         buttons.forEach(button -> button.draw(canvas));
     }
 
+
+    @Override
+    public float getAspectRatio() {
+        return (buttons.size() * (1 + gap) - gap) * Button.ASPECT_RATIO;
+    }
 
 }

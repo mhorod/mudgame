@@ -31,10 +31,10 @@ public enum Texture {
     BUTTON_SMALL(181f / 450f),
     BUTTON_SMALL_PRESSED(181f / 450f),
     SCROLL_TOP(34f / 62f),
-    SCROLL_MID(294f / 62f),
+    SCROLL_MID(33f / 62f),
     SCROLL_BOT(33f / 62f),
     SCROLL_BACK_TOP(33f / 62f),
-    SCROLL_BACK_MID(294f / 62f),
+    SCROLL_BACK_MID(33f / 62f),
     SCROLL_BACK_BOT(34f / 62f),
     LOGO(544f / 450f);
     private final float ratio;

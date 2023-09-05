@@ -34,10 +34,10 @@ public class TextureBank implements io.model.engine.TextureBank {
         unitPixmap = units.getTextureData().consumePixmap();
         buttonSmall = new TextureRegion(ui, 0, 0, 450, 181);
         scrollTop = new TextureRegion(ui, 450, 0, 62, 34);
-        scrollMid = new TextureRegion(ui, 450, 34, 62, 294);
+        scrollMid = new TextureRegion(ui, 450, 34, 62, 33);
         scrollBot = new TextureRegion(ui, 450, 328, 62, 33);
         scrollBackTop = new TextureRegion(ui, 450, 362, 62, 33);
-        scrollBackMid = new TextureRegion(ui, 450, 395, 62, 294);
+        scrollBackMid = new TextureRegion(ui, 450, 395, 62, 33);
         scrollBackBot = new TextureRegion(ui, 450, 689, 62, 34);
         buttonSmallPressed = new TextureRegion(ui, 0, 181, 450, 181);
         logo = new TextureRegion(ui, 0, 362, 449, 544);
