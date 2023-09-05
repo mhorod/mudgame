@@ -10,7 +10,17 @@ import io.animation.Finishable;
 import io.game.Camera;
 import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
-import io.game.world.entity.*;
+import io.game.world.entity.AnimationChain;
+import io.game.world.entity.Condense;
+import io.game.world.entity.Dissipate;
+import io.game.world.entity.Drop;
+import io.game.world.entity.Entity;
+import io.game.world.entity.EntityAnimation;
+import io.game.world.entity.Exist;
+import io.game.world.entity.Hover;
+import io.game.world.entity.MoveAlong;
+import io.game.world.entity.Raise;
+import io.game.world.entity.WorldEntity;
 import io.game.world.tile.Tile;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
@@ -52,7 +62,8 @@ public class Map implements Animation {
     private WorldEntity entityFromID(EntityID id) {
         if (entityAnimations.containsKey(id))
             return entityAnimations.get(id).getEntity();
-        return new Entity(WorldPosition.from(entities.entityPosition(id)), entities.findEntityByID(id));
+        return new Entity(WorldPosition.from(entities.entityPosition(id)),
+                          entities.findEntityByID(id));
     }
 
     public void objectAt(
@@ -98,9 +109,11 @@ public class Map implements Animation {
                     case WATER -> new Tile(pos, WorldTexture.TILE_LIGHT).draw(canvas, camera);
                     case LAND -> new Tile(pos, WorldTexture.TILE_DARK).draw(canvas, camera);
                 }
-                if (highlightedTiles != null && !highlightedTiles.contains(pos) && tile == TerrainType.LAND)
+                if (highlightedTiles != null && !highlightedTiles.contains(pos) &&
+                    tile == TerrainType.LAND)
                     highlightTiles.add(
-                            new WorldEntity(WorldPosition.from(pos), WorldTexture.TILE_HIGHLIGHT, false)
+                            new WorldEntity(WorldPosition.from(pos), WorldTexture.TILE_HIGHLIGHT,
+                                            false)
                     );
             }
 

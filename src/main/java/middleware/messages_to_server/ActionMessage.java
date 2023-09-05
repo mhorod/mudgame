@@ -1,8 +1,8 @@
 package middleware.messages_to_server;
 
-import core.events.Event.Action;
-import middleware.GameServer;
-import middleware.UserID;
+import middleware.model.UserID;
+import middleware.server.GameServer;
+import core.event.Action;
 
 public record ActionMessage(Action action) implements MessageToServer {
     @Override

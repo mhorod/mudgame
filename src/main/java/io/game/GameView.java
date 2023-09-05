@@ -1,11 +1,9 @@
 package io.game;
 
-import core.entities.events.*;
-import core.events.Event;
-import core.events.Event.Action;
+import core.event.Event;
 import core.model.EntityID;
+import core.model.PlayerID;
 import core.model.Position;
-import core.terrain.events.SetTerrain;
 import io.animation.AnimationController;
 import io.game.world.Map;
 import io.game.world.MapObserver;
@@ -19,11 +17,17 @@ import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
-import middleware.Client;
-import middleware.LocalServer;
-import middleware.messages_to_server.ActionMessage;
-
-import static core.entities.model.EntityType.PAWN;
+import middleware.clients.GameClient;
+import middleware.clients.ServerClient;
+import middleware.local.LocalServer;
+import middleware.remote.RemoteNetworkClient;
+import middleware.remote.SocketConnection;
+import mudgame.controls.events.HideEntity;
+import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.RemoveEntity;
+import mudgame.controls.events.ShowEntity;
+import mudgame.controls.events.SpawnEntity;
+import mudgame.controls.events.VisibilityChange;
 
 @Slf4j
 public class GameView extends SimpleView {
@@ -39,13 +43,34 @@ public class GameView extends SimpleView {
     };
     private final WorldController worldController;
 
-    private final Client me;
+    private final GameClient me;
     private boolean eventObserved = false;
 
     public GameView() {
-        var clients = LocalServer.of(5);
-        me = clients.get(0);
-        me.processAllMessages();
+        var server = new LocalServer(5);
+
+        if (true) {
+            me = server.getClients().get(0);
+        } else {
+            // --------------------------------------------------
+            // if this causes many merge conflicts remove it
+            try {
+                RemoteNetworkClient.GLOBAL_CLIENT.connect(new SocketConnection("localhost", 6789));
+                Thread.sleep(200);
+                RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
+                ServerClient serverClient = RemoteNetworkClient.GLOBAL_CLIENT.getServerClient()
+                        .orElseThrow();
+                serverClient.createRoom(new PlayerID(0), 5);
+                serverClient.startGame();
+                Thread.sleep(200);
+                RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
+                me = serverClient.getGameClient().orElseThrow();
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+            // --------------------------------------------------
+        }
+
         map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
@@ -57,14 +82,12 @@ public class GameView extends SimpleView {
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
-                        me.getCommunicator()
-                                .sendMessage(new ActionMessage(new MoveEntity(id, destination)));
+                        me.getControls().moveEntity(id, destination);
                     }
 
                     @Override
                     public void createEntity(Position position) {
-                        Action action = new CreateEntity(PAWN, me.myPlayerID(), position);
-                        me.getCommunicator().sendMessage(new ActionMessage(action));
+                        me.getControls().createEntity(position);
                     }
 
                     @Override
@@ -81,15 +104,15 @@ public class GameView extends SimpleView {
 
     private void processEvent(Event event) {
         log.debug("Processing event: {}", event);
-        if (event instanceof MoveEntity e) {
+        if (event instanceof MoveEntityAlongPath e) {
             eventObserved = true;
-            worldController.onMoveEntity(e);
-        } else if (event instanceof SetTerrain e) {
+            worldController.onMoveEntityAlongPath(e);
+        } else if (event instanceof VisibilityChange e) {
             eventObserved = true;
-            worldController.onSetTerrain(e);
-        } else if (event instanceof PlaceEntity e) {
+            worldController.onVisibilityChange(e);
+        } else if (event instanceof SpawnEntity e) {
             eventObserved = true;
-            worldController.onPlaceEntity(e);
+            worldController.onSpawnEntity(e);
         } else if (event instanceof RemoveEntity e) {
             eventObserved = true;
             worldController.onRemoveEntity(e);
@@ -104,12 +127,12 @@ public class GameView extends SimpleView {
 
     private boolean canEatEvent() {
         return me.peekEvent().stream().anyMatch(
-                event -> !(event instanceof MoveEntity)
-                        && !(event instanceof SetTerrain)
-                        && !(event instanceof PlaceEntity)
-                        && !(event instanceof RemoveEntity)
-                        && !(event instanceof ShowEntity)
-                        && !(event instanceof HideEntity)
+                event -> !(event instanceof MoveEntityAlongPath)
+                         && !(event instanceof VisibilityChange)
+                         && !(event instanceof SpawnEntity)
+                         && !(event instanceof RemoveEntity)
+                         && !(event instanceof ShowEntity)
+                         && !(event instanceof HideEntity)
         );
     }
 
@@ -120,7 +143,7 @@ public class GameView extends SimpleView {
 
     @Override
     public void update(Input input, TextureBank bank) {
-        me.processAllMessages();
+        RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
         worldController.update();
         if (!eventObserved) {
             while (canEatEvent())

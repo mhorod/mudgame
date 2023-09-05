@@ -1,10 +1,10 @@
 package core;
 
-import core.events.EventObserver;
-import core.events.EventOccurrence;
-import core.events.EventOccurrenceObserver;
-import core.events.EventSource;
-import core.events.PlayerEventObserver;
+import mudgame.events.EventObserver;
+import core.event.EventOccurrence;
+import mudgame.events.EventOccurrenceObserver;
+import mudgame.events.EventSource;
+import mudgame.events.PlayerEventObserver;
 
 import java.util.ArrayList;
 import java.util.List;
