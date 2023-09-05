@@ -4,6 +4,7 @@ import core.event.Event;
 import core.model.EntityID;
 import core.model.Position;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,11 @@ import java.util.Optional;
  */
 public record MoveEntityAlongPath(EntityID entityID, List<SingleMove> moves) implements Event {
     public record SingleMove(
-            Optional<Position> destination,
+            Position destinationNullable,
             VisibilityChange visibilityChange
-    ) { }
+    ) implements Serializable {
+        public Optional<Position> destination() {
+            return Optional.ofNullable(destinationNullable);
+        }
+    }
 }

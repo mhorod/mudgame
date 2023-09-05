@@ -36,6 +36,7 @@ public final class GameServer {
             throw new IllegalArgumentException(userID + " is already connected");
         senderMap.put(userID, sender);
         sendMessage(userID, new SetUserIDMessage(userID));
+        sendRoomList(userID);
     }
 
     public void removeConnection(UserID userID) {

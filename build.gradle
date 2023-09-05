@@ -51,3 +51,24 @@ test {
 }
 
 mainClassName = 'Program'
+
+task mudServer(type: Jar) {
+    archiveName = 'mudServer.jar'
+    manifest { attributes('Main-Class': 'middleware.server.RemoteServer') }
+    from {
+        configurations.runtimeClasspath
+                .filter { !it.path.contains("org.lwjgl") }
+                .filter { !it.path.contains("com.badlogicgames") }
+                .collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    with jar
+}
+
+task mudClient(type: Jar) {
+    archiveName = 'mudClient.jar'
+    manifest { attributes('Main-Class': mainClassName) }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    with jar
+}

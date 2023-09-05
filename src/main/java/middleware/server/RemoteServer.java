@@ -15,7 +15,7 @@ import java.util.TimerTask;
 
 @Slf4j
 public final class RemoteServer {
-    private static final Duration CLEAR_CONNECTION_DELAY = Duration.ofSeconds(15);
+    private static final Duration SCAN_CLOSED_CONNECTIONS_DELAY = Duration.ofSeconds(15);
 
     private final GameServer server = new GameServer();
     private final ServerSocket serverSocket;
@@ -27,14 +27,15 @@ public final class RemoteServer {
         new Thread(this::workReceiveConnections).start();
         new Timer().schedule(
                 new WorkRemoveConnections(),
-                CLEAR_CONNECTION_DELAY.toMillis(),
-                CLEAR_CONNECTION_DELAY.toMillis()
+                SCAN_CLOSED_CONNECTIONS_DELAY.toMillis(),
+                SCAN_CLOSED_CONNECTIONS_DELAY.toMillis()
         );
     }
 
     @SneakyThrows(IOException.class)
     public static void main(String[] args) {
-        new RemoteServer(new ServerSocket(6789));
+        int port = args.length > 0 ? Integer.parseInt(args[0]) : 6789;
+        new RemoteServer(new ServerSocket(port));
     }
 
     @SneakyThrows(IOException.class)

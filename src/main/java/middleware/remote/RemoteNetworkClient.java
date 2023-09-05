@@ -26,17 +26,23 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
 public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkClient> {
-    private static final Duration IDLE_TIMEOUT = Duration.ofSeconds(10);
-    private static final Duration PING_TIMEOUT = Duration.ofSeconds(5);
-    private static final Duration USED_ID_TIMEOUT = Duration.ofSeconds(5);
+    static final Duration SOCKET_CONNECTION_TIMEOUT = Duration.ofSeconds(10);
+    static final Duration PING_TIMEOUT = Duration.ofSeconds(5);
+    static final Duration PING_AFTER_IDLE = Duration.ofSeconds(15);
+    static final Duration USER_ID_TIMEOUT = Duration.ofSeconds(5);
+
     // TODO remove GLOBAL_CLIENT
     public static RemoteNetworkClient GLOBAL_CLIENT = new RemoteNetworkClient();
+
     private final Queue<MessageToClient> messageQueue = new LinkedBlockingQueue<>();
-    private Instant lastIncoming = Instant.EPOCH, lastPing = Instant.EPOCH, connectionBegan = Instant.EPOCH;
 
     private NetworkStatus networkStatus = NetworkStatus.DISCONNECTED;
     private Sender<MessageToServer> sender;
     private RemoteServerClient currentServerClient;
+
+    private Instant lastIncoming = Instant.EPOCH;
+    private Instant lastPing = Instant.EPOCH;
+    private Instant connectionBegan = Instant.EPOCH;
 
     private void verifyNetworkStatus() {
         if (networkStatus == NetworkStatus.OK) {
@@ -44,7 +50,7 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
                 clearStateAndSetStatus(NetworkStatus.FAILED);
                 return;
             }
-            if (Duration.between(lastIncoming, Instant.now()).compareTo(IDLE_TIMEOUT) < 0)
+            if (Duration.between(lastIncoming, Instant.now()).compareTo(PING_AFTER_IDLE) < 0)
                 return;
             if (lastPing.compareTo(lastIncoming) <= 0) {
                 sendMessage(new PingToServer("pingFromClient", true));
@@ -52,10 +58,9 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
             } else if (Duration.between(lastPing, Instant.now()).compareTo(PING_TIMEOUT) > 0)
                 clearStateAndSetStatus(NetworkStatus.FAILED);
         }
-        if (networkStatus == NetworkStatus.ATTEMPTING) {
-            if (Duration.between(connectionBegan, Instant.now()).compareTo(USED_ID_TIMEOUT) < 0)
-                return;
-            clearStateAndSetStatus(NetworkStatus.FAILED);
+        if (networkStatus == NetworkStatus.ATTEMPTING && sender != null) {
+            if (Duration.between(connectionBegan, Instant.now()).compareTo(USER_ID_TIMEOUT) > 0)
+                clearStateAndSetStatus(NetworkStatus.FAILED);
         }
     }
 
@@ -78,8 +83,7 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
 
     public void setSocketConnection(Socket socket) {
         if (networkStatus != NetworkStatus.ATTEMPTING)
-            throw new RuntimeException(
-                    "reportConnectionAttempt() should be called before setSocketConnection()");
+            throw new RuntimeException("reportConnectionAttempt() should be called before setSocketConnection()");
         if (!socket.isConnected() || socket.isClosed())
             throw new RuntimeException("setSocketConnection() called with bad socket");
 
@@ -92,8 +96,7 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
 
     public void sendMessage(MessageToServer message) {
         if (networkStatus != NetworkStatus.OK)
-            throw new RuntimeException(
-                    "Attempting to send message using disconnected NetworkClient");
+            throw new RuntimeException("Attempting to send message using disconnected NetworkClient");
         log.info("[SND] " + message);
         sender.sendMessage(message);
     }
@@ -106,8 +109,7 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
 
     public void setUserID(UserID userID) {
         if (networkStatus != NetworkStatus.ATTEMPTING)
-            throw new RuntimeException(
-                    "setUsedId() should only be called when network status is ATTEMPTING");
+            throw new RuntimeException("setUserId() should only be called when network status is ATTEMPTING");
 
         currentServerClient = new RemoteServerClient(userID, this);
         networkStatus = NetworkStatus.OK;

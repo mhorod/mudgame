@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
 import middleware.local.LocalServer;
+import middleware.model.RoomID;
 import middleware.remote.RemoteNetworkClient;
 import middleware.remote.SocketConnection;
 import mudgame.controls.events.HideEntity;
@@ -56,14 +57,17 @@ public class GameView extends SimpleView {
             // if this causes many merge conflicts remove it
             try {
                 RemoteNetworkClient.GLOBAL_CLIENT.connect(new SocketConnection("localhost", 6789));
-                Thread.sleep(200);
-                RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
-                ServerClient serverClient = RemoteNetworkClient.GLOBAL_CLIENT.getServerClient()
-                        .orElseThrow();
+
+                while (RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().isEmpty())
+                    RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
+
+                ServerClient serverClient = RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().orElseThrow();
                 serverClient.createRoom(new PlayerID(0), 5);
                 serverClient.startGame();
-                Thread.sleep(200);
-                RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
+
+                while (serverClient.getGameClient().isEmpty())
+                    RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
+
                 me = serverClient.getGameClient().orElseThrow();
             } catch (Throwable throwable) {
                 throw new RuntimeException(throwable);
@@ -128,11 +132,11 @@ public class GameView extends SimpleView {
     private boolean canEatEvent() {
         return me.peekEvent().stream().anyMatch(
                 event -> !(event instanceof MoveEntityAlongPath)
-                         && !(event instanceof VisibilityChange)
-                         && !(event instanceof SpawnEntity)
-                         && !(event instanceof RemoveEntity)
-                         && !(event instanceof ShowEntity)
-                         && !(event instanceof HideEntity)
+                        && !(event instanceof VisibilityChange)
+                        && !(event instanceof SpawnEntity)
+                        && !(event instanceof RemoveEntity)
+                        && !(event instanceof ShowEntity)
+                        && !(event instanceof HideEntity)
         );
     }
 
