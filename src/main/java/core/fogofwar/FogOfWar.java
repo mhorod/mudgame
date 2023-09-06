@@ -21,7 +21,7 @@ public final class FogOfWar implements Serializable {
     }
 
     public static FogOfWar from(PlayerFogOfWar fow) {
-        return new FogOfWar(Map.of(fow.playerID, fow));
+        return new FogOfWar(Map.of(fow.playerID(), fow));
     }
 
     public boolean isVisible(Position position, PlayerID viewer) {

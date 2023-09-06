@@ -1,31 +1,23 @@
 package core.pathfinder;
 
 import core.entities.EntityBoard;
-import core.entities.components.Movement;
 import core.entities.model.Entity;
-import core.entities.model.EntityData;
-import core.entities.model.EntityType;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
 import core.terrain.Terrain;
-import core.terrain.model.TerrainSize;
-import core.terrain.model.TerrainType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
 
-import static core.terrain.model.TerrainType.LAND;
-import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-class EntityPathfinderTest {
-
+class EntityPathfinderTest extends PathfinderTestBase {
     EntityBoard entityBoard;
     Terrain terrain;
     Pathfinder pathfinder;
@@ -35,13 +27,17 @@ class EntityPathfinderTest {
     void init() {
         entityBoard = new EntityBoard();
         terrain = simpleTerrain();
-        fow = new FogOfWar(List.of(new PlayerID(0)));
+        fow = mock(FogOfWar.class);
+        when(fow.isVisible(any(), any())).thenReturn(true);
+
         pathfinder = new EntityPathfinder(terrain, entityBoard, fow);
     }
 
     @Test
     void finds_reachable_positions() {
         // given
+        fow = mock(FogOfWar.class);
+
         int movement = 2;
         Entity entity = entityBoard.createEntity(
                 entityWithMovement(movement),
@@ -98,38 +94,29 @@ class EntityPathfinderTest {
                 .endsWith(new Position(1, 1));
     }
 
+    @Test
+    void avoids_tiles_in_fog_of_war() {
+        // given
+        when(fow.isVisible(eq(new Position(0, 1)), any())).thenReturn(false);
 
-    Terrain simpleTerrain() {
-        TerrainSize size = new TerrainSize(5, 5);
-        Map<Position, TerrainType> map = IntStream.range(0, size.width())
-                .boxed()
-                .flatMap(
-                        x -> IntStream.range(0, size.height())
-                                .mapToObj(y -> new Position(x, y))
-                )
-                .collect(
-                        toMap(p -> p, p -> LAND)
-                );
-        return new Terrain(size, map);
-    }
-
-    EntityData entityWithMovement(int movement) {
-        return new EntityData(
-                mock(EntityType.class),
-                List.of(new Movement(movement))
+        int movement = 5;
+        Entity entity = entityBoard.createEntity(
+                entityWithMovement(movement),
+                new PlayerID(0),
+                new Position(0, 0)
         );
+
+        // when
+        ReachablePositions positions = pathfinder.reachablePositions(entity.id());
+        List<Position> path = positions.getPath(new Position(0, 2));
+
+        // then
+        assertThat(path).hasSize(5);
+        assertThatPathIsContinuous(path);
+        assertThat(path)
+                .startsWith(new Position(0, 0))
+                .endsWith(new Position(0, 2));
     }
 
-    void assertThatPathIsContinuous(List<Position> path) {
-        for (int i = 1; i < path.size(); i++)
-            assertThatPositionsAreNeighboring(path.get(i - 1), path.get(i));
-    }
-
-    private void assertThatPositionsAreNeighboring(Position prev, Position next) {
-        int dx = next.x() - prev.x();
-        int dy = next.y() - prev.y();
-        if (dx * dy != 0 && Math.abs(dx + dy) != 1)
-            fail("Positions %s and %s are not neighboring", prev, next);
-    }
 
 }
