@@ -4,7 +4,10 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import io.model.ScreenPosition;
@@ -18,6 +21,8 @@ public class GdxGameUI implements ApplicationListener, Canvas {
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private TextureBank textureBank;
+    private BitmapFont font;
+    private GlyphLayout glyphLayout;
 
     public GdxGameUI(View view) {
         this.view = view;
@@ -25,6 +30,8 @@ public class GdxGameUI implements ApplicationListener, Canvas {
 
     @Override
     public void create() {
+        font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
+        glyphLayout = new GlyphLayout();
         camera = new OrthographicCamera();
         batch = new SpriteBatch();
         textureBank = new TextureBank();
@@ -44,7 +51,7 @@ public class GdxGameUI implements ApplicationListener, Canvas {
     @Override
     public void render() {
         view.update(inputParser.getInput(), textureBank);
-        ScreenUtils.clear(Color.BLACK);
+        ScreenUtils.clear(Color.WHITE);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         view.draw(this);
@@ -103,6 +110,22 @@ public class GdxGameUI implements ApplicationListener, Canvas {
         );
         batch.setColor(1, 1, 1, 1);
 
+    }
+
+    @Override
+    public void drawText(String text, ScreenPosition position, float height) {
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        var fontHeight = height * Gdx.graphics.getWidth();
+        font.getData().setScale(fontHeight * 0.0208f);
+        font.setColor(Color.BLACK);
+        font.draw(batch, text, position.x() * Gdx.graphics.getWidth(), position.y() * Gdx.graphics.getWidth() + fontHeight);
+        batch.setProjectionMatrix(camera.combined);
+    }
+
+    @Override
+    public float getTextAspectRatio(String text) {
+        glyphLayout.setText(font, text);
+        return glyphLayout.width / glyphLayout.height;
     }
 
     @Override

@@ -1,17 +1,14 @@
 package io.game.world.controller;
 
 import core.model.EntityID;
+import core.model.Position;
 import io.animation.Finishable;
-import mudgame.controls.events.HideEntity;
-import mudgame.controls.events.MoveEntityAlongPath;
-import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.ShowEntity;
-import mudgame.controls.events.SpawnEntity;
-import mudgame.controls.events.VisibilityChange;
+import mudgame.controls.events.*;
 import mudgame.controls.events.VisibilityChange.HidePosition;
 import mudgame.controls.events.VisibilityChange.ShowPosition;
 
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class WorldState implements WorldBehavior {
     private WorldController controller;
@@ -53,17 +50,37 @@ public abstract class WorldState implements WorldBehavior {
     }
 
     protected void changeVisibility(VisibilityChange event) {
-        state.animatedEvents().add(event);
-        var fogAdded = event.positions().stream()
+        event.positions().stream()
                 .filter(HidePosition.class::isInstance)
-                .map(p -> state.map().addFog(p.position()));
+                .forEach(p -> state.map().hideIn(0, p.position()));
 
-        var fogRemoved = event.positions().stream()
+        event.positions().stream()
                 .filter(ShowPosition.class::isInstance)
-                .map(p -> state.map().removeFog(p.position()));
+                .forEach(p -> state.map().showIn(0, (ShowPosition) p));
+
+    }
+
+    protected void moveEntity(MoveEntityAlongPath event) {
+        state.animatedEvents().add(event);
+        List<Optional<Position>> path = event.moves()
+                .stream()
+                .map(MoveEntityAlongPath.SingleMove::destination)
+                .toList();
+
+        for (int i = 0; i < event.moves().size(); i++) {
+            var move = event.moves().get(i);
+            float time = 0.3f + i / 3f;
+            move.visibilityChange().positions().forEach(change -> {
+                if (change instanceof ShowPosition)
+                    state.map().showIn(time, (ShowPosition) change);
+                if (change instanceof HidePosition)
+                    state.map().hideIn(time, change.position());
+            });
+        }
+
 
         onFinish(
-                Finishable.all(Stream.concat(fogAdded, fogRemoved).toList()),
+                state.map().moveAlongPath(event.entityID(), path),
                 () -> state.animatedEvents().remove(event)
         );
     }

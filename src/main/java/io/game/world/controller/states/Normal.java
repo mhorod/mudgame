@@ -5,11 +5,9 @@ import core.model.Position;
 import io.game.world.controller.CommonState;
 import io.game.world.controller.WorldState;
 import mudgame.controls.events.MoveEntityAlongPath;
-import mudgame.controls.events.MoveEntityAlongPath.SingleMove;
 import mudgame.controls.events.VisibilityChange;
 
 import java.util.List;
-import java.util.Optional;
 
 public class Normal extends WorldState {
 
@@ -44,17 +42,7 @@ public class Normal extends WorldState {
 
     @Override
     public void onMoveEntityAlongPath(MoveEntityAlongPath event) {
-        state.animatedEvents().add(event);
-        List<Position> path = event.moves()
-                .stream()
-                .map(SingleMove::destination)
-                .flatMap(Optional::stream)
-                .toList();
-
-        onFinish(
-                state.map().moveAlongPath(event.entityID(), path),
-                () -> state.animatedEvents().remove(event)
-        );
+        moveEntity(event);
         nextEvent();
     }
 

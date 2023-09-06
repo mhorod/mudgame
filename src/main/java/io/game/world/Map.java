@@ -10,36 +10,26 @@ import io.animation.Finishable;
 import io.game.Camera;
 import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
-import io.game.world.entity.AnimationChain;
-import io.game.world.entity.Condense;
-import io.game.world.entity.Dissipate;
-import io.game.world.entity.Drop;
-import io.game.world.entity.Entity;
-import io.game.world.entity.EntityAnimation;
-import io.game.world.entity.Exist;
-import io.game.world.entity.Hover;
-import io.game.world.entity.MoveAlong;
-import io.game.world.entity.Raise;
-import io.game.world.entity.WorldEntity;
+import io.game.world.entity.*;
+import io.game.world.tile.PlannedChange;
 import io.game.world.tile.Tile;
+import io.game.world.tile.TileAnimation;
 import io.game.world.tile.TileKind;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.TextureBank;
+import mudgame.controls.events.VisibilityChange;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Map implements Animation {
     HashMap<EntityID, EntityAnimation> entityAnimations = new HashMap<>();
-    HashMap<Position, EntityAnimation> tileAnimations = new HashMap<>();
     ArrayList<EntityAnimation> otherAnimations = new ArrayList<>();
     private final TerrainView terrain;
     private final EntityBoardView entities;
     private final ArrayList<Position> path = new ArrayList<>();
     private Collection<Position> highlightedTiles = null;
+    HashMap<Position, TileAnimation> tmpTiles = new HashMap<>();
 
     public Map(TerrainView terrain, EntityBoardView entities) {
         this.terrain = terrain;
@@ -55,16 +45,17 @@ public class Map implements Animation {
         highlightedTiles = positions;
     }
 
-    private void setAnimation(EntityID entityID, EntityAnimation animation) {
+    private Finishable setAnimation(EntityID entityID, EntityAnimation animation) {
         animation.init(entityFromID(entityID));
         entityAnimations.put(entityID, animation);
+        return animation;
     }
 
     private WorldEntity entityFromID(EntityID id) {
         if (entityAnimations.containsKey(id))
             return entityAnimations.get(id).getEntity();
         return new Entity(WorldPosition.from(entities.entityPosition(id)),
-                          entities.findEntityByID(id));
+                entities.findEntityByID(id));
     }
 
     public void objectAt(
@@ -84,35 +75,56 @@ public class Map implements Animation {
             listener.onTile(tile);
     }
 
+    private Tile fog(Position pos) {
+        var left = terrain.terrainAt(new Position(pos.x(), pos.y() + 1)) == TerrainType.VOID;
+        var right = terrain.terrainAt(new Position(pos.x() + 1, pos.y())) == TerrainType.VOID;
+        if (left && right)
+            return new Tile(pos, WorldTexture.FOG_TALL);
+        if (left)
+            return new Tile(pos, WorldTexture.FOG_LEFT);
+        if (right)
+            return new Tile(pos, WorldTexture.FOG_RIGHT);
+        return new Tile(pos, WorldTexture.FOG);
+    }
+
     public void draw(Canvas canvas, Camera camera) {
         ArrayList<Tile> fogTiles = new ArrayList<>();
         ArrayList<WorldEntity> highlightTiles = new ArrayList<>();
         ArrayList<WorldEntity> entitiesToDraw = new ArrayList<>();
         camera.forAllVisibleTiles(canvas.getAspectRatio(), pos -> {
-            if (tileAnimations.containsKey(pos)) {
-                tileAnimations.get(pos).getEntity().draw(canvas, camera);
+            if (tmpTiles.containsKey(pos)) {
+                var tile = tmpTiles.get(pos);
+                switch (tile.getKind()) {
+                    case TILE_DARK -> new Tile(pos, WorldTexture.TILE_DARK).draw(canvas, camera);
+                    case TILE_LIGHT -> new Tile(pos, WorldTexture.TILE_LIGHT).draw(canvas, camera);
+                    case FOG -> fogTiles.add(fog(pos));
+                }
+                entitiesToDraw.addAll(tile.getEntities().stream().filter(
+                        entity -> !entityAnimations.containsKey(entity.getId())
+                ).toList());
+                entitiesToDraw.addAll(tile.otherWorldEntities());
             } else {
                 var tile = terrain.terrainAt(pos);
                 switch (tile) {
-                    case UNKNOWN -> fogTiles.add(new Tile(pos, TileKind.FOG));
-                    case WATER -> new Tile(pos, TileKind.TILE_LIGHT).draw(canvas, camera);
-                    case LAND -> new Tile(pos, TileKind.TILE_DARK).draw(canvas, camera);
+                    case UNKNOWN -> fogTiles.add(fog(pos));
+                    case WATER -> new Tile(pos, WorldTexture.TILE_LIGHT).draw(canvas, camera);
+                    case LAND -> new Tile(pos, WorldTexture.TILE_DARK).draw(canvas, camera);
                 }
                 if (highlightedTiles != null && !highlightedTiles.contains(pos) &&
-                    tile == TerrainType.LAND)
+                        tile == TerrainType.LAND)
                     highlightTiles.add(
                             new WorldEntity(WorldPosition.from(pos), WorldTexture.TILE_HIGHLIGHT,
-                                            false)
+                                    false)
                     );
+                entitiesToDraw.addAll(
+                        entities.entitiesAt(pos).stream()
+                                .filter(e -> !entityAnimations.containsKey(e.id()))
+                                .map(e -> entityFromID(e.id()))
+                                .toList()
+                );
             }
 
 
-            entitiesToDraw.addAll(
-                    entities.entitiesAt(pos).stream()
-                            .filter(e -> !entityAnimations.containsKey(e.id()))
-                            .map(e -> entityFromID(e.id()))
-                            .toList()
-            );
         });
         highlightTiles.forEach(tile -> tile.draw(canvas, camera));
 
@@ -135,43 +147,29 @@ public class Map implements Animation {
     public void update(float deltaTime) {
         otherAnimations.forEach(animation -> animation.update(deltaTime));
         entityAnimations.values().forEach(animation -> animation.update(deltaTime));
-        tileAnimations.values().forEach(animation -> animation.update(deltaTime));
+        tmpTiles.values().forEach(animation -> animation.update(deltaTime));
 
         otherAnimations.removeIf(Animation::finished);
+        tmpTiles.entrySet().stream()
+                .filter((entry) -> entry.getValue().finished())
+                .toList()
+                .forEach(entry -> tmpTiles.remove(entry.getKey()));
         entityAnimations.entrySet().stream()
                 .filter((entry) -> entry.getValue().finished())
                 .toList()
                 .forEach(entry -> entityAnimations.remove(entry.getKey()));
-        tileAnimations.entrySet().stream()
-                .filter((entry) -> entry.getValue().finished())
-                .toList()
-                .forEach(entry -> tileAnimations.remove(entry.getKey()));
     }
 
     public void pickUp(EntityID entity) {
         setAnimation(entity, new AnimationChain(List.of(new Raise(), new Hover())));
     }
 
-    public void putDown(EntityID entity) {
-        setAnimation(entity, new Drop());
+    public Finishable putDown(EntityID entity) {
+        return setAnimation(entity, new Drop());
     }
 
-    public Finishable removeFog(Position position) {
-        var animation = new Dissipate();
-        animation.init(new WorldEntity(WorldPosition.from(position), WorldTexture.FOG, false));
-        otherAnimations.add(animation);
-        return animation;
-    }
-
-    public Finishable addFog(Position position) {
-        var tileReplacement = new Exist(Condense.TIME);
-        tileReplacement.init(
-                new WorldEntity(WorldPosition.from(position), WorldTexture.TILE_DARK, false));
-        var animation = new Condense();
-        animation.init(new WorldEntity(WorldPosition.from(position), WorldTexture.FOG, false));
-        otherAnimations.add(animation);
-        tileAnimations.put(position, tileReplacement);
-        return animation;
+    public Finishable getAnimation(EntityID entity) {
+        return entityAnimations.get(entity);
     }
 
     public Finishable createEntity(Position position, core.entities.model.Entity entity) {
@@ -202,10 +200,41 @@ public class Map implements Animation {
         return animation;
     }
 
-    public Finishable moveAlongPath(EntityID entity, List<Position> path) {
-        var animation = new AnimationChain(List.of(new Drop(), new MoveAlong(path)));
+    public Finishable moveAlongPath(EntityID entity, List<Optional<Position>> path) {
+        ArrayList<Position> substring = new ArrayList<>();
+        ArrayList<EntityAnimation> animations = new ArrayList<>(List.of(new Drop()));
+        path.forEach(pos -> {
+            if (!substring.isEmpty() && pos.isEmpty()) {
+                animations.add(new MoveAlong(new ArrayList<>(substring)));
+                substring.clear();
+            }
+            pos.ifPresent(substring::add);
+        });
+        if (!substring.isEmpty())
+            animations.add(new MoveAlong(new ArrayList<>(substring)));
+        var animation = new AnimationChain(animations);
         setAnimation(entity, animation);
         return animation;
+    }
+
+    public void showIn(float time, VisibilityChange.ShowPosition event) {
+        if (!tmpTiles.containsKey(event.position()))
+            tmpTiles.put(event.position(), new TileAnimation(
+                    event.position(),
+                    TileKind.from(terrain.terrainAt(event.position())),
+                    entities.entitiesAt(event.position())
+            ));
+        tmpTiles.get(event.position()).changeIn(time, new PlannedChange(TileKind.from(event.terrain()), event.entities()));
+    }
+
+    public void hideIn(float time, Position position) {
+        if (!tmpTiles.containsKey(position))
+            tmpTiles.put(position, new TileAnimation(
+                    position,
+                    TileKind.from(terrain.terrainAt(position)),
+                    entities.entitiesAt(position)
+            ));
+        tmpTiles.get(position).changeIn(time, new PlannedChange(TileKind.FOG, List.of()));
     }
 
     @Override

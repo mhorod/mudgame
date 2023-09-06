@@ -7,12 +7,14 @@ import io.model.ScreenPosition;
 import io.model.textures.TextureDrawData;
 
 public class TextureBank implements io.model.engine.TextureBank {
-    public final TextureRegion tileDark, tileLight, fog, unit, shadow, base, warrior, tower, tileHighlight;
+    public final TextureRegion tileDark, tileLight, fog, fogTall, fogLeft, fogRight, unit, shadow, base, warrior, tower, tileHighlight;
     private final TextureRegion ARROW_NONE, ARROW_SW_NE, ARROW_SE_NW,
             ARROW_START_NE, ARROW_START_SE, ARROW_START_NW, ARROW_START_SW,
             ARROW_END_NE, ARROW_END_SE, ARROW_END_NW, ARROW_END_SW,
             ARROW_SE_NE, ARROW_SW_SE, ARROW_SW_NW, ARROW_NW_NE;
-    public final TextureRegion buttonSmall, buttonSmallPressed, logo, scroll;
+    public final TextureRegion buttonSmall, buttonSmallPressed, logo,
+            scrollTop, scrollMid, scrollBot,
+            scrollBackTop, scrollBackMid, scrollBackBot;
     private final Pixmap unitPixmap;
     private final Texture units;
 
@@ -31,10 +33,18 @@ public class TextureBank implements io.model.engine.TextureBank {
         units.getTextureData().prepare();
         unitPixmap = units.getTextureData().consumePixmap();
         buttonSmall = new TextureRegion(ui, 0, 0, 450, 181);
-        scroll = new TextureRegion(ui, 450, 0, 62, 181);
+        scrollTop = new TextureRegion(ui, 450, 0, 62, 34);
+        scrollMid = new TextureRegion(ui, 450, 34, 62, 33);
+        scrollBot = new TextureRegion(ui, 450, 328, 62, 33);
+        scrollBackTop = new TextureRegion(ui, 450, 362, 62, 33);
+        scrollBackMid = new TextureRegion(ui, 450, 395, 62, 33);
+        scrollBackBot = new TextureRegion(ui, 450, 689, 62, 34);
         buttonSmallPressed = new TextureRegion(ui, 0, 181, 450, 181);
-        logo = new TextureRegion(ui, 0, 362, 450, 544);
-        fog = new TextureRegion(new Texture("fog.png"));
+        logo = new TextureRegion(ui, 0, 362, 449, 544);
+        fog = new TextureRegion(tiles, 5, 236, 326, 212);
+        fogLeft = new TextureRegion(tiles, 9, 498, 329, 282);
+        fogRight = new TextureRegion(tiles, 381, 530, 325, 282);
+        fogTall = new TextureRegion(tiles, 384, 227, 328, 283);
         tileDark = new TextureRegion(tiles, 0, 0, 256, 222);
         tileLight = new TextureRegion(tiles, 256, 0, 256, 222);
         tileHighlight = new TextureRegion(tiles, 512, 0, 256, 148);
@@ -68,6 +78,9 @@ public class TextureBank implements io.model.engine.TextureBank {
             case TILE_LIGHT -> tileLight;
             case TILE_HIGHLIGHT -> tileHighlight;
             case FOG -> fog;
+            case FOG_TALL -> fogTall;
+            case FOG_LEFT -> fogLeft;
+            case FOG_RIGHT -> fogRight;
             case PAWN -> unit;
             case SHADOW -> shadow;
             case ARROW_NONE -> ARROW_NONE;
@@ -89,7 +102,12 @@ public class TextureBank implements io.model.engine.TextureBank {
             case BASE -> base;
             case BUTTON_SMALL -> buttonSmall;
             case BUTTON_SMALL_PRESSED -> buttonSmallPressed;
-            case SCROLL -> scroll;
+            case SCROLL_TOP -> scrollTop;
+            case SCROLL_MID -> scrollMid;
+            case SCROLL_BOT -> scrollBot;
+            case SCROLL_BACK_TOP -> scrollBackTop;
+            case SCROLL_BACK_MID -> scrollBackMid;
+            case SCROLL_BACK_BOT -> scrollBackBot;
             case LOGO -> logo;
             case TOWER -> tower;
         };
