@@ -7,6 +7,7 @@ import core.event.Action;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
+import core.pathfinder.EntityPathfinder;
 import core.pathfinder.Pathfinder;
 import core.terrain.Terrain;
 import core.terrain.TerrainGenerator;
@@ -61,9 +62,10 @@ public final class MudServerCore {
         placePlayerBases(generatedTerrain.startingLocations());
         this.actionProcessor = new ActionProcessor(state.rules(), state, eventOccurrenceObserver);
         this.eventOccurrenceObserver = eventOccurrenceObserver;
-        this.pathfinder = new Pathfinder(
+        this.pathfinder = new EntityPathfinder(
                 state.terrain(),
-                state.entityBoard()
+                state.entityBoard(),
+                state.fogOfWar()
         );
     }
 
@@ -75,9 +77,10 @@ public final class MudServerCore {
         this.eventOccurrenceObserver = eventOccurrenceObserver;
         this.state = state;
         this.actionProcessor = new ActionProcessor(state.rules(), state, eventOccurrenceObserver);
-        this.pathfinder = new Pathfinder(
+        this.pathfinder = new EntityPathfinder(
                 state.terrain(),
-                state.entityBoard()
+                state.entityBoard(),
+                state.fogOfWar()
         );
     }
 
@@ -85,7 +88,7 @@ public final class MudServerCore {
         PlayerManager playerManager = new PlayerManager(playerCount);
         FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
         EntityBoard entityBoard = new EntityBoard();
-        Pathfinder pathfinder = new Pathfinder(terrain, entityBoard);
+        Pathfinder pathfinder = new EntityPathfinder(terrain, entityBoard, fow);
 
         return new ServerGameState(
                 playerManager,

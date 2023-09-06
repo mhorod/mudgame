@@ -54,6 +54,7 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
     private final Map<Position, Integer> visionCount = new HashMap<>();
     private final Map<EntityID, VisionArea> entityVision = new HashMap<>();
 
+
     public boolean isVisible(Position position) {
         return visionCount.getOrDefault(position, 0) > 0;
     }
@@ -64,6 +65,8 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
                 .filter(this::isVisible)
                 .toList();
     }
+
+    public PlayerID playerID() { return playerID; }
 
     public Set<PositionVisibility> placeEntity(Entity entity, Position position) {
         if (!entity.owner().equals(playerID) || !hasVision(entity))

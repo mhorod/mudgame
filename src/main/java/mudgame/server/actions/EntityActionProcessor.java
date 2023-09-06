@@ -7,6 +7,7 @@ import core.fogofwar.PlayerFogOfWar.PositionVisibility;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import core.pathfinder.EntityPathfinder;
 import core.pathfinder.Pathfinder;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;
@@ -22,7 +23,6 @@ import mudgame.server.ServerGameState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public class EntityActionProcessor {
@@ -37,9 +37,10 @@ public class EntityActionProcessor {
     ) {
         this.state = state;
         this.eventOccurrenceObserver = eventOccurrenceObserver;
-        pathfinder = new Pathfinder(
+        pathfinder = new EntityPathfinder(
                 state.terrain(),
-                state.entityBoard()
+                state.entityBoard(),
+                state.fogOfWar()
         );
         fow = new EventFogOfWar(state.fogOfWar());
     }
