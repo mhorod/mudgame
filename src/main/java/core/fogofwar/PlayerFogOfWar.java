@@ -50,7 +50,7 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
     public record PositionVisibility(Position position, boolean isVisible) { }
 
 
-    private final PlayerID playerID;
+    final PlayerID playerID;
     private final Map<Position, Integer> visionCount = new HashMap<>();
     private final Map<EntityID, VisionArea> entityVision = new HashMap<>();
 

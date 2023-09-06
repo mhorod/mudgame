@@ -5,9 +5,9 @@ import core.entities.components.Movement;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
 import core.entities.model.EntityType;
+import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
-import core.pathfinder.Pathfinder.ReachablePositions;
 import core.terrain.Terrain;
 import core.terrain.model.TerrainSize;
 import core.terrain.model.TerrainType;
@@ -24,17 +24,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.mockito.Mockito.mock;
 
-class PathfinderTest {
+class EntityPathfinderTest {
 
     EntityBoard entityBoard;
     Terrain terrain;
     Pathfinder pathfinder;
+    FogOfWar fow;
 
     @BeforeEach
     void init() {
         entityBoard = new EntityBoard();
         terrain = simpleTerrain();
-        pathfinder = new Pathfinder(terrain, entityBoard);
+        fow = new FogOfWar(List.of(new PlayerID(0)));
+        pathfinder = new EntityPathfinder(terrain, entityBoard, fow);
     }
 
     @Test
@@ -46,7 +48,6 @@ class PathfinderTest {
                 new PlayerID(0),
                 new Position(0, 0)
         );
-
         // when
         ReachablePositions positions = pathfinder.reachablePositions(entity.id());
 
