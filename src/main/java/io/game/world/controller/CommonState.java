@@ -1,10 +1,10 @@
 package io.game.world.controller;
 
 import core.entities.EntityBoard;
+import core.event.Event;
 import core.pathfinder.Pathfinder;
 import core.terrain.Terrain;
 import io.game.world.Map;
-import core.event.Event;
 
 import java.util.HashSet;
 

@@ -21,6 +21,7 @@ final class EntityEventProcessor {
 
     public void spawnEntity(SpawnEntity e) {
         state.entityBoard().placeEntity(e.entity(), e.position());
+        state.fogOfWar().placeEntity(e.entity(), e.position());
         applyVisibilityChange(e.visibilityChange());
     }
 

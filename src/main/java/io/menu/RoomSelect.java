@@ -1,6 +1,8 @@
 package io.menu;
 
+import io.animation.Easer;
 import io.game.GameView;
+import io.menu.scroll.ScrollBox;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.TextureBank;
@@ -9,34 +11,37 @@ import io.model.input.events.Click;
 import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.model.textures.Texture;
-import io.model.textures.TextureDrawData;
 import io.views.SimpleView;
 
 import java.util.List;
 
-public class MainMenu extends SimpleView implements EventHandler {
+public class RoomSelect extends SimpleView implements EventHandler {
     ButtonBlock buttons = new ButtonBlock(0.1f,
             List.of(
-                    "PLAY",
-                    "SETTINGS",
-                    "EXIT"
+                    "BAGNO",
+                    "MOCZARY",
+                    "BLOTO"
             ),
             List.of(
-                    () -> changeView(new RoomSelect()),
+                    () -> changeView(new GameView()),
                     () -> changeView(new GameView()),
                     () -> changeView(new GameView())
             ));
+
+    ScrollBox scrollBox = new ScrollBox(buttons);
+
+    Easer scrollEaser = new Easer(0) {
+        @Override
+        public void onUpdate(float value) {
+            scrollBox.setScroll(value);
+        }
+    };
 
     Rectangle logo = new Rectangle(Texture.LOGO.aspectRatio());
 
     @Override
     public void draw(Canvas canvas) {
-        buttons.draw(canvas);
-        canvas.draw(new TextureDrawData(
-                Texture.LOGO,
-                logo.position,
-                logo.height
-        ));
+        scrollBox.draw(canvas);
     }
 
     @Override
@@ -45,13 +50,18 @@ public class MainMenu extends SimpleView implements EventHandler {
         window.position = new ScreenPosition(0, 0);
         window.height = input.window().height() / input.window().width();
 
-        var scene = new Rectangle(0.5f);
-        scene.fitInto(window);
+        var scene = new Rectangle(
+                0.025f,
+                0.025f,
+                window.width() - 0.025f,
+                window.height - 0.05f
+        );
 
-        input.events().forEach(event -> event.accept(this));
-        buttons.fitInto(new Rectangle(scene.position.x(), scene.position.y(), scene.width() / 2, scene.height));
+        scrollEaser.update(input.deltaTime());
+        scrollBox.fitInto(scene);
         buttons.update(input.mouse().position(), input.mouse().leftPressed());
         logo.fitInto(new Rectangle(scene.position.x() + scene.width() / 2, scene.position.y(), scene.width() / 2, scene.height));
+        input.events().forEach(event -> event.accept(this));
     }
 
     @Override
@@ -61,6 +71,6 @@ public class MainMenu extends SimpleView implements EventHandler {
 
     @Override
     public void onScroll(Scroll scroll) {
-
+        scrollEaser.setTarget(Math.min(Math.max(scrollEaser.getTarget() + scroll.amount() * 0.1f, 0), scrollBox.getMaxScroll()));
     }
 }

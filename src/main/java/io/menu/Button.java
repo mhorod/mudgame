@@ -9,6 +9,7 @@ public class Button {
     public ScreenPosition position;
     public float height;
     private final Runnable onClick;
+    private final String text;
 
 
     private enum ButtonState {
@@ -20,7 +21,8 @@ public class Button {
     private ButtonState state = ButtonState.NORMAL;
     public static final float ASPECT_RATIO = Texture.BUTTON_SMALL.aspectRatio();
 
-    public Button(Runnable onClick) {
+    public Button(String text, Runnable onClick) {
+        this.text = text;
         this.onClick = onClick;
     }
 
@@ -56,5 +58,11 @@ public class Button {
             case NORMAL, HOVER -> canvas.draw(new TextureDrawData(Texture.BUTTON_SMALL, position, height));
             case PRESSED -> canvas.draw(new TextureDrawData(Texture.BUTTON_SMALL_PRESSED, position, height));
         }
+        float textHeight = 0.4f * height;
+        var textWidth = canvas.getTextAspectRatio(text) * textHeight;
+        canvas.drawText(text, new ScreenPosition(
+                position.x() + height / ASPECT_RATIO / 2 - textWidth / 2,
+                position.y() + height / 2 - textHeight / 2
+        ), textHeight);
     }
 }

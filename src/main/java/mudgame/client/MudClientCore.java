@@ -2,6 +2,7 @@ package mudgame.client;
 
 import core.event.Event;
 import core.pathfinder.Pathfinder;
+import core.pathfinder.PlayerPathfinder;
 import mudgame.client.events.EventProcessor;
 
 public class MudClientCore {
@@ -11,7 +12,12 @@ public class MudClientCore {
 
     public MudClientCore(ClientGameState state) {
         this.state = state;
-        this.pathfinder = new Pathfinder(state.terrain(), state.entityBoard());
+        this.pathfinder = new PlayerPathfinder(
+                state.playerID(),
+                state.terrain(),
+                state.entityBoard(),
+                state.fogOfWar()
+        );
         eventProcessor = new EventProcessor(state);
     }
 
