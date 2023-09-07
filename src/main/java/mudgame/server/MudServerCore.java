@@ -96,6 +96,10 @@ public final class MudServerCore {
         );
     }
 
+    public static ServerGameState newState(int playerCount) {
+        return newState(playerCount, defaultTerrainGenerator().generateTerrain(playerCount).terrain());
+    }
+
 
     public void process(Action action, PlayerID actor) {
         actionProcessor.process(action, actor);

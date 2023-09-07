@@ -32,10 +32,10 @@ public final class SocketReceiver<T extends Serializable> {
                 consumer.accept(message);
             }
         } catch (IOException | ClassNotFoundException exception) {
+            log.debug(exception.toString());
             if (exception instanceof NotSerializableException || exception.getCause() instanceof NotSerializableException)
-                log.warn(exception.toString());
-            else
-                log.debug(exception.toString());
+                throw new RuntimeException(exception);
+        } finally {
             try {
                 socket.close();
             } catch (IOException innerException) {

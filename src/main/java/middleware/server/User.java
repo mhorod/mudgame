@@ -29,6 +29,7 @@ public final class User {
 
     private Room currentRoom;
     private PlayerID currentPlayerID;
+
     private final MessageToServerHandler messageToServerHandler = new MessageToServerHandler() {
         @Override
         public void createRoom(PlayerID myPlayerID, int playerCount) {
@@ -39,8 +40,7 @@ public final class User {
                 sendError("playerCount must be positive");
                 return;
             }
-            // TODO fix this hack
-            loadGame(myPlayerID, new MudServerCore(playerCount).state());
+            loadGame(myPlayerID, MudServerCore.newState(playerCount));
         }
 
         @Override
@@ -51,8 +51,9 @@ public final class User {
                 sendError("Invalid PlayerID");
                 return;
             }
-            if (!new Room(state, server).joinRoom(myPlayerID, User.this))
-                throw new RuntimeException();
+            Room room = new Room(state, server);
+            room.joinRoom(myPlayerID, User.this);
+            room.checkRemoval();
         }
 
         @Override
@@ -110,6 +111,7 @@ public final class User {
             kick();
         }
     };
+
     private int sinceLastCheck = 0;
     private boolean last0 = false;
 
@@ -153,9 +155,18 @@ public final class User {
     public void processMessage(MessageToServer message) {
         synchronized (server) {
             log.debug("[FROM: " + userID + "]: " + message);
-            if (networkDevice.isClosedOrScheduledToClose())
+            if (networkDevice.isClosedOrScheduledToClose()) {
+                kick();
                 return;
-            message.execute(messageToServerHandler);
+            }
+            sinceLastCheck++;
+            try {
+                message.execute(messageToServerHandler);
+            } catch (RuntimeException exc) {
+                log.warn(exc.toString());
+                sendError("Exception happened while processing your message");
+                kick();
+            }
         }
     }
 
@@ -183,6 +194,10 @@ public final class User {
 
     public UserID getUserID() {
         return userID;
+    }
+
+    public Room getRoom() {
+        return currentRoom;
     }
 
     public PlayerID getPlayerID() {

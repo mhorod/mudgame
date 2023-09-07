@@ -24,9 +24,8 @@ public final class LocalServer {
         core = new MudServerCore(state, this::sendEvent);
     }
 
-    // TODO this is cursed, fix it
     public LocalServer(int playerCount) {
-        this(new MudServerCore(playerCount).state());
+        this(MudServerCore.newState(playerCount));
     }
 
     public ServerGameState state() {

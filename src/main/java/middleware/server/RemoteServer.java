@@ -1,6 +1,5 @@
 package middleware.server;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import middleware.communication.SocketReceiver;
 import middleware.communication.SocketSender;
@@ -20,57 +19,71 @@ public final class RemoteServer {
 
     private final GameServer server = new GameServer();
     private final ServerSocket serverSocket;
+    private final Timer timer;
 
-    public RemoteServer(ServerSocket serverSocket) {
+    public RemoteServer(ServerSocket serverSocket, Timer timer) {
         this.serverSocket = serverSocket;
+        this.timer = timer;
         new Thread(this::workReceiveConnections).start();
-        new Timer().schedule(
-                new WorkRemoveConnections(),
+
+        timer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        server.checkRemoval();
+                    }
+                },
                 SCAN_CLOSED_CONNECTIONS_DELAY.toMillis(),
                 SCAN_CLOSED_CONNECTIONS_DELAY.toMillis()
         );
     }
 
-    @SneakyThrows(IOException.class)
-    public static void main(String[] args) {
-        int port = args.length > 0 ? Integer.parseInt(args[0]) : 6789;
-        new RemoteServer(new ServerSocket(port));
+    public void stop() {
+        try {
+            serverSocket.close();
+        } catch (IOException exception) {
+            log.debug(exception.toString());
+        }
+
+        server.stop();
+        timer.cancel();
     }
 
-    @SneakyThrows(IOException.class)
-    private void workReceiveConnections() {
-        log.info("Started listening on port " + serverSocket.getLocalPort());
+    private void receiveConnection(Socket socket) {
+        synchronized (server) {
+            SocketSender<MessageToClient> sender = new SocketSender<>(socket);
 
-        while (!serverSocket.isClosed()) {
-            Socket socket = serverSocket.accept();
+            User user = new User(
+                    sender::sendMessage,
+                    sender.getClosingDevice(),
+                    server
+            );
 
-            synchronized (server) {
-                SocketSender<MessageToClient> sender = new SocketSender<>(socket);
+            new SocketReceiver<>(
+                    user::processMessage,
+                    socket,
+                    MessageToServer.class
+            );
 
-                User user = new User(
-                        sender::sendMessage,
-                        sender.getClosingDevice(),
-                        server
-                );
-
-                new SocketReceiver<>(
-                        user::processMessage,
-                        socket,
-                        MessageToServer.class
-                );
-
-                log.info("New connection from %s got %s".formatted(
-                        socket.getInetAddress().toString(),
-                        user.getUserID().toString()
-                ));
-            }
+            log.info("New connection from %s got %s".formatted(
+                    socket.getInetAddress().toString(),
+                    user.getUserID().toString()
+            ));
         }
     }
 
-    private class WorkRemoveConnections extends TimerTask {
-        @Override
-        public void run() {
-            server.checkRemoval();
+    private void workReceiveConnections() {
+        log.info("Started listening on port " + serverSocket.getLocalPort());
+
+        try {
+            while (!serverSocket.isClosed()) {
+                Socket socket = serverSocket.accept();
+                receiveConnection(socket);
+            }
+        } catch (IOException exception) {
+            log.debug(exception.toString());
+        } finally {
+            stop();
         }
     }
 }

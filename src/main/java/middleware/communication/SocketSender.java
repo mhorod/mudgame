@@ -35,13 +35,12 @@ public final class SocketSender<T extends Serializable> {
                 if (message.isEmpty())
                     break;
                 log.debug(message.toString());
-                stream.writeObject(message);
+                stream.writeObject(message.get());
             }
         } catch (IOException | InterruptedException exception) {
+            log.debug(exception.toString());
             if (exception instanceof NotSerializableException || exception.getCause() instanceof NotSerializableException)
-                log.warn(exception.toString());
-            else
-                log.debug(exception.toString());
+                throw new RuntimeException(exception);
         } finally {
             try {
                 socket.close();

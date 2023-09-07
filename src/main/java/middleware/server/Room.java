@@ -50,26 +50,11 @@ public final class Room {
         connectedUsers.forEach(User::sendCurrentRoom);
     }
 
-    public void sendGameStateIfRunning(User user) {
+    public void sendGameState(User user) {
         if (!isRunning)
             return;
         ClientGameState state = core.state().toClientGameState(user.getPlayerID());
         user.setGameState(state);
-    }
-
-    private boolean sendErrorIfNotOwner(User user) {
-        if (!user.equals(owner)) {
-            user.sendError("You are not owner of this room");
-            return true;
-        }
-        return false;
-    }
-
-    public void sendServerGameState(User user) {
-        if (sendErrorIfNotOwner(user))
-            return;
-
-        throw new UnsupportedOperationException();
     }
 
     public boolean joinRoom(PlayerID asPlayerID, User user) {
@@ -90,8 +75,14 @@ public final class Room {
         connectedUsers.add(user);
 
         sendUpdatedInfo();
-        sendGameStateIfRunning(user);
+        if (isRunning)
+            sendGameState(user);
         return true;
+    }
+
+    public void checkRemoval() {
+        if (connectedUsers.isEmpty())
+            server.removeRoom(this);
     }
 
     public void leaveRoom(User user) {
@@ -105,8 +96,7 @@ public final class Room {
             owner = connectedUsers.iterator().next();
 
         sendUpdatedInfo();
-        if (connectedUsers.isEmpty())
-            server.removeRoom(this);
+        checkRemoval();
     }
 
     public UserID getOwnerID() {
@@ -119,23 +109,53 @@ public final class Room {
 
     public RoomInfo getRoomInfo() {
         Map<PlayerID, UserID> toUserIDMap = new LinkedHashMap<>();
-        for (var entry : toUserMap.entrySet())
-            toUserIDMap.put(entry.getKey(), entry.getValue().getUserID());
+        for (var entry : toUserMap.entrySet()) {
+            PlayerID playerID = entry.getKey();
+            User user = entry.getValue();
+            toUserIDMap.put(playerID, user == null ? null : user.getUserID());
+        }
         return new RoomInfo(roomID, toUserIDMap, getOwnerID(), isRunning);
     }
 
     public void start(User actor) {
-        if (isRunning)
+        if (sendErrorIfStarted(actor))
             return;
         if (sendErrorIfNotOwner(actor))
             return;
 
         isRunning = true;
         for (User user : connectedUsers)
-            sendGameStateIfRunning(user);
+            sendGameState(user);
+        sendUpdatedInfo();
+    }
+
+    private boolean sendErrorIfNotOwner(User user) {
+        if (!user.equals(owner)) {
+            user.sendError("You are not owner of this room");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean sendErrorIfNotStarted(User user) {
+        if (!isRunning) {
+            user.sendError("Game is not started yet");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean sendErrorIfStarted(User user) {
+        if (isRunning) {
+            user.sendError("Game is already started");
+            return true;
+        }
+        return false;
     }
 
     public void processAction(Action action, User actor) {
+        if (sendErrorIfNotStarted(actor))
+            return;
         core.process(action, actor.getPlayerID());
     }
 }

@@ -5,14 +5,14 @@ import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 public final class GameServer {
-    private final Map<UserID, User> userMap = new HashMap<>();
-    private final Map<RoomID, Room> roomMap = new HashMap<>();
+    private final Map<UserID, User> userMap = new LinkedHashMap<>();
+    private final Map<RoomID, Room> roomMap = new LinkedHashMap<>();
 
     public synchronized void checkRemoval() {
         userMap.values().stream()
@@ -21,8 +21,16 @@ public final class GameServer {
                 .forEach(User::kick);
     }
 
+    public synchronized void stop() {
+        userMap.values().stream().toList().forEach(User::kick);
+    }
+
     public List<RoomInfo> getRoomList() {
         return roomMap.values().stream().map(Room::getRoomInfo).toList();
+    }
+
+    public List<User> getConnectedUsers() {
+        return userMap.values().stream().toList();
     }
 
     public void putUser(User user) {
