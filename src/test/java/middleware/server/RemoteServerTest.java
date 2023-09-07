@@ -17,6 +17,10 @@ import static org.mockito.Mockito.*;
 class RemoteServerTest {
     private static final Duration VERIFY_WAIT = Duration.ofMillis(100);
 
+    void verify_wait() throws Throwable {
+        Thread.sleep(VERIFY_WAIT.toMillis());
+    }
+
     @Test
     void stop_cancels_timer_and_socket() throws Throwable {
         // given
@@ -27,7 +31,7 @@ class RemoteServerTest {
 
         // when
         server.stop();
-        Thread.sleep(VERIFY_WAIT);
+        verify_wait();
 
         // then
         verify(mockedTimer, atLeastOnce()).cancel();
@@ -44,7 +48,7 @@ class RemoteServerTest {
 
         // when
         mockedServerSocket.socket().close();
-        Thread.sleep(VERIFY_WAIT);
+        verify_wait();
 
         // then
         verify(mockedTimer, atLeastOnce()).cancel();
@@ -59,11 +63,11 @@ class RemoteServerTest {
 
         RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
         mockedServerSocket.controller().accept(userSocket);
-        Thread.sleep(VERIFY_WAIT);
+        verify_wait();
 
         // when
         server.stop();
-        Thread.sleep(VERIFY_WAIT);
+        verify_wait();
 
         // then
         verify(mockedTimer, atLeastOnce()).cancel();
@@ -80,11 +84,11 @@ class RemoteServerTest {
 
         RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
         mockedServerSocket.controller().accept(userSocket);
-        Thread.sleep(VERIFY_WAIT);
+        verify_wait();
 
         // when
         mockedServerSocket.socket().close();
-        Thread.sleep(VERIFY_WAIT);
+        verify_wait();
 
         // then
         verify(mockedTimer, atLeastOnce()).cancel();
@@ -101,13 +105,13 @@ class RemoteServerTest {
         ServerSocketWithController mockedServerSocket = serverSocket();
         RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
         mockedServerSocket.controller().accept(userSocket);
-        Thread.sleep(VERIFY_WAIT);
+        verify_wait();
 
         // when
         verify(mockedTimer).schedule(captor.capture(), anyLong(), anyLong());
         captor.getValue().run();
         captor.getValue().run();
-        Thread.sleep(VERIFY_WAIT);
+        verify_wait();
 
         // then
         assertThat(userSocket.isClosed()).isTrue();
@@ -128,6 +132,7 @@ class RemoteServerTest {
 
         // when
         server.stop();
+        verify_wait();
 
         // then
         verify(mockedTimer, atLeastOnce()).cancel();

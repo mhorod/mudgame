@@ -43,6 +43,115 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
     private NetworkDevice networkDevice;
     private MessageToServerHandler sender;
     private RemoteServerClient currentServerClient;
+
+    private Instant lastIncoming = Instant.EPOCH;
+    private Instant lastPing = Instant.EPOCH;
+    private Instant connectionBegan = Instant.EPOCH;
+
+    private void verifyNetworkStatus() {
+        if (networkStatus == NetworkStatus.OK) {
+            if (networkDevice.isClosed()) {
+                clearStateAndSetStatus(NetworkStatus.FAILED);
+                return;
+            }
+            if (Duration.between(lastIncoming, Instant.now()).compareTo(PING_AFTER_IDLE) < 0)
+                return;
+            if (lastPing.compareTo(lastIncoming) <= 0) {
+                sender.pingToServer();
+                lastPing = Instant.now();
+            } else if (Duration.between(lastPing, Instant.now()).compareTo(PING_TIMEOUT) > 0)
+                clearStateAndSetStatus(NetworkStatus.FAILED);
+        }
+        if (networkStatus == NetworkStatus.ATTEMPTING && networkDevice != null) {
+            if (Duration.between(connectionBegan, Instant.now()).compareTo(USER_ID_TIMEOUT) > 0)
+                clearStateAndSetStatus(NetworkStatus.FAILED);
+        }
+    }
+
+    private void clearStateAndSetStatus(NetworkStatus status) {
+        if (networkDevice != null) {
+            networkDevice.close();
+            networkDevice = null;
+            sender = null;
+            currentServerClient = null;
+        }
+        networkStatus = status;
+    }
+
+    public void disconnect() {
+        sender.disconnect();
+        networkDevice.scheduleToClose();
+        log.info("disconnect() called");
+    }
+
+    public void reportConnectionAttempt() {
+        clearStateAndSetStatus(NetworkStatus.ATTEMPTING);
+        log.info("reportConnectionAttempt() called, status is now ATTEMPTING");
+    }
+
+    public void setConnection(Consumer<MessageToServer> consumer, NetworkDevice device) {
+        if (networkStatus != NetworkStatus.ATTEMPTING)
+            throw new RuntimeException("reportConnectionAttempt() should be called before setSocketConnection()");
+        if (device.isClosedOrScheduledToClose()) {
+            networkStatus = NetworkStatus.FAILED;
+            return;
+        }
+
+        sender = new MessageToServerFactory(consumer.andThen(
+                message -> {
+                    if (networkStatus != NetworkStatus.OK)
+                        throw new RuntimeException("Attempting to send message using disconnected NetworkClient");
+                    log.debug("[SND]: " + message);
+                }
+        ));
+        networkDevice = device;
+
+        connectionBegan = Instant.now();
+        log.info("setConnection() is successful, status is now ATTEMPTING");
+        networkStatus = NetworkStatus.ATTEMPTING;
+    }
+
+    public void setSocketConnection(Socket socket) {
+        log.info("setSocketConnection() called, socket is closed: %b, is connected: %b "
+                .formatted(socket.isClosed(), socket.isConnected()));
+
+        SocketSender<MessageToServer> socketSender = new SocketSender<>(socket);
+        new SocketReceiver<>(messageQueue::add, socket, MessageToClient.class);
+        setConnection(socketSender::sendMessage, socketSender.getClosingDevice());
+    }
+
+    @Override
+    public NetworkStatus getNetworkStatus() {
+        verifyNetworkStatus();
+        return networkStatus;
+    }
+
+    @Override
+    public void connect(Connection<RemoteNetworkClient> connection) {
+        connection.connect(this);
+    }
+
+    @Override
+    public Optional<ServerClient> getServerClient() {
+        return Optional.ofNullable(currentServerClient);
+    }
+
+    @Override
+    public void processAllMessages() {
+        verifyNetworkStatus();
+        while (!messageQueue.isEmpty()) {
+            MessageToClient message = messageQueue.remove();
+            log.info("[REC] " + message);
+            lastIncoming = Instant.now();
+
+            message.execute(messageToClientHandler);
+        }
+    }
+
+    public MessageToServerHandler getSender() {
+        return sender;
+    }
+
     private final MessageToClientHandler messageToClientHandler = new MessageToClientHandler() {
         @Override
         public void error(String errorText) {
@@ -94,106 +203,4 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
             clearStateAndSetStatus(NetworkStatus.DISCONNECTED);
         }
     };
-    private Instant lastIncoming = Instant.EPOCH;
-    private Instant lastPing = Instant.EPOCH;
-    private Instant connectionBegan = Instant.EPOCH;
-
-    private void verifyNetworkStatus() {
-        if (networkStatus == NetworkStatus.OK) {
-            if (networkDevice.isClosed()) {
-                clearStateAndSetStatus(NetworkStatus.FAILED);
-                return;
-            }
-            if (Duration.between(lastIncoming, Instant.now()).compareTo(PING_AFTER_IDLE) < 0)
-                return;
-            if (lastPing.compareTo(lastIncoming) <= 0) {
-                sender.pingToServer();
-                lastPing = Instant.now();
-            } else if (Duration.between(lastPing, Instant.now()).compareTo(PING_TIMEOUT) > 0)
-                clearStateAndSetStatus(NetworkStatus.FAILED);
-        }
-        if (networkStatus == NetworkStatus.ATTEMPTING && networkDevice != null) {
-            if (Duration.between(connectionBegan, Instant.now()).compareTo(USER_ID_TIMEOUT) > 0)
-                clearStateAndSetStatus(NetworkStatus.FAILED);
-        }
-    }
-
-    private void clearStateAndSetStatus(NetworkStatus status) {
-        if (networkDevice != null) {
-            networkDevice.close();
-            networkDevice = null;
-            sender = null;
-            currentServerClient = null;
-        }
-        networkStatus = status;
-    }
-
-    public void disconnect() {
-        sender.disconnect();
-        networkDevice.scheduleToClose();
-    }
-
-    public void reportConnectionAttempt() {
-        clearStateAndSetStatus(NetworkStatus.ATTEMPTING);
-    }
-
-    public void setConnection(Consumer<MessageToServer> consumer, NetworkDevice device) {
-        if (networkStatus != NetworkStatus.ATTEMPTING)
-            throw new RuntimeException("reportConnectionAttempt() should be called before setSocketConnection()");
-        if (device.isClosedOrScheduledToClose()) {
-            networkStatus = NetworkStatus.FAILED;
-            return;
-        }
-
-        sender = new MessageToServerFactory(consumer.andThen(
-                message -> {
-                    if (networkStatus != NetworkStatus.OK)
-                        throw new RuntimeException("Attempting to send message using disconnected NetworkClient");
-                    log.debug("[SND]: " + message);
-                }
-        ));
-        networkDevice = device;
-
-        connectionBegan = Instant.now();
-        networkStatus = NetworkStatus.ATTEMPTING;
-    }
-
-    public void setSocketConnection(Socket socket) {
-        SocketSender<MessageToServer> socketSender = new SocketSender<>(socket);
-        new SocketReceiver<>(this::registerMessage, socket, MessageToClient.class);
-        setConnection(socketSender::sendMessage, socketSender.getClosingDevice());
-    }
-
-    private void registerMessage(MessageToClient message) {
-        log.info("[REC] " + message);
-        lastIncoming = Instant.now();
-        messageQueue.add(message);
-    }
-
-    @Override
-    public NetworkStatus getNetworkStatus() {
-        verifyNetworkStatus();
-        return networkStatus;
-    }
-
-    @Override
-    public void connect(Connection<RemoteNetworkClient> connection) {
-        connection.connect(this);
-    }
-
-    @Override
-    public Optional<ServerClient> getServerClient() {
-        return Optional.ofNullable(currentServerClient);
-    }
-
-    @Override
-    public void processAllMessages() {
-        verifyNetworkStatus();
-        while (!messageQueue.isEmpty())
-            messageQueue.remove().execute(messageToClientHandler);
-    }
-
-    public MessageToServerHandler getSender() {
-        return sender;
-    }
 }

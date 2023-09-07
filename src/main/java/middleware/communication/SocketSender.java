@@ -31,11 +31,12 @@ public final class SocketSender<T extends Serializable> {
             final ObjectOutputStream stream = new ObjectOutputStream(socket.getOutputStream());
 
             while (!socket.isClosed()) {
-                Optional<T> message = queue.take();
-                if (message.isEmpty())
+                Optional<T> messageOrNull = queue.take();
+                if (messageOrNull.isEmpty())
                     break;
+                T message = messageOrNull.get();
                 log.debug(message.toString());
-                stream.writeObject(message.get());
+                stream.writeObject(message);
             }
         } catch (IOException | InterruptedException exception) {
             log.debug(exception.toString());
