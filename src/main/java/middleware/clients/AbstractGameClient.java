@@ -14,7 +14,7 @@ public abstract class AbstractGameClient implements GameClient {
     private final Queue<Event> eventQueue = new ArrayDeque<>();
     private final MudClientCore core;
 
-    public AbstractGameClient(ClientGameState state) {
+    protected AbstractGameClient(ClientGameState state) {
         core = new MudClientCore(state);
     }
 
@@ -31,6 +31,10 @@ public abstract class AbstractGameClient implements GameClient {
     @Override
     public Optional<Event> peekEvent() {
         return Optional.ofNullable(eventQueue.peek());
+    }
+
+    public boolean hasEvent() {
+        return !eventQueue.isEmpty();
     }
 
     @Override

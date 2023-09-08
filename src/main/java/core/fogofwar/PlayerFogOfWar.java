@@ -7,6 +7,7 @@ import core.entities.model.Entity;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.StandardException;
 
@@ -20,6 +21,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
 
@@ -53,7 +55,6 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
     private final PlayerID playerID;
     private final Map<Position, Integer> visionCount = new HashMap<>();
     private final Map<EntityID, VisionArea> entityVision = new HashMap<>();
-
 
     public boolean isVisible(Position position) {
         return visionCount.getOrDefault(position, 0) > 0;
@@ -154,5 +155,4 @@ public final class PlayerFogOfWar implements PlayerFogOfWarView, Serializable {
         }
         throw new EntityHasNoVision();
     }
-
 }

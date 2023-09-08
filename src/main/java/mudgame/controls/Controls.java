@@ -5,6 +5,7 @@ import core.event.Action;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import core.turns.CompleteTurn;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;
@@ -28,5 +29,9 @@ public class Controls {
 
     public void createEntity(EntityType type, Position position) {
         actionConsumer.accept(new CreateEntity(type, player, position));
+    }
+
+    public void completeTurn() {
+        actionConsumer.accept(new CompleteTurn());
     }
 }

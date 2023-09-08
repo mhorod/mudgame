@@ -1,6 +1,7 @@
 package core.terrain;
 
 import core.model.Position;
+import core.terrain.model.Terrain;
 import core.terrain.model.TerrainSize;
 import core.terrain.model.TerrainType;
 import org.junit.jupiter.api.Test;

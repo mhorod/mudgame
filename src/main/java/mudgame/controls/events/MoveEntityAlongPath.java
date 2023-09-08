@@ -26,5 +26,17 @@ public record MoveEntityAlongPath(EntityID entityID, List<SingleMove> moves) imp
         public Optional<Position> destination() {
             return Optional.ofNullable(destinationNullable);
         }
+
+        public boolean isHidden() {
+            return destinationNullable == null;
+        }
+
+        public static SingleMove hidden() {
+            return new SingleMove(null, VisibilityChange.empty());
+        }
+
+        public SingleMove withoutVisibilityChange() {
+            return new SingleMove(destinationNullable, VisibilityChange.empty());
+        }
     }
 }

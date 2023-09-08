@@ -1,13 +1,13 @@
 package mudgame.server;
 
-import mudgame.client.ClientGameState;
 import core.entities.EntityBoard;
 import core.fogofwar.FogOfWar;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
-import mudgame.server.rules.ActionRule;
-import core.terrain.Terrain;
+import core.terrain.model.Terrain;
 import core.turns.PlayerManager;
+import mudgame.client.ClientGameState;
+import mudgame.server.rules.ActionRule;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;

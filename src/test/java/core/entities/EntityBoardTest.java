@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static core.entities.EntityBoardAssert.assertThat;
+import static core.entities.EntityBoardAssert.assertThatEntityBoard;
 import static core.entities.model.EntityType.PAWN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,7 +31,7 @@ class EntityBoardTest {
 
     @Test
     void initial_board_contains_no_entities() {
-        assertThat(board).containsNoEntities();
+        assertThatEntityBoard(board).containsNoEntities();
     }
 
     @Nested
@@ -56,7 +56,9 @@ class EntityBoardTest {
             Entity entity = board.createEntity(DATA, OWNER, POSITION_0);
 
             // then
-            assertThat(board).containsExactlyEntities(entity).containsEntityWithId(entity.id());
+            assertThatEntityBoard(board)
+                    .containsExactlyEntities(entity)
+                    .containsEntityWithId(entity.id());
         }
 
         @Test
@@ -80,7 +82,8 @@ class EntityBoardTest {
 
             // then
             assertThat(firstEntity).isNotEqualTo(secondEntity);
-            assertThat(board).containsExactlyEntities(firstEntity, secondEntity);
+            assertThatEntityBoard(board)
+                    .containsExactlyEntities(firstEntity, secondEntity);
             assertThat(board.entitiesAt(POSITION_0)).containsExactly(firstEntity, secondEntity);
         }
     }
@@ -113,7 +116,9 @@ class EntityBoardTest {
             board.removeEntity(entity.id());
 
             // then
-            assertThat(board).containsNoEntities().doesNotContainEntityWithId(entity.id());
+            assertThatEntityBoard(board)
+                    .containsNoEntities()
+                    .doesNotContainEntityWithId(entity.id());
             assertThat(board.entitiesAt(position)).isEmpty();
         }
 
@@ -142,7 +147,9 @@ class EntityBoardTest {
             board.moveEntity(entity.id(), POSITION_1);
 
             // then
-            assertThat(board).containsEntityWithId(entity.id()).containsExactlyEntities(entity);
+            assertThatEntityBoard(board)
+                    .containsEntityWithId(entity.id())
+                    .containsExactlyEntities(entity);
         }
 
         @Test

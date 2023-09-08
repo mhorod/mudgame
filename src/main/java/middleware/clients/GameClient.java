@@ -13,6 +13,8 @@ public interface GameClient {
 
     MudClientCore getCore();
 
+    boolean hasEvent();
+
     Optional<Event> peekEvent();
 
     void processEvent();

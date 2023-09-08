@@ -9,10 +9,14 @@ import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.EntityPathfinder;
 import core.pathfinder.Pathfinder;
-import core.terrain.Terrain;
-import core.terrain.TerrainGenerator;
-import core.terrain.TerrainGenerator.GeneratedTerrain;
-import core.terrain.generators.SimpleLandGenerator;
+import core.terrain.TerrainView;
+import core.terrain.generators.RectangleLandGenerator;
+import core.terrain.generators.StartingTerrainGenerator;
+import core.terrain.generators.TerrainGenerator;
+import core.terrain.model.StartingTerrain;
+import core.terrain.model.Terrain;
+import core.terrain.placers.PlayerPlacer;
+import core.terrain.placers.RandomPlayerPlacer;
 import core.turns.PlayerManager;
 import core.turns.TurnView;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +24,9 @@ import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
 import mudgame.server.rules.CreationPositionIsEmpty;
+import mudgame.server.rules.CreationPositionIsLand;
 import mudgame.server.rules.MoveDestinationIsEmpty;
+import mudgame.server.rules.MoveDestinationIsLand;
 import mudgame.server.rules.MoveDestinationIsReachable;
 import mudgame.server.rules.PlayerOwnsCreatedEntity;
 import mudgame.server.rules.PlayerOwnsMovedEntity;
@@ -37,12 +43,8 @@ public final class MudServerCore {
 
     private final ServerGameState state;
 
-    private final EventOccurrenceObserver eventOccurrenceObserver;
-
     // action processing
     private final ActionProcessor actionProcessor;
-
-    private final Pathfinder pathfinder;
 
     public MudServerCore(int playerCount) {
         this(playerCount, e -> { });
@@ -55,18 +57,12 @@ public final class MudServerCore {
     public MudServerCore(
             int playerCount,
             EventOccurrenceObserver eventOccurrenceObserver,
-            TerrainGenerator terrainGenerator
+            StartingTerrainGenerator terrainGenerator
     ) {
-        GeneratedTerrain generatedTerrain = terrainGenerator.generateTerrain(playerCount);
-        this.state = newState(playerCount, generatedTerrain.terrain());
-        placePlayerBases(generatedTerrain.startingLocations());
+        StartingTerrain terrain = terrainGenerator.generate(playerCount);
+        this.state = newState(playerCount, terrain.terrain());
+        placePlayerBases(terrain.startingPositions());
         this.actionProcessor = new ActionProcessor(state.rules(), state, eventOccurrenceObserver);
-        this.eventOccurrenceObserver = eventOccurrenceObserver;
-        this.pathfinder = new EntityPathfinder(
-                state.terrain(),
-                state.entityBoard(),
-                state.fogOfWar()
-        );
     }
 
     public List<PlayerID> players() {
@@ -74,28 +70,21 @@ public final class MudServerCore {
     }
 
     public MudServerCore(ServerGameState state, EventOccurrenceObserver eventOccurrenceObserver) {
-        this.eventOccurrenceObserver = eventOccurrenceObserver;
         this.state = state;
         this.actionProcessor = new ActionProcessor(state.rules(), state, eventOccurrenceObserver);
-        this.pathfinder = new EntityPathfinder(
-                state.terrain(),
-                state.entityBoard(),
-                state.fogOfWar()
-        );
     }
 
     private static ServerGameState newState(int playerCount, Terrain terrain) {
         PlayerManager playerManager = new PlayerManager(playerCount);
         FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
         EntityBoard entityBoard = new EntityBoard();
-        Pathfinder pathfinder = new EntityPathfinder(terrain, entityBoard, fow);
 
         return new ServerGameState(
                 playerManager,
                 entityBoard,
                 fow,
                 terrain,
-                defaultRules(playerManager, entityBoard, fow, pathfinder)
+                defaultRules(playerManager, entityBoard, fow, terrain)
         );
     }
 
@@ -108,28 +97,38 @@ public final class MudServerCore {
         return state;
     }
 
-    static List<ActionRule> defaultRules(
+    public static List<ActionRule> defaultRules(
             TurnView turnView,
             EntityBoardView entityBoard,
             FogOfWar fow,
-            Pathfinder pathfinder
+            TerrainView terrain
     ) {
+        Pathfinder pathfinder = new EntityPathfinder(terrain, entityBoard, fow);
+
         return List.of(
+                // turn rules
                 new PlayerTakesActionDuringOwnTurn(turnView),
 
-                // entity rules
+                // entity creation rules
+                new PlayerOwnsCreatedEntity(),
+                new CreationPositionIsEmpty(entityBoard),
+                new PlayerSeesCreationPosition(fow),
+                new CreationPositionIsLand(terrain),
+
+                // entity movement rules
                 new PlayerOwnsMovedEntity(entityBoard),
                 new PlayerSeesMoveDestination(fow),
-                new PlayerSeesCreationPosition(fow),
-                new CreationPositionIsEmpty(entityBoard),
-                new PlayerOwnsCreatedEntity(),
                 new MoveDestinationIsEmpty(entityBoard),
+                new MoveDestinationIsLand(terrain),
                 new MoveDestinationIsReachable(pathfinder)
         );
     }
 
-    private static TerrainGenerator defaultTerrainGenerator() {
-        return new SimpleLandGenerator(2, 4, 100);
+    private static StartingTerrainGenerator defaultTerrainGenerator() {
+        PlayerPlacer playerPlacer = new RandomPlayerPlacer(2, 4);
+        TerrainGenerator terrainGenerator = new RectangleLandGenerator(100);
+
+        return StartingTerrainGenerator.of(terrainGenerator, playerPlacer);
     }
 
 
