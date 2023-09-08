@@ -7,11 +7,7 @@ import middleware.clients.GameClient;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class LocalServer {
     private final MudServerCore core;
@@ -28,9 +24,8 @@ public final class LocalServer {
         core = new MudServerCore(state, this::sendEvent);
     }
 
-    // TODO this is cursed, fix it
     public LocalServer(int playerCount) {
-        this(new MudServerCore(playerCount).state());
+        this(MudServerCore.newState(playerCount));
     }
 
     public int playerCount() {

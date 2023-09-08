@@ -1,5 +1,6 @@
 package middleware.clients;
 
+import core.event.Action;
 import core.event.Event;
 import core.model.PlayerID;
 import mudgame.client.ClientGameState;
@@ -46,6 +47,8 @@ public abstract class AbstractGameClient implements GameClient {
     public void registerEvent(Event event) {
         eventQueue.add(event);
     }
+
+    protected abstract void sendAction(Action action);
 
     public Controls getControls() {
         return new Controls(myPlayerID(), this::sendAction);

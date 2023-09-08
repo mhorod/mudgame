@@ -1,16 +1,11 @@
 package middleware.remote;
 
+import core.event.Action;
 import core.event.Event;
 import core.model.PlayerID;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
-import middleware.messages_to_server.CreateRoomFromStateMessage;
-import middleware.messages_to_server.CreateRoomMessage;
-import middleware.messages_to_server.GetRoomListMessage;
-import middleware.messages_to_server.JoinRoomMessage;
-import middleware.messages_to_server.LeaveRoomMessage;
-import middleware.messages_to_server.MessageToServer;
-import middleware.messages_to_server.StartGameMessage;
+import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
@@ -47,10 +42,10 @@ public final class RemoteServerClient implements ServerClient {
         return status;
     }
 
-    public void sendMessage(MessageToServer message) {
+    private MessageToServerHandler getServerHandler() {
         if (!isActive())
             throw new RuntimeException("Attempting to send message using inactive ServerClient");
-        client.sendMessage(message);
+        return client.getSender();
     }
 
     public void setGameState(ClientGameState state) {
@@ -92,31 +87,35 @@ public final class RemoteServerClient implements ServerClient {
 
     @Override
     public void leaveCurrentRoom() {
-        sendMessage(new LeaveRoomMessage());
+        getServerHandler().leaveRoom();
     }
 
     @Override
     public void refreshRoomList() {
-        sendMessage(new GetRoomListMessage());
+        getServerHandler().getRoomList();
     }
 
     @Override
     public void joinRoom(RoomID roomID, PlayerID playerID) {
-        sendMessage(new JoinRoomMessage(playerID, roomID));
+        getServerHandler().joinRoom(playerID, roomID);
     }
 
     @Override
     public void createRoom(PlayerID myPlayerID, int playerCount) {
-        sendMessage(new CreateRoomMessage(myPlayerID, playerCount));
+        getServerHandler().createRoom(myPlayerID, playerCount);
     }
 
     @Override
     public void createRoom(PlayerID myPlayerID, ServerGameState state) {
-        sendMessage(new CreateRoomFromStateMessage(myPlayerID, state));
+        getServerHandler().loadGame(myPlayerID, state);
     }
 
     @Override
     public void startGame() {
-        sendMessage(new StartGameMessage());
+        getServerHandler().startGame();
+    }
+
+    public void makeAction(Action action) {
+        getServerHandler().makeAction(action);
     }
 }

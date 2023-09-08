@@ -59,9 +59,7 @@ public final class MudServerCore {
             EventOccurrenceObserver eventOccurrenceObserver,
             StartingTerrainGenerator terrainGenerator
     ) {
-        StartingTerrain terrain = terrainGenerator.generate(playerCount);
-        this.state = newState(playerCount, terrain.terrain());
-        placePlayerBases(terrain.startingPositions());
+        this.state = newState(playerCount, terrainGenerator);
         this.actionProcessor = new ActionProcessor(state.rules(), state, eventOccurrenceObserver);
     }
 
@@ -74,7 +72,7 @@ public final class MudServerCore {
         this.actionProcessor = new ActionProcessor(state.rules(), state, eventOccurrenceObserver);
     }
 
-    private static ServerGameState newState(int playerCount, Terrain terrain) {
+    private static ServerGameState newRawState(int playerCount, Terrain terrain) {
         PlayerManager playerManager = new PlayerManager(playerCount);
         FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
         EntityBoard entityBoard = new EntityBoard();
@@ -88,6 +86,18 @@ public final class MudServerCore {
         );
     }
 
+    public static ServerGameState newState(
+            int playerCount, StartingTerrainGenerator terrainGenerator
+    ) {
+        StartingTerrain generatedTerrain = terrainGenerator.generate(playerCount);
+        ServerGameState state = newRawState(playerCount, generatedTerrain.terrain());
+        placePlayerBases(state, generatedTerrain.startingPositions());
+        return state;
+    }
+
+    public static ServerGameState newState(int playerCount) {
+        return newState(playerCount, defaultTerrainGenerator());
+    }
 
     public void process(Action action, PlayerID actor) {
         actionProcessor.process(action, actor);
@@ -132,12 +142,12 @@ public final class MudServerCore {
     }
 
 
-    private void placePlayerBases(List<Position> startingLocations) {
+    private static void placePlayerBases(ServerGameState state, List<Position> startingLocations) {
         for (int i = 0; i < startingLocations.size(); i++)
-            placeBase(i, startingLocations.get(i));
+            placeBase(state, i, startingLocations.get(i));
     }
 
-    private void placeBase(int i, Position position) {
+    private static void placeBase(ServerGameState state, int i, Position position) {
         PlayerID owner = state.playerManager().getPlayerIDs().get(i);
         Entity entity = state.entityBoard().createEntity(BASE, owner, position);
         state.fogOfWar().playerFogOfWar(owner).placeEntity(entity, position);

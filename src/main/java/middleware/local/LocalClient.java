@@ -13,7 +13,7 @@ public final class LocalClient extends AbstractGameClient {
     }
 
     @Override
-    public void sendAction(Action action) {
+    protected void sendAction(Action action) {
         server.processAction(action, myPlayerID());
     }
 }
