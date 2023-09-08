@@ -36,7 +36,12 @@ public enum Texture {
     SCROLL_BACK_TOP(33f / 62f),
     SCROLL_BACK_MID(33f / 62f),
     SCROLL_BACK_BOT(34f / 62f),
-    LOGO(544f / 450f);
+    LOGO(544f / 450f),
+    BUTTON_TINY(181f / 182f),
+    BUTTON_TINY_PRESSED(181f / 182f),
+    BUTTON_BIG(182f / 720f),
+    BUTTON_BIG_PRESSED(182f / 720f),
+    ;
     private final float ratio;
 
     Texture(float aspectRatio) {
