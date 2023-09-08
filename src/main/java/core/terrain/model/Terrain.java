@@ -1,9 +1,8 @@
-package core.terrain;
+package core.terrain.model;
 
 import core.fogofwar.PlayerFogOfWar;
 import core.model.Position;
-import core.terrain.model.TerrainSize;
-import core.terrain.model.TerrainType;
+import core.terrain.TerrainView;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
@@ -44,6 +43,7 @@ public class Terrain implements TerrainView, Serializable {
         return terrainMap.getOrDefault(position, VOID);
     }
 
+    @Override
     public boolean contains(Position position) {
         return terrainMap.containsKey(position);
     }

@@ -15,12 +15,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @EqualsAndHashCode
 public final class EntityBoard implements EntityBoardView, Serializable {
     private final Map<Position, List<EntityID>> board = new HashMap<>();
     private final Map<EntityID, Position> entityPositions = new HashMap<>();
     private final Map<EntityID, Entity> entitiesById = new HashMap<>();
+    @EqualsAndHashCode.Exclude
     private long nextEntityID = 0;
 
     public Entity createEntity(EntityData data, PlayerID owner, Position position) {
@@ -40,7 +42,10 @@ public final class EntityBoard implements EntityBoardView, Serializable {
 
     @Override
     public List<Entity> entitiesAt(Position position) {
-        return mutableEntitiesAt(position).stream().map(entitiesById::get).toList();
+        if (board.containsKey(position))
+            return board.get(position).stream().map(this::findEntityByID).toList();
+        else
+            return List.of();
     }
 
     @Override
@@ -66,8 +71,11 @@ public final class EntityBoard implements EntityBoardView, Serializable {
         if (!containsEntity(entityID))
             throw new EntityDoesNotExist(entityID);
 
+
         Position position = entityPositions.get(entityID);
         board.get(position).remove(entityID);
+        if (board.get(position).isEmpty())
+            board.remove(position);
         entityPositions.remove(entityID);
         entitiesById.remove(entityID);
     }
@@ -76,8 +84,10 @@ public final class EntityBoard implements EntityBoardView, Serializable {
     public void placeEntity(Entity entity, Position position) {
         if (containsEntity(entity.id()))
             throw new EntityIsAlreadyPlaced(entity);
+        if (entity.id().id() >= nextEntityID)
+            nextEntityID = entity.id().id() + 1;
 
-        mutableEntitiesAt(position).add(entity.id());
+        safeEntitiesAt(position).add(entity.id());
         entitiesById.put(entity.id(), entity);
         entityPositions.put(entity.id(), position);
     }
@@ -89,6 +99,7 @@ public final class EntityBoard implements EntityBoardView, Serializable {
         Entity entity = entitiesById.get(entityID);
         removeEntity(entityID);
         placeEntity(entity, targetPosition);
+
     }
 
     @Override
@@ -101,17 +112,22 @@ public final class EntityBoard implements EntityBoardView, Serializable {
     }
 
 
-    private List<EntityID> mutableEntitiesAt(Position position) {
+    private List<EntityID> safeEntitiesAt(Position position) {
         return board.computeIfAbsent(position, key -> new ArrayList<>());
     }
 
-    public EntityBoard applyFogOfWar(PlayerFogOfWar newFogOfWar) {
+    public EntityBoard applyFogOfWar(PlayerFogOfWar fow) {
         EntityBoard newEntityBoard = new EntityBoard();
         for (Entity entity : allEntities()) {
             Position position = entityPosition(entity.id());
-            if (newFogOfWar.isVisible(position))
+            if (fow.isVisible(position))
                 newEntityBoard.placeEntity(SerializationUtils.clone(entity), position);
         }
         return newEntityBoard;
+    }
+
+
+    public Set<Position> occupiedPositions() {
+        return board.keySet();
     }
 }

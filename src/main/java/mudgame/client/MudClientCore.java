@@ -3,8 +3,10 @@ package mudgame.client;
 import core.event.Event;
 import core.pathfinder.Pathfinder;
 import core.pathfinder.PlayerPathfinder;
+import lombok.extern.slf4j.Slf4j;
 import mudgame.client.events.EventProcessor;
 
+@Slf4j
 public class MudClientCore {
     private final ClientGameState state;
     private final EventProcessor eventProcessor;
@@ -22,6 +24,7 @@ public class MudClientCore {
     }
 
     public void receive(Event event) {
+        log.debug("Processing event: {}", event);
         eventProcessor.process(event);
     }
 

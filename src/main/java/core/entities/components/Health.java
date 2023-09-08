@@ -1,7 +1,9 @@
 package core.entities.components;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+@EqualsAndHashCode
 public final class Health implements Component {
 
     private final int maxHealth;

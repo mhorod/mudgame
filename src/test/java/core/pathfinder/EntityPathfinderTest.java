@@ -5,7 +5,7 @@ import core.entities.model.Entity;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
-import core.terrain.Terrain;
+import core.terrain.model.Terrain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

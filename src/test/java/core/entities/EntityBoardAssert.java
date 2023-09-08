@@ -3,14 +3,17 @@ package core.entities;
 import core.entities.model.Entity;
 import core.model.EntityID;
 import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.api.Assertions;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class EntityBoardAssert extends AbstractAssert<EntityBoardAssert, EntityBoard> {
     protected EntityBoardAssert(EntityBoard entityBoard) {
         super(entityBoard, EntityBoardAssert.class);
     }
 
-    public static EntityBoardAssert assertThat(EntityBoard actual) {
+    public static EntityBoardAssert assertThatEntityBoard(EntityBoard actual) {
         return new EntityBoardAssert(actual);
     }
 
@@ -33,13 +36,27 @@ public class EntityBoardAssert extends AbstractAssert<EntityBoardAssert, EntityB
 
     public EntityBoardAssert containsNoEntities() {
         isNotNull();
-        Assertions.assertThat(actual.allEntities()).isEmpty();
+        assertThat(actual.allEntities()).isEmpty();
         return this;
     }
 
     public EntityBoardAssert containsExactlyEntities(Entity... entities) {
         isNotNull();
-        Assertions.assertThat(actual.allEntities()).containsExactly(entities);
+        assertThat(actual.allEntities()).containsExactly(entities);
+        return this;
+    }
+
+    public EntityBoardAssert isEqualTo(EntityBoard expected) {
+        isNotNull();
+        List<Entity> actualEntities = actual.allEntities();
+        List<Entity> expectedEntities = expected.allEntities();
+        assertThat(actualEntities).isEqualTo(expectedEntities);
+        assertThat(actualEntities)
+                .allMatch(
+                        e -> actual.entityPosition(e.id()).equals(expected.entityPosition(e.id())));
+
+        assertThat(actual.occupiedPositions()).isEqualTo(expected.occupiedPositions());
+        assertThat(actual).isEqualTo(expected);
         return this;
     }
 }
