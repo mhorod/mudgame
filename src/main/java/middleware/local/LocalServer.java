@@ -28,6 +28,11 @@ public final class LocalServer {
         this(MudServerCore.newState(playerCount));
     }
 
+    public int playerCount() {
+        return clients.size();
+    }
+
+
     public ServerGameState state() {
         return core.state();
     }
@@ -43,5 +48,9 @@ public final class LocalServer {
     private void sendEvent(EventOccurrence eventOccurrence) {
         for (PlayerID playerID : eventOccurrence.recipients())
             clientMap.get(playerID).registerEvent(eventOccurrence.event());
+    }
+
+    public GameClient getClient(int i) {
+        return clients.get(i);
     }
 }

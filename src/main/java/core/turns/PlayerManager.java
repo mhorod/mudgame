@@ -32,5 +32,7 @@ public final class PlayerManager implements TurnView, Serializable {
         currentTurn = nextTurn();
     }
 
+    public void setTurn(int turn) { currentTurn = turn; }
+
     private int nextTurn() { return (currentTurn + 1) % playerCount; }
 }

@@ -4,7 +4,7 @@ import core.entities.components.Movement;
 import core.entities.model.EntityData;
 import core.entities.model.EntityType;
 import core.model.Position;
-import core.terrain.Terrain;
+import core.terrain.model.Terrain;
 import core.terrain.model.TerrainSize;
 import core.terrain.model.TerrainType;
 

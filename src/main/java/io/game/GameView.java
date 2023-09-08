@@ -1,5 +1,7 @@
 package io.game;
 
+import ai.Bot;
+import ai.RandomWalker;
 import core.event.Event;
 import core.model.EntityID;
 import core.model.PlayerID;
@@ -20,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
 import middleware.local.LocalServer;
-import middleware.model.RoomID;
 import middleware.remote.RemoteNetworkClient;
 import middleware.remote.SocketConnection;
 import mudgame.controls.events.HideEntity;
@@ -29,6 +30,9 @@ import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class GameView extends SimpleView {
@@ -46,12 +50,15 @@ public class GameView extends SimpleView {
 
     private final GameClient me;
     private boolean eventObserved = false;
+    private final List<Bot> bots = new ArrayList<>();
 
     public GameView() {
-        var server = new LocalServer(5);
+        var server = new LocalServer(4);
 
         if (true) {
             me = server.getClients().get(0);
+            for (int i = 1; i < server.playerCount(); i++)
+                bots.add(new RandomWalker(server.getClient(i)));
         } else {
             // --------------------------------------------------
             // if this causes many merge conflicts remove it
@@ -61,7 +68,8 @@ public class GameView extends SimpleView {
                 while (RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().isEmpty())
                     RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
 
-                ServerClient serverClient = RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().orElseThrow();
+                ServerClient serverClient = RemoteNetworkClient.GLOBAL_CLIENT.getServerClient()
+                        .orElseThrow();
                 serverClient.createRoom(new PlayerID(0), 5);
                 serverClient.startGame();
 
@@ -87,6 +95,8 @@ public class GameView extends SimpleView {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
                         me.getControls().moveEntity(id, destination);
+                        me.getControls().completeTurn();
+                        ;
                     }
 
                     @Override
@@ -132,11 +142,11 @@ public class GameView extends SimpleView {
     private boolean canEatEvent() {
         return me.peekEvent().stream().anyMatch(
                 event -> !(event instanceof MoveEntityAlongPath)
-                        && !(event instanceof VisibilityChange)
-                        && !(event instanceof SpawnEntity)
-                        && !(event instanceof RemoveEntity)
-                        && !(event instanceof ShowEntity)
-                        && !(event instanceof HideEntity)
+                         && !(event instanceof VisibilityChange)
+                         && !(event instanceof SpawnEntity)
+                         && !(event instanceof RemoveEntity)
+                         && !(event instanceof ShowEntity)
+                         && !(event instanceof HideEntity)
         );
     }
 
@@ -147,6 +157,8 @@ public class GameView extends SimpleView {
 
     @Override
     public void update(Input input, TextureBank bank) {
+        for (Bot bot : bots)
+            bot.update();
         RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
         worldController.update();
         if (!eventObserved) {

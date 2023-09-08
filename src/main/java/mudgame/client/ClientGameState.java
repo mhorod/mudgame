@@ -3,9 +3,9 @@ package mudgame.client;
 import core.entities.EntityBoard;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
-import mudgame.server.rules.ActionRule;
-import core.terrain.Terrain;
+import core.terrain.model.Terrain;
 import core.turns.PlayerManager;
+import mudgame.server.rules.ActionRule;
 
 import java.io.Serializable;
 import java.util.List;
