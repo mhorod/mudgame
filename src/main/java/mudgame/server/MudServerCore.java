@@ -20,6 +20,9 @@ import core.terrain.placers.RandomPlayerPlacer;
 import core.turns.PlayerManager;
 import core.turns.TurnView;
 import lombok.extern.slf4j.Slf4j;
+import mudgame.controls.actions.AttackEntityAction;
+import mudgame.controls.actions.CreateEntity;
+import mudgame.controls.actions.MoveEntity;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
@@ -42,6 +45,7 @@ import mudgame.server.rules.PlayerTakesActionDuringOwnTurn;
 import java.util.List;
 
 import static core.entities.model.EntityType.BASE;
+import static mudgame.server.rules.RuleGroup.groupRules;
 
 @Slf4j
 public final class MudServerCore {
@@ -125,24 +129,30 @@ public final class MudServerCore {
                 new PlayerTakesActionDuringOwnTurn(turnView),
 
                 // entity creation rules
-                new PlayerOwnsCreatedEntity(),
-                new CreationPositionIsEmpty(entityBoard),
-                new PlayerSeesCreationPosition(fow),
-                new CreationPositionIsLand(terrain),
+                groupRules(
+                        new PlayerOwnsCreatedEntity(),
+                        new CreationPositionIsEmpty(entityBoard),
+                        new PlayerSeesCreationPosition(fow),
+                        new CreationPositionIsLand(terrain)
+                ).forActions(CreateEntity.class),
 
                 // entity movement rules
-                new PlayerOwnsMovedEntity(entityBoard),
-                new PlayerSeesMoveDestination(fow),
-                new MoveDestinationIsEmpty(entityBoard),
-                new MoveDestinationIsLand(terrain),
-                new MoveDestinationIsReachable(pathfinder),
+                groupRules(
+                        new PlayerOwnsMovedEntity(entityBoard),
+                        new PlayerSeesMoveDestination(fow),
+                        new MoveDestinationIsEmpty(entityBoard),
+                        new MoveDestinationIsLand(terrain),
+                        new MoveDestinationIsReachable(pathfinder)
+                ).forActions(MoveEntity.class),
 
                 // attack rules
-                new AttackerSeesAttackedEntity(entityBoard, fow),
-                new AttackerEntityHasAttackComponent(entityBoard),
-                new PlayerOwnsAttackerEntity(entityBoard),
-                new PlayerCannotAttackOwnEntities(entityBoard),
-                new AttackedEntityIsInAttackRange(entityBoard)
+                groupRules(
+                        new AttackerSeesAttackedEntity(entityBoard, fow),
+                        new AttackerEntityHasAttackComponent(entityBoard),
+                        new PlayerOwnsAttackerEntity(entityBoard),
+                        new PlayerCannotAttackOwnEntities(entityBoard),
+                        new AttackedEntityIsInAttackRange(entityBoard)
+                ).forActions(AttackEntityAction.class)
         );
     }
 
