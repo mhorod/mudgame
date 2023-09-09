@@ -1,11 +1,10 @@
 package mudgame.server.actions.entities;
 
-import core.entities.EntityBoardView;
+import core.entities.EntityBoard;
 import core.entities.components.visitors.GetAttack;
 import core.entities.components.visitors.GetHealth;
 import core.entities.model.Entity;
 import core.fogofwar.FogOfWar;
-import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
@@ -14,16 +13,20 @@ import mudgame.controls.events.AttackEntityEvent;
 import mudgame.controls.events.AttackPosition;
 import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.KillEntity;
+import mudgame.controls.events.VisibilityChange;
 import mudgame.server.actions.Sender;
 
 @RequiredArgsConstructor
 class EntityAttacker {
     private final Sender sender;
-    private final EntityBoardView entityBoard;
+    private final EntityBoard entityBoard;
     private final FogOfWar fow;
+    private final EntityManager entityManager;
+    private final Visibility visibility;
 
     private final GetAttack getAttack = new GetAttack();
     private final GetHealth getHealth = new GetHealth();
+
 
     void attackEntity(AttackEntityAction a) {
         Entity originalAttacker = entityBoard.findEntityByID(a.attacker());
@@ -35,6 +38,9 @@ class EntityAttacker {
     }
 
     void attack(Entity attacker, Entity attacked) {
+        if (!entityBoard.containsEntity(attacker.id()) ||
+            !entityBoard.containsEntity(attacked.id()))
+            return;
         if (getAttack.getAttack(attacker) == null || getHealth.getHealth(attacked) == null)
             return;
         if (getAttack.getAttack(attacker) == null || getHealth.getHealth(attacked) <= 0)
@@ -42,15 +48,22 @@ class EntityAttacker {
         int damage = getAttack.getAttack(attacker).damage();
         int healthLeft = attacked.damage(damage).orElse(0);
         sendAttack(attacker, attacked, damage);
-        if (healthLeft <= 0)
-            sendKill(attacked.id());
+        if (healthLeft <= 0) {
+            kill(attacked);
+        }
     }
 
-    private void sendKill(EntityID entityID) {
-        Position position = entityBoard.entityPosition(entityID);
-        for (PlayerID player : fow.players())
-            if (fow.isVisible(position, player))
-                sender.send(new KillEntity(entityID), player);
+    private void kill(Entity entity) {
+        Position position = entityBoard.entityPosition(entity.id());
+        VisibilityChange visibilityChange = visibility.convert(
+                entityManager.removeEntity(entity.id()));
+
+        for (PlayerID player : fow.players()) {
+            if (player.equals(entity.owner()))
+                sender.send(new KillEntity(entity.id(), visibilityChange), player);
+            else if (fow.isVisible(position, player))
+                sender.send(new KillEntity(entity.id(), VisibilityChange.empty()), player);
+        }
     }
 
     private void sendAttack(Entity attacker, Entity attacked, int damage) {

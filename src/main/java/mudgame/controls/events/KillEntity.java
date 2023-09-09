@@ -6,5 +6,8 @@ import core.model.EntityID;
 /**
  * Remove entity due to a loss of Health
  */
-public record KillEntity(EntityID entityID) implements Event {
+public record KillEntity(
+        EntityID entityID,
+        VisibilityChange visibilityChange
+) implements Event {
 }

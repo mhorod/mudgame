@@ -1,21 +1,20 @@
-package mudgame.server.rules;
+package mudgame.server.rules.attack;
 
 import core.entities.EntityBoardView;
-import core.entities.components.visitors.GetAttack;
 import core.event.Action;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.AttackEntityAction;
+import mudgame.server.rules.ActionRule;
 
 @RequiredArgsConstructor
-public class AttackerEntityHasAttackComponent implements ActionRule {
+public class PlayerOwnsAttackerEntity implements ActionRule {
     private final EntityBoardView entityBoard;
-    private final GetAttack getAttack = new GetAttack();
 
     @Override
     public boolean isSatisfied(Action action, PlayerID actor) {
         if (action instanceof AttackEntityAction a)
-            return getAttack.getAttack(entityBoard.findEntityByID(a.attacker())) != null;
+            return actor.equals(entityBoard.entityOwner(a.attacker()));
         else
             return true;
     }

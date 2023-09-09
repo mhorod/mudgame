@@ -30,4 +30,10 @@ class EntityManager {
         entityBoard.moveEntity(entityID, position);
         return fow.playerFogOfWar(owner).moveEntity(entityID, position);
     }
+
+    Set<PositionVisibility> removeEntity(EntityID entityID) {
+        PlayerID owner = entityBoard.entityOwner(entityID);
+        entityBoard.removeEntity(entityID);
+        return fow.playerFogOfWar(owner).removeEntity(entityID);
+    }
 }

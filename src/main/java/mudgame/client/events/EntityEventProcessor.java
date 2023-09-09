@@ -78,5 +78,6 @@ final class EntityEventProcessor {
 
     public void killEntity(KillEntity e) {
         entityManager.removeEntity(e.entityID());
+        applyVisibilityChange(e.visibilityChange());
     }
 }

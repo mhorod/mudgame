@@ -28,4 +28,12 @@ public final class Movement implements Component {
     public <T> T accept(ComponentVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return "Movement{" +
+               "movementPerTurn=" + movementPerTurn +
+               ", currentMovement=" + currentMovement +
+               '}';
+    }
 }

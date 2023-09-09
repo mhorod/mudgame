@@ -1,21 +1,22 @@
-package mudgame.server.rules;
+package mudgame.server.rules.creation;
 
 import core.event.Action;
 import core.model.PlayerID;
 import core.terrain.TerrainView;
 import lombok.RequiredArgsConstructor;
-import mudgame.controls.actions.MoveEntity;
+import mudgame.controls.actions.CreateEntity;
+import mudgame.server.rules.ActionRule;
 
 import static core.terrain.model.TerrainType.LAND;
 
 @RequiredArgsConstructor
-public class MoveDestinationIsLand implements ActionRule {
+public class CreationPositionIsLand implements ActionRule {
     private final TerrainView terrain;
 
     @Override
     public boolean isSatisfied(Action action, PlayerID actor) {
-        if (action instanceof MoveEntity a)
-            return terrain.terrainAt(a.destination()).equals(LAND);
+        if (action instanceof CreateEntity a)
+            return terrain.terrainAt(a.position()).equals(LAND);
         else
             return true;
     }
