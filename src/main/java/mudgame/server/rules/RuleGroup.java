@@ -5,10 +5,11 @@ import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Slf4j
-public final class RuleGroup implements ActionRule {
+public final class RuleGroup implements ActionRule, Serializable {
     private final List<ActionRule> rules;
     private final List<Class<? extends Action>> actionTypes;
 

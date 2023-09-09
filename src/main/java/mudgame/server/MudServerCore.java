@@ -109,8 +109,10 @@ public final class MudServerCore {
     }
 
     public void process(Action action, PlayerID actor) {
-        actionProcessor.process(action, actor);
+        if (action != null)
+            actionProcessor.process(action, actor);
     }
+
 
     public ServerGameState state() {
         return state;

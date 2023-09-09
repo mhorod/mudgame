@@ -4,9 +4,10 @@ import core.entities.components.ComponentVisitor;
 import core.entities.components.Health;
 import core.entities.model.Entity;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class GetHealth implements ComponentVisitor<Integer> {
+public class GetHealth implements ComponentVisitor<Integer>, Serializable {
     @Override
     public Integer visit(Health h) { return h.getCurrentHealth(); }
 

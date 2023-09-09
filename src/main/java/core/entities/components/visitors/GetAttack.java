@@ -4,9 +4,10 @@ import core.entities.components.Attack;
 import core.entities.components.ComponentVisitor;
 import core.entities.model.Entity;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class GetAttack implements ComponentVisitor<Attack> {
+public class GetAttack implements ComponentVisitor<Attack>, Serializable {
     @Override
     public Attack visit(Attack a) { return a; }
 
