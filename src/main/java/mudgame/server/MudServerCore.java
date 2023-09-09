@@ -23,11 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
+import mudgame.server.rules.AttackedEntityIsInAttackRange;
+import mudgame.server.rules.AttackerEntityHasAttackComponent;
+import mudgame.server.rules.AttackerSeesAttackedEntity;
 import mudgame.server.rules.CreationPositionIsEmpty;
 import mudgame.server.rules.CreationPositionIsLand;
 import mudgame.server.rules.MoveDestinationIsEmpty;
 import mudgame.server.rules.MoveDestinationIsLand;
 import mudgame.server.rules.MoveDestinationIsReachable;
+import mudgame.server.rules.PlayerCannotAttackOwnEntities;
+import mudgame.server.rules.PlayerOwnsAttackerEntity;
 import mudgame.server.rules.PlayerOwnsCreatedEntity;
 import mudgame.server.rules.PlayerOwnsMovedEntity;
 import mudgame.server.rules.PlayerSeesCreationPosition;
@@ -130,7 +135,14 @@ public final class MudServerCore {
                 new PlayerSeesMoveDestination(fow),
                 new MoveDestinationIsEmpty(entityBoard),
                 new MoveDestinationIsLand(terrain),
-                new MoveDestinationIsReachable(pathfinder)
+                new MoveDestinationIsReachable(pathfinder),
+
+                // attack rules
+                new AttackerSeesAttackedEntity(entityBoard, fow),
+                new AttackerEntityHasAttackComponent(entityBoard),
+                new PlayerOwnsAttackerEntity(entityBoard),
+                new PlayerCannotAttackOwnEntities(entityBoard),
+                new AttackedEntityIsInAttackRange(entityBoard)
         );
     }
 

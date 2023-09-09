@@ -3,6 +3,8 @@ package mudgame.client.events;
 import core.event.Event;
 import core.turns.CompleteTurn;
 import mudgame.client.ClientGameState;
+import mudgame.controls.events.AttackEntityEvent;
+import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.PlaceEntity;
 import mudgame.controls.events.RemoveEntity;
@@ -28,6 +30,10 @@ public final class EventProcessor {
             entityEventProcessor.moveEntityAlongPath(e);
         else if (event instanceof CompleteTurn)
             completeTurn();
+        else if (event instanceof AttackEntityEvent e)
+            entityEventProcessor.attackEntity(e);
+        else if (event instanceof KillEntity e)
+            entityEventProcessor.killEntity(e);
     }
 
     private void completeTurn() {

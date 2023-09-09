@@ -41,7 +41,7 @@ public record EntityData(
                 List.of(
                         new Vision(2),
                         new Movement(5),
-                        new Attack(3),
+                        new Attack(3, 1),
                         new Health(12)
                 )
         );

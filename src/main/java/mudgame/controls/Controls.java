@@ -7,6 +7,7 @@ import core.model.PlayerID;
 import core.model.Position;
 import core.turns.CompleteTurn;
 import lombok.RequiredArgsConstructor;
+import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;
 
@@ -33,5 +34,9 @@ public class Controls {
 
     public void completeTurn() {
         actionConsumer.accept(new CompleteTurn());
+    }
+
+    public void attackEntity(EntityID attacker, EntityID attacked) {
+        actionConsumer.accept(new AttackEntityAction(attacker, attacked));
     }
 }

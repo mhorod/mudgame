@@ -1,12 +1,6 @@
-package mudgame.integration;
+package mudgame.integration.tests;
 
 import core.entities.model.Entity;
-import core.event.Action;
-import core.event.Event;
-import core.model.PlayerID;
-import core.model.Position;
-import mudgame.controls.actions.CreateEntity;
-import mudgame.controls.actions.MoveEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.PlaceEntity;
 import mudgame.controls.events.RemoveEntity;
@@ -18,20 +12,14 @@ import mudgame.integration.utils.Scenario;
 import mudgame.integration.utils.ScenarioResult;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static core.entities.EntityBoardAssert.assertThatEntityBoard;
-import static core.entities.model.EntityType.PAWN;
 import static mudgame.integration.assertions.ClientScenarioResultAssert.assertThatClient;
 import static mudgame.integration.scenarios.Scenarios.*;
 import static mudgame.integration.utils.Entities.pawn;
 import static mudgame.integration.utils.Players.PLAYER_0;
 import static mudgame.integration.utils.Players.PLAYER_1;
 import static mudgame.integration.utils.Positions.pos;
-import static org.assertj.core.api.Assertions.assertThat;
 
-class IntegrationTest {
-
+class MovementIntegrationTest extends IntegrationTestBase {
     @Test
     void no_actions_are_performed_when_player_has_no_entities() {
         // given
@@ -47,6 +35,7 @@ class IntegrationTest {
         assertNoEvents(result);
     }
 
+
     @Test
     void base_cannot_be_moved() {
         // given
@@ -54,7 +43,7 @@ class IntegrationTest {
 
         // when
         ScenarioResult result = scenario
-                .act(PLAYER_0, moveEntity(scenario.base, pos(0, 1)))
+                .act(PLAYER_0, move(scenario.base, pos(0, 1)))
                 .finish();
 
         // then
@@ -74,7 +63,7 @@ class IntegrationTest {
 
         // then
         assertIntegrity(result);
-        assertEventTypes(result.clientEvents(PLAYER_0), SpawnEntity.class);
+        assertThatClient(result, PLAYER_0).receivedEventTypes(SpawnEntity.class);
     }
 
     @Test
@@ -84,7 +73,7 @@ class IntegrationTest {
 
         // when
         ScenarioResult result = scenario
-                .act(PLAYER_0, moveEntity(scenario.pawn, pos(1, 1)))
+                .act(PLAYER_0, move(scenario.pawn, pos(1, 1)))
                 .finish();
 
         // then
@@ -105,7 +94,7 @@ class IntegrationTest {
 
         // when
         ScenarioResult result = scenario
-                .act(PLAYER_0, moveEntity(pawn0, pos(2, 2)))
+                .act(PLAYER_0, move(pawn0, pos(2, 2)))
                 .finish();
 
         // then
@@ -133,7 +122,7 @@ class IntegrationTest {
 
         // when
         ScenarioResult result = scenario
-                .act(PLAYER_0, moveEntity(pawn0, pos(0, 0)))
+                .act(PLAYER_0, move(pawn0, pos(0, 0)))
                 .finish();
 
         // then
@@ -147,35 +136,4 @@ class IntegrationTest {
                 .receivedEventTypes(MoveEntityAlongPath.class, RemoveEntity.class)
                 .doesNotSeeEntities(pawn0);
     }
-
-    private void assertIntegrity(ScenarioResult result) {
-        for (PlayerID player : result.players()) {
-            System.err.println("Asserting integrity for player: " + player);
-            assertThat(result.serverFow(player)).isEqualTo(result.clientFow(player));
-            assertThatEntityBoard(result.serverEntityBoard(player))
-                    .isEqualTo(result.clientEntityBoard(player));
-            assertThat(result.serverTurn()).isEqualTo(result.clientTurn(player));
-        }
-    }
-
-
-    @SafeVarargs
-    private void assertEventTypes(List<Event> actual, Class<? extends Event>... expected) {
-        assertThat(actual).hasSize(expected.length);
-        for (int i = 0; i < actual.size(); i++)
-            assertThat(actual.get(i)).isInstanceOf(expected[i]);
-    }
-
-    private void assertNoEvents(ScenarioResult result) {
-        assertThat(result.receivedEvents()).allSatisfy((p, es) -> assertThat(es).isEmpty());
-    }
-
-    private Action moveEntity(Entity entity, Position position) {
-        return new MoveEntity(entity.id(), position);
-    }
-
-    private Action createPawn(PlayerID player, Position position) {
-        return new CreateEntity(PAWN, player, position);
-    }
-
 }
