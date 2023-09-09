@@ -29,4 +29,12 @@ public final class Health implements Component {
     public <T> T accept(ComponentVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return "Health{" +
+               "maxHealth=" + maxHealth +
+               ", currentHealth=" + currentHealth +
+               '}';
+    }
 }

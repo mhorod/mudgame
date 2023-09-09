@@ -1,4 +1,4 @@
-package mudgame.server.rules;
+package mudgame.server.rules.attack;
 
 import core.entities.EntityBoardView;
 import core.entities.components.visitors.GetAttack;
@@ -9,6 +9,7 @@ import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.AttackEntityAction;
+import mudgame.server.rules.ActionRule;
 
 @RequiredArgsConstructor
 public class AttackedEntityIsInAttackRange implements ActionRule {
@@ -25,6 +26,8 @@ public class AttackedEntityIsInAttackRange implements ActionRule {
 
     private boolean attackedEntityIsInRange(EntityID attackerID, EntityID attackedID) {
         Entity attacker = entityBoard.findEntityByID(attackerID);
+        if (attacker == null || getAttack.getAttack(attacker) == null)
+            return false;
         int range = getAttack.getAttack(attacker).range();
 
         Position attackerPosition = entityBoard.entityPosition(attackerID);

@@ -26,21 +26,20 @@ import mudgame.controls.actions.MoveEntity;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
-import mudgame.server.rules.AttackedEntityIsInAttackRange;
-import mudgame.server.rules.AttackerEntityHasAttackComponent;
-import mudgame.server.rules.AttackerSeesAttackedEntity;
-import mudgame.server.rules.CreationPositionIsEmpty;
-import mudgame.server.rules.CreationPositionIsLand;
-import mudgame.server.rules.MoveDestinationIsEmpty;
-import mudgame.server.rules.MoveDestinationIsLand;
-import mudgame.server.rules.MoveDestinationIsReachable;
-import mudgame.server.rules.PlayerCannotAttackOwnEntities;
-import mudgame.server.rules.PlayerOwnsAttackerEntity;
-import mudgame.server.rules.PlayerOwnsCreatedEntity;
-import mudgame.server.rules.PlayerOwnsMovedEntity;
-import mudgame.server.rules.PlayerSeesCreationPosition;
-import mudgame.server.rules.PlayerSeesMoveDestination;
-import mudgame.server.rules.PlayerTakesActionDuringOwnTurn;
+import mudgame.server.rules.attack.AttackedEntityIsInAttackRange;
+import mudgame.server.rules.attack.AttackerSeesAttackedEntity;
+import mudgame.server.rules.attack.PlayerCannotAttackOwnEntities;
+import mudgame.server.rules.attack.PlayerOwnsAttackerEntity;
+import mudgame.server.rules.creation.CreationPositionIsEmpty;
+import mudgame.server.rules.creation.CreationPositionIsLand;
+import mudgame.server.rules.creation.PlayerOwnsCreatedEntity;
+import mudgame.server.rules.creation.PlayerSeesCreationPosition;
+import mudgame.server.rules.movement.MoveDestinationIsEmpty;
+import mudgame.server.rules.movement.MoveDestinationIsLand;
+import mudgame.server.rules.movement.MoveDestinationIsReachable;
+import mudgame.server.rules.movement.PlayerOwnsMovedEntity;
+import mudgame.server.rules.movement.PlayerSeesMoveDestination;
+import mudgame.server.rules.turn.PlayerTakesActionDuringOwnTurn;
 
 import java.util.List;
 
@@ -150,7 +149,6 @@ public final class MudServerCore {
                 // attack rules
                 groupRules(
                         new AttackerSeesAttackedEntity(entityBoard, fow),
-                        new AttackerEntityHasAttackComponent(entityBoard),
                         new PlayerOwnsAttackerEntity(entityBoard),
                         new PlayerCannotAttackOwnEntities(entityBoard),
                         new AttackedEntityIsInAttackRange(entityBoard)

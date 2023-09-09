@@ -1,20 +1,22 @@
-package mudgame.server.rules;
+package mudgame.server.rules.movement;
 
-import core.entities.EntityBoardView;
 import core.event.Action;
+import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.MoveEntity;
+import mudgame.server.rules.ActionRule;
 
 @RequiredArgsConstructor
-public final class MoveDestinationIsEmpty implements ActionRule {
-    private final EntityBoardView boardView;
+public final class PlayerSeesMoveDestination implements ActionRule {
+    private final FogOfWar fow;
 
     @Override
     public boolean isSatisfied(Action action, PlayerID actor) {
         if (action instanceof MoveEntity moveEntity)
-            return boardView.entitiesAt(moveEntity.destination()).isEmpty();
+            return fow.isVisible(moveEntity.destination(), actor);
         else
             return true;
     }
+
 }

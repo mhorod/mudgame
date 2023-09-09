@@ -58,6 +58,11 @@ public final class ClientScenarioResultAssert {
         return this;
     }
 
+    public ClientScenarioResultAssert receivedNoEvents() {
+        assertThat(receivedEvents).isEmpty();
+        return this;
+    }
+
     public ClientScenarioResultAssert turn(PlayerID player) {
         assertThat(state.playerManager().getCurrentPlayer()).isEqualTo(player);
         return this;

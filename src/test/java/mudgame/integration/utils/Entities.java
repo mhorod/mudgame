@@ -8,6 +8,10 @@ import core.model.PlayerID;
 public class Entities {
     static int nextID = 0;
 
+    public static Entity entity(EntityData data, PlayerID owner) {
+        return new Entity(data, new EntityID(nextID++), owner);
+    }
+
     public static Entity base(PlayerID owner) {
         return new Entity(EntityData.base(), new EntityID(nextID++), owner);
     }

@@ -1,10 +1,11 @@
-package mudgame.server.rules;
+package mudgame.server.rules.movement;
 
 import core.event.Action;
 import core.model.PlayerID;
 import core.pathfinder.Pathfinder;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.MoveEntity;
+import mudgame.server.rules.ActionRule;
 
 @RequiredArgsConstructor
 public class MoveDestinationIsReachable implements ActionRule {

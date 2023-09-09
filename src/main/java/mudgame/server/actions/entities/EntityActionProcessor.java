@@ -17,7 +17,8 @@ public final class EntityActionProcessor {
         Visibility visibility = new Visibility(state.entityBoard(), state.terrain());
         entityCreator = new EntityCreator(sender, entityManager, state.fogOfWar(), visibility);
         entityMover = new EntityMover(state, sender);
-        entityAttacker = new EntityAttacker(sender, state.entityBoard(), state.fogOfWar());
+        entityAttacker = new EntityAttacker(sender, state.entityBoard(), state.fogOfWar(),
+                                            entityManager, visibility);
     }
 
     public void process(Action action) {
