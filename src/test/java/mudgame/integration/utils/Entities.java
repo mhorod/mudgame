@@ -15,4 +15,8 @@ public class Entities {
     public static Entity pawn(PlayerID owner) {
         return new Entity(EntityData.pawn(), new EntityID(nextID++), owner);
     }
+
+    public static Entity warrior(PlayerID owner) {
+        return new Entity(EntityData.warrior(), new EntityID(nextID++), owner);
+    }
 }

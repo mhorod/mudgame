@@ -20,14 +20,22 @@ import core.terrain.placers.RandomPlayerPlacer;
 import core.turns.PlayerManager;
 import core.turns.TurnView;
 import lombok.extern.slf4j.Slf4j;
+import mudgame.controls.actions.AttackEntityAction;
+import mudgame.controls.actions.CreateEntity;
+import mudgame.controls.actions.MoveEntity;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
+import mudgame.server.rules.AttackedEntityIsInAttackRange;
+import mudgame.server.rules.AttackerEntityHasAttackComponent;
+import mudgame.server.rules.AttackerSeesAttackedEntity;
 import mudgame.server.rules.CreationPositionIsEmpty;
 import mudgame.server.rules.CreationPositionIsLand;
 import mudgame.server.rules.MoveDestinationIsEmpty;
 import mudgame.server.rules.MoveDestinationIsLand;
 import mudgame.server.rules.MoveDestinationIsReachable;
+import mudgame.server.rules.PlayerCannotAttackOwnEntities;
+import mudgame.server.rules.PlayerOwnsAttackerEntity;
 import mudgame.server.rules.PlayerOwnsCreatedEntity;
 import mudgame.server.rules.PlayerOwnsMovedEntity;
 import mudgame.server.rules.PlayerSeesCreationPosition;
@@ -37,6 +45,7 @@ import mudgame.server.rules.PlayerTakesActionDuringOwnTurn;
 import java.util.List;
 
 import static core.entities.model.EntityType.BASE;
+import static mudgame.server.rules.RuleGroup.groupRules;
 
 @Slf4j
 public final class MudServerCore {
@@ -100,8 +109,10 @@ public final class MudServerCore {
     }
 
     public void process(Action action, PlayerID actor) {
-        actionProcessor.process(action, actor);
+        if (action != null)
+            actionProcessor.process(action, actor);
     }
+
 
     public ServerGameState state() {
         return state;
@@ -120,17 +131,30 @@ public final class MudServerCore {
                 new PlayerTakesActionDuringOwnTurn(turnView),
 
                 // entity creation rules
-                new PlayerOwnsCreatedEntity(),
-                new CreationPositionIsEmpty(entityBoard),
-                new PlayerSeesCreationPosition(fow),
-                new CreationPositionIsLand(terrain),
+                groupRules(
+                        new PlayerOwnsCreatedEntity(),
+                        new CreationPositionIsEmpty(entityBoard),
+                        new PlayerSeesCreationPosition(fow),
+                        new CreationPositionIsLand(terrain)
+                ).forActions(CreateEntity.class),
 
                 // entity movement rules
-                new PlayerOwnsMovedEntity(entityBoard),
-                new PlayerSeesMoveDestination(fow),
-                new MoveDestinationIsEmpty(entityBoard),
-                new MoveDestinationIsLand(terrain),
-                new MoveDestinationIsReachable(pathfinder)
+                groupRules(
+                        new PlayerOwnsMovedEntity(entityBoard),
+                        new PlayerSeesMoveDestination(fow),
+                        new MoveDestinationIsEmpty(entityBoard),
+                        new MoveDestinationIsLand(terrain),
+                        new MoveDestinationIsReachable(pathfinder)
+                ).forActions(MoveEntity.class),
+
+                // attack rules
+                groupRules(
+                        new AttackerSeesAttackedEntity(entityBoard, fow),
+                        new AttackerEntityHasAttackComponent(entityBoard),
+                        new PlayerOwnsAttackerEntity(entityBoard),
+                        new PlayerCannotAttackOwnEntities(entityBoard),
+                        new AttackedEntityIsInAttackRange(entityBoard)
+                ).forActions(AttackEntityAction.class)
         );
     }
 

@@ -4,6 +4,7 @@ import core.event.Action;
 import core.model.PlayerID;
 import mudgame.controls.actions.CreateEntity;
 
+
 public final class PlayerOwnsCreatedEntity implements ActionRule {
     @Override
     public boolean isSatisfied(Action action, PlayerID actor) {

@@ -1,9 +1,9 @@
 package mudgame.server.actions;
 
+import core.event.Action;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import core.event.Action;
 import mudgame.server.rules.ActionRule;
 
 import java.util.List;
@@ -21,9 +21,9 @@ final class RuleChecker {
     private boolean isRuleSatisfied(ActionRule rule, Action action, PlayerID actor) {
         boolean isSatisfied = rule.isSatisfied(action, actor);
         if (isSatisfied)
-            log.info("Rule {} is satisfied", rule.getClass().getSimpleName());
+            log.info("Rule {} is satisfied", rule.name());
         else
-            log.info("Rule {} is not satisfied", rule.getClass().getSimpleName());
+            log.info("Rule {} is not satisfied", rule.name());
         return isSatisfied;
     }
 }

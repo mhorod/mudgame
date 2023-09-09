@@ -30,6 +30,4 @@ class EntityManager {
         entityBoard.moveEntity(entityID, position);
         return fow.playerFogOfWar(owner).moveEntity(entityID, position);
     }
-
-
 }
