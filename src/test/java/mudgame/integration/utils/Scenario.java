@@ -10,13 +10,13 @@ import core.model.PlayerID;
 import core.model.Position;
 import core.terrain.model.Terrain;
 import core.terrain.model.TerrainType;
-import core.turns.PlayerManager;
+import core.turns.TurnManager;
 import mudgame.server.ServerGameState;
 
 @SuppressWarnings("unchecked")
 public class Scenario<T extends Scenario<T>> {
 
-    private PlayerManager playerManager;
+    private TurnManager turnManager;
     private EntityBoard entityBoard;
     private FogOfWar fow;
     private Terrain terrain;
@@ -31,12 +31,12 @@ public class Scenario<T extends Scenario<T>> {
 
     private ServerGameState serverState() {
         return new ServerGameState(
-                playerManager,
+                turnManager,
                 entityBoard,
                 fow,
                 terrain,
                 claimedArea,
-                ruleProvider.rules(playerManager, entityBoard, fow, terrain, claimedArea)
+                ruleProvider.rules(turnManager, entityBoard, fow, terrain, claimedArea)
         );
     }
 
@@ -45,9 +45,9 @@ public class Scenario<T extends Scenario<T>> {
     }
 
     public Scenario(int playerCount) {
-        playerManager = new PlayerManager(playerCount);
+        turnManager = new TurnManager(playerCount);
         entityBoard = new EntityBoard();
-        fow = new FogOfWar(playerManager.getPlayerIDs());
+        fow = new FogOfWar(turnManager.players());
         claimedArea = new ClaimedArea();
         ruleProvider = new DefaultRules();
     }

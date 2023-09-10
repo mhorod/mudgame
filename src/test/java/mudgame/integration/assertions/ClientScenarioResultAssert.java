@@ -77,7 +77,7 @@ public final class ClientScenarioResultAssert {
     }
 
     public ClientScenarioResultAssert turn(PlayerID player) {
-        assertThat(state.playerManager().getCurrentPlayer()).isEqualTo(player);
+        assertThat(state.turnManager().currentPlayer()).isEqualTo(player);
         return this;
     }
 

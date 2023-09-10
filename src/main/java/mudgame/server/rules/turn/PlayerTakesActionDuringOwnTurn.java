@@ -12,6 +12,6 @@ public final class PlayerTakesActionDuringOwnTurn implements ActionRule {
 
     @Override
     public boolean isSatisfied(Action action, PlayerID actor) {
-        return turnView.getCurrentPlayer().equals(actor);
+        return turnView.currentPlayer().equals(actor);
     }
 }

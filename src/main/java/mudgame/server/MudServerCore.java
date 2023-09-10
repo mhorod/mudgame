@@ -21,9 +21,10 @@ import core.terrain.model.StartingTerrain;
 import core.terrain.model.Terrain;
 import core.terrain.placers.PlayerPlacer;
 import core.terrain.placers.RandomPlayerPlacer;
-import core.turns.PlayerManager;
+import core.turns.TurnManager;
 import core.turns.TurnView;
 import lombok.extern.slf4j.Slf4j;
+import mudgame.client.ClientGameState;
 import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.actions.MoveEntity;
 import mudgame.events.EventOccurrenceObserver;
@@ -68,31 +69,31 @@ public final class MudServerCore {
             StartingTerrainGenerator terrainGenerator
     ) {
         this.state = newState(playerCount, terrainGenerator);
-        this.actionProcessor = new ActionProcessor(state.rules(), state, eventOccurrenceObserver);
+        this.actionProcessor = new ActionProcessor(state, eventOccurrenceObserver);
     }
 
     public List<PlayerID> players() {
-        return state.playerManager().getPlayerIDs();
+        return state.turnManager().players();
     }
 
     public MudServerCore(ServerGameState state, EventOccurrenceObserver eventOccurrenceObserver) {
         this.state = state;
-        this.actionProcessor = new ActionProcessor(state.rules(), state, eventOccurrenceObserver);
+        this.actionProcessor = new ActionProcessor(state, eventOccurrenceObserver);
     }
 
     private static ServerGameState newRawState(int playerCount, Terrain terrain) {
-        PlayerManager playerManager = new PlayerManager(playerCount);
-        FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
+        TurnManager turnManager = new TurnManager(playerCount);
+        FogOfWar fow = new FogOfWar(turnManager.players());
         EntityBoard entityBoard = new EntityBoard();
         ClaimedArea claimedArea = new ClaimedArea();
 
         return new ServerGameState(
-                playerManager,
+                turnManager,
                 entityBoard,
                 fow,
                 terrain,
                 claimedArea,
-                defaultRules(playerManager, entityBoard, fow, terrain, claimedArea)
+                defaultRules(turnManager, entityBoard, fow, terrain, claimedArea)
         );
     }
 
@@ -174,9 +175,13 @@ public final class MudServerCore {
     }
 
     private static void placeBase(ServerGameState state, int i, Position position) {
-        PlayerID owner = state.playerManager().getPlayerIDs().get(i);
+        PlayerID owner = state.turnManager().players().get(i);
         Entity entity = state.entityBoard().createEntity(BASE, owner, position);
         state.fogOfWar().playerFogOfWar(owner).placeEntity(entity, position);
         state.claimedArea().placeEntity(entity, position);
+    }
+
+    public ClientGameState clientState(PlayerID playerID) {
+        return state.toClientGameState(playerID);
     }
 }

@@ -1,10 +1,8 @@
 package middleware.server;
 
 import core.model.PlayerID;
-import core.turns.CompleteTurn;
-import middleware.messages_to_server.MessageToServer.*;
-import middleware.messages_to_client.MessageToClient.*;
 import middleware.model.UserID;
+import mudgame.controls.actions.CompleteTurn;
 import mudgame.server.MudServerCore;
 import org.junit.jupiter.api.Test;
 

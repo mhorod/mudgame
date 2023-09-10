@@ -6,7 +6,8 @@ import core.fogofwar.FogOfWar;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
 import core.terrain.model.Terrain;
-import core.turns.PlayerManager;
+import core.turns.PlayerTurnManager;
+import core.turns.TurnManager;
 import mudgame.client.ClientGameState;
 import mudgame.server.rules.ActionRule;
 import org.apache.commons.lang3.SerializationUtils;
@@ -15,7 +16,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public record ServerGameState(
-        PlayerManager playerManager,
+        TurnManager turnManager,
         EntityBoard entityBoard,
         FogOfWar fogOfWar,
         Terrain terrain,
@@ -23,13 +24,16 @@ public record ServerGameState(
         List<ActionRule> rules
 ) implements Serializable {
     public ClientGameState toClientGameState(PlayerID playerID) {
-        PlayerManager newPlayerManager = SerializationUtils.clone(playerManager);
+        PlayerTurnManager newTurnManager = new PlayerTurnManager(
+                playerID,
+                turnManager.currentPlayer()
+        );
         PlayerFogOfWar newFogOfWar = SerializationUtils.clone(fogOfWar.playerFogOfWar(playerID));
 
 
         return new ClientGameState(
                 playerID,
-                newPlayerManager,
+                newTurnManager,
                 entityBoard.applyFogOfWar(newFogOfWar),
                 newFogOfWar,
                 terrain.applyFogOfWar(newFogOfWar),

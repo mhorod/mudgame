@@ -19,15 +19,11 @@ public class RandomWalker implements Bot {
         while (client.hasEvent())
             client.processEvent();
 
-        if (!client.getCore()
-                .state()
-                .playerManager()
-                .getCurrentPlayer()
-                .equals(client.myPlayerID()))
+        if (!client.getCore().turnView().isMyTurn())
             return;
 
         log.info("Random walker {} updating...", client.myPlayerID());
-        List<Position> positions = client.getCore().state().fogOfWar().visiblePositions();
+        List<Position> positions = client.getCore().fogOfWar().visiblePositions();
         if (entities().size() < 5)
             client.getControls().createEntity(randomPosition(positions));
 
@@ -42,8 +38,7 @@ public class RandomWalker implements Bot {
 
     private List<Entity> entities() {
         return client.getCore()
-                .state().
-                entityBoard()
+                .entityBoard()
                 .allEntities()
                 .stream().
                 filter(e -> e.owner().equals(client.myPlayerID()))

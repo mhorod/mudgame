@@ -22,6 +22,9 @@ import java.util.Set;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
+/**
+ * Manages areas owned by players.
+ */
 public class ClaimedArea implements ClaimedAreaView, Serializable {
     private final Map<Position, PlayerID> claimed;
     private final Map<EntityID, List<Position>> claimedByEntity = new HashMap<>();
@@ -30,10 +33,6 @@ public class ClaimedArea implements ClaimedAreaView, Serializable {
 
     public ClaimedArea() {
         claimed = new HashMap<>();
-    }
-
-    private ClaimedArea(Map<Position, PlayerID> claimed) {
-        this.claimed = new HashMap<>(claimed);
     }
 
 
@@ -63,6 +62,10 @@ public class ClaimedArea implements ClaimedAreaView, Serializable {
                 .toList();
     }
 
+    /**
+     * Sets positions to be owned by player.
+     * If a position is already owner then the owner is overridden.
+     */
     private ClaimChange claim(PlayerID player, List<Position> positions) {
         List<ClaimedPosition> claimedPositions = new ArrayList<>();
         for (Position position : positions) {
@@ -72,6 +75,9 @@ public class ClaimedArea implements ClaimedAreaView, Serializable {
         return new ClaimChange(claimedPositions, List.of());
     }
 
+    /**
+     * Sets positions to be owned by no one
+     */
     public ClaimChange unclaim(List<Position> positions) {
         for (Position position : positions)
             claimed.remove(position);

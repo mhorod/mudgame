@@ -4,44 +4,26 @@ import core.event.Action;
 import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;
-import mudgame.server.ServerGameState;
 import mudgame.server.actions.Sender;
+import mudgame.server.internal.InteractiveState;
 
 public final class EntityActionProcessor {
-    private final EntityCreator entityCreator;
-    private final EntityMover entityMover;
-    private final EntityAttacker entityAttacker;
+    private final CreationProcessor creationProcessor;
+    private final MoveProcessor moveProcessor;
+    private final AttackProcessor attackProcessor;
 
-    public EntityActionProcessor(ServerGameState state, Sender sender) {
-        EntityManager entityManager = new EntityManager(
-                state.entityBoard(),
-                state.fogOfWar(),
-                state.claimedArea()
-        );
-        Visibility visibility = new Visibility(state.entityBoard(), state.terrain(),
-                                               state.claimedArea());
-        entityCreator = new EntityCreator(sender,
-                                          entityManager,
-                                          state.fogOfWar(),
-                                          state.terrain(),
-                                          visibility
-        );
-        entityMover = new EntityMover(state, sender);
-        entityAttacker = new EntityAttacker(sender,
-                                            state.entityBoard(),
-                                            state.fogOfWar(),
-                                            entityManager,
-                                            visibility,
-                                            state.terrain()
-        );
+    public EntityActionProcessor(InteractiveState state, Sender sender) {
+        creationProcessor = new CreationProcessor(state, sender);
+        moveProcessor = new MoveProcessor(state, sender);
+        attackProcessor = new AttackProcessor(state, sender);
     }
 
     public void process(Action action) {
         if (action instanceof CreateEntity a)
-            entityCreator.createEntity(a);
+            creationProcessor.createEntity(a);
         else if (action instanceof MoveEntity a)
-            entityMover.moveEntity(a);
+            moveProcessor.moveEntity(a);
         else if (action instanceof AttackEntityAction a)
-            entityAttacker.attackEntity(a);
+            attackProcessor.attackEntity(a);
     }
 }

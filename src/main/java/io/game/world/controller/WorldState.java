@@ -3,7 +3,10 @@ package io.game.world.controller;
 import core.model.EntityID;
 import core.model.Position;
 import io.animation.Finishable;
-import mudgame.controls.events.*;
+import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.RemoveEntity;
+import mudgame.controls.events.SpawnEntity;
+import mudgame.controls.events.VisibilityChange;
 import mudgame.controls.events.VisibilityChange.HidePosition;
 import mudgame.controls.events.VisibilityChange.ShowPosition;
 
@@ -71,8 +74,8 @@ public abstract class WorldState implements WorldBehavior {
             var move = event.moves().get(i);
             float time = 0.3f + i / 3f;
             move.visibilityChange().positions().forEach(change -> {
-                if (change instanceof ShowPosition)
-                    state.map().showIn(time, (ShowPosition) change);
+                if (change instanceof ShowPosition showPosition)
+                    state.map().showIn(time, showPosition);
                 if (change instanceof HidePosition)
                     state.map().hideIn(time, change.position());
             });
@@ -89,18 +92,6 @@ public abstract class WorldState implements WorldBehavior {
     public void onRemoveEntity(RemoveEntity event) {
         state.map()
                 .removeEntity(state.entities().entityPosition(event.entityID()), event.entityID());
-        nextEvent();
-    }
-
-    @Override
-    public void onShowEntity(ShowEntity event) {
-        state.map().showEntity(event.position(), event.entity());
-        nextEvent();
-    }
-
-    @Override
-    public void onHideEntity(HideEntity event) {
-        state.map().hideEntity(state.entities().entityPosition(event.entityID()), event.entityID());
         nextEvent();
     }
 }

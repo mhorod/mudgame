@@ -1,31 +1,33 @@
 package mudgame.server.actions.entities;
 
 import core.event.EventOccurrence;
-import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
-import core.terrain.TerrainView;
-import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
 import mudgame.server.actions.Sender;
-import mudgame.server.actions.entities.EntityManager.CreatedEntity;
+import mudgame.server.internal.EntityCreator.CreatedEntity;
+import mudgame.server.internal.InteractiveState;
 
-@RequiredArgsConstructor
-final class EntityCreator {
+/**
+ * Creates new entities and sends the events
+ */
+final class CreationProcessor {
+    private final InteractiveState state;
     private final Sender sender;
-    private final EntityManager entityManager;
-    private final FogOfWar fow;
-    private final TerrainView terrain;
-    private final Visibility visibility;
 
-    public void createEntity(CreateEntity a) {
-        CreatedEntity createdEntity = entityManager.createEntity(a.type(), a.owner(), a.position());
+    public CreationProcessor(InteractiveState state, Sender sender) {
+        this.state = state;
+        this.sender = sender;
+    }
 
-        fow.players()
+    void createEntity(CreateEntity a) {
+        CreatedEntity createdEntity = state.createEntity(a.type(), a.owner(), a.position());
+
+        state.players()
                 .stream()
-                .filter(p -> fow.isVisible(a.position(), p))
+                .filter(p -> state.playerSees(p, a.position()))
                 .map(p -> eventOccurrenceFor(p, a, createdEntity))
                 .forEach(sender::send);
     }
@@ -40,12 +42,10 @@ final class EntityCreator {
     }
 
     private SpawnEntity ownerEvent(CreatedEntity createdEntity, Position position) {
-        VisibilityChange ownerVisibilityChange = visibility.convert(
-                createdEntity.changedPositions());
         return new SpawnEntity(
                 createdEntity.entity(),
                 position,
-                ownerVisibilityChange,
+                createdEntity.visibilityChange(),
                 createdEntity.claimChange()
         );
     }
@@ -57,8 +57,9 @@ final class EntityCreator {
                 createdEntity.entity(),
                 position,
                 VisibilityChange.empty(),
-                createdEntity.claimChange().mask(fow.playerFogOfWar(player), terrain)
+                state.maskedFor(player, createdEntity.claimChange())
         );
     }
+
 
 }

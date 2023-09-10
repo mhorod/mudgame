@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 @EqualsAndHashCode
-public final class PlayerManager implements TurnView, Serializable {
+public final class TurnManager implements TurnView, Serializable {
     private final int playerCount;
     private final List<PlayerID> playerIDs;
     private int currentTurn;
 
-    public PlayerManager(int playerCount) {
+    public TurnManager(int playerCount) {
         if (playerCount <= 0)
             throw new IllegalArgumentException("playerCount must be positive");
 
@@ -22,11 +22,11 @@ public final class PlayerManager implements TurnView, Serializable {
         currentTurn = 0;
     }
 
-    public List<PlayerID> getPlayerIDs() {
+    public List<PlayerID> players() {
         return playerIDs;
     }
 
-    public PlayerID getCurrentPlayer() { return playerIDs.get(currentTurn); }
+    public PlayerID currentPlayer() { return playerIDs.get(currentTurn); }
 
     public void completeTurn() {
         currentTurn = nextTurn();

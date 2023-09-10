@@ -2,6 +2,7 @@ package core.turns;
 
 import core.PlayerAction;
 import lombok.experimental.UtilityClass;
+import mudgame.controls.actions.CompleteTurn;
 
 @UtilityClass
 public class TurnEvents {

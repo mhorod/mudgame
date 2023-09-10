@@ -1,9 +1,9 @@
 package middleware.server;
 
 import core.model.PlayerID;
-import core.turns.CompleteTurn;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
+import mudgame.controls.actions.CompleteTurn;
 import mudgame.server.MudServerCore;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
@@ -237,7 +237,8 @@ public class RoomTest {
         user1.receive().createRoom(new PlayerID(1), 2);
 
         // when
-        List<RoomInfo> serialized = SerializationUtils.clone((Serializable & List<RoomInfo>) server.getRoomList());
+        List<RoomInfo> serialized = SerializationUtils.clone(
+                (Serializable & List<RoomInfo>) server.getRoomList());
 
         // then
         assertThat(serialized).isEqualTo(server.getRoomList());

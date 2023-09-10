@@ -2,7 +2,7 @@ package middleware.clients;
 
 import core.event.Event;
 import core.model.PlayerID;
-import mudgame.client.MudClientCore;
+import mudgame.client.MudClientCoreView;
 import mudgame.controls.Controls;
 
 import java.util.Optional;
@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface GameClient {
     PlayerID myPlayerID();
 
-    MudClientCore getCore();
+    MudClientCoreView getCore();
 
     boolean hasEvent();
 

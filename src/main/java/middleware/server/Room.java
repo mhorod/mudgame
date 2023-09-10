@@ -5,13 +5,15 @@ import core.event.EventOccurrence;
 import core.model.PlayerID;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
-import middleware.model.UserID;
 import mudgame.client.ClientGameState;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public final class Room {
     private static long nextRoomID = 0;
@@ -34,7 +36,7 @@ public final class Room {
         this.core = new MudServerCore(state, this::eventObserver);
 
         server.putRoom(this);
-        for (PlayerID playerID : state.playerManager().getPlayerIDs())
+        for (PlayerID playerID : state.turnManager().players())
             toUserMap.put(playerID, Optional.empty());
     }
 
@@ -54,7 +56,7 @@ public final class Room {
     public void sendGameState(User user) {
         if (!isRunning)
             return;
-        ClientGameState state = core.state().toClientGameState(user.getPlayerID());
+        ClientGameState state = core.clientState(user.getPlayerID());
         user.setGameState(state);
     }
 

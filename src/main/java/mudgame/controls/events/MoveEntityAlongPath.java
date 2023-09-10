@@ -33,12 +33,8 @@ public record MoveEntityAlongPath(EntityID entityID, List<SingleMove> moves) imp
             return destinationNullable == null;
         }
 
-        public static SingleMove hidden(ClaimChange claimChange) {
-            return new SingleMove(null, VisibilityChange.empty(), claimChange);
-        }
-
-        public SingleMove withoutVisibilityChange() {
-            return new SingleMove(destinationNullable, VisibilityChange.empty(), claimChange);
+        public boolean isShown() {
+            return destinationNullable != null;
         }
     }
 }

@@ -27,6 +27,6 @@ public class AttackerSeesAttackedEntity implements ActionRule {
         if (!entityBoard.containsEntity(attacked))
             return false;
         Position position = entityBoard.entityPosition(attacked);
-        return fow.isVisible(position, actor);
+        return fow.playerSees(position, actor);
     }
 }
