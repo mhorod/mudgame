@@ -4,6 +4,7 @@ import core.entities.EntityBoard;
 import core.model.EntityID;
 import core.model.Position;
 import core.pathfinder.Pathfinder;
+import core.spawning.PlayerSpawnManager;
 import core.terrain.model.Terrain;
 import io.animation.Finishable;
 import io.animation.FutureExecutor;
@@ -23,10 +24,16 @@ public class WorldController implements WorldBehavior {
     private final FutureExecutor executor = new FutureExecutor();
 
     public WorldController(
-            Map map, EntityBoard entities, Terrain terrain, Pathfinder pathfinder, Controls controls
+            Map map,
+            EntityBoard entities,
+            Terrain terrain,
+            Pathfinder pathfinder,
+            PlayerSpawnManager spawnManager,
+            Controls controls
     ) {
         state = new Normal(
-                new CommonState(map, terrain, entities, pathfinder, controls, new HashSet<>()));
+                new CommonState(map, terrain, entities, pathfinder, spawnManager, controls,
+                                new HashSet<>()));
         state.init(this);
     }
 

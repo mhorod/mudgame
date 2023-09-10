@@ -1,6 +1,7 @@
 package core.entities.model;
 
 import core.entities.components.Attack;
+import core.entities.components.Claim;
 import core.entities.components.Component;
 import core.entities.components.Health;
 import core.entities.components.Movement;
@@ -53,7 +54,8 @@ public record EntityData(
                 List.of(
                         new Vision(3),
                         new Movement(6),
-                        new Health(10)
+                        new Health(10),
+                        new Claim(1)
                 )
         );
     }
@@ -62,6 +64,7 @@ public record EntityData(
         return new EntityData(
                 EntityType.BASE,
                 List.of(
+                        new Claim(2),
                         new Vision(3),
                         new Health(30)
                 )
@@ -72,6 +75,7 @@ public record EntityData(
         return new EntityData(
                 EntityType.TOWER,
                 List.of(
+                        new Claim(3),
                         new Vision(5),
                         new Health(15)
                 )

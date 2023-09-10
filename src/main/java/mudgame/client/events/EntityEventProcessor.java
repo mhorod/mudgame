@@ -1,5 +1,6 @@
 package mudgame.client.events;
 
+import core.claiming.PlayerClaimedArea;
 import core.entities.model.Entity;
 import core.model.Position;
 import lombok.extern.slf4j.Slf4j;
@@ -22,16 +23,23 @@ import static core.terrain.model.TerrainType.UNKNOWN;
 final class EntityEventProcessor {
     private final ClientGameState state;
     private final EntityManager entityManager;
+    private final PlayerClaimedArea claimedArea;
 
     public EntityEventProcessor(ClientGameState state) {
         this.state = state;
-        this.entityManager = new EntityManager(state.entityBoard(), state.fogOfWar());
+        this.entityManager = new EntityManager(
+                state.entityBoard(),
+                state.fogOfWar()
+        );
+        this.claimedArea = state.claimedArea();
     }
 
     public void spawnEntity(SpawnEntity e) {
         entityManager.placeEntity(e.entity(), e.position());
         applyVisibilityChange(e.visibilityChange());
+        claimedArea.apply(e.claimChange());
     }
+
 
     private void applyVisibilityChange(VisibilityChange visibilityChange) {
         for (PositionVisibilityChange p : visibilityChange.positions())
@@ -61,6 +69,7 @@ final class EntityEventProcessor {
             if (destination != null)
                 entityManager.moveEntity(e.entityID(), destination);
             applyVisibilityChange(singleMove.visibilityChange());
+            claimedArea.apply(singleMove.claimChange());
         }
     }
 
@@ -79,5 +88,6 @@ final class EntityEventProcessor {
     public void killEntity(KillEntity e) {
         entityManager.removeEntity(e.entityID());
         applyVisibilityChange(e.visibilityChange());
+        claimedArea.apply(e.claimChange());
     }
 }

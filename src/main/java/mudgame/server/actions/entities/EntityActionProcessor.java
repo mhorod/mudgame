@@ -13,7 +13,11 @@ public final class EntityActionProcessor {
     private final EntityAttacker entityAttacker;
 
     public EntityActionProcessor(ServerGameState state, Sender sender) {
-        EntityManager entityManager = new EntityManager(state.entityBoard(), state.fogOfWar());
+        EntityManager entityManager = new EntityManager(
+                state.entityBoard(),
+                state.fogOfWar(),
+                state.claimedArea()
+        );
         Visibility visibility = new Visibility(state.entityBoard(), state.terrain());
         entityCreator = new EntityCreator(sender, entityManager, state.fogOfWar(), visibility);
         entityMover = new EntityMover(state, sender);

@@ -1,4 +1,4 @@
-package mudgame.integration.utils;
+package testutils;
 
 import core.model.Position;
 

@@ -4,9 +4,9 @@ import core.entities.model.Entity;
 import core.model.Position;
 import mudgame.integration.utils.Scenario;
 
-import static mudgame.integration.utils.Entities.base;
-import static mudgame.integration.utils.Players.PLAYER_0;
-import static mudgame.integration.utils.Players.PLAYER_1;
+import static testutils.Entities.base;
+import static testutils.Players.PLAYER_0;
+import static testutils.Players.PLAYER_1;
 
 public class TwoPlayersWithBases extends Scenario<TwoPlayersWithBases> {
     public Entity base0;

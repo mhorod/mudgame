@@ -1,5 +1,6 @@
 package mudgame.controls.events;
 
+import core.claiming.ClaimedAreaView.ClaimChange;
 import core.event.Event;
 import core.model.EntityID;
 
@@ -8,6 +9,7 @@ import core.model.EntityID;
  */
 public record KillEntity(
         EntityID entityID,
-        VisibilityChange visibilityChange
+        VisibilityChange visibilityChange,
+        ClaimChange claimChange
 ) implements Event {
 }

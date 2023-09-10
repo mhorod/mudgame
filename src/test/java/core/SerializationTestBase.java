@@ -20,6 +20,7 @@ public abstract class SerializationTestBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends Serializable> T serializeAndDeserialize(T obj)
             throws IOException, ClassNotFoundException {
         return deserialize(serialize(obj), (Class<T>) obj.getClass());

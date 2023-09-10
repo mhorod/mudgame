@@ -1,14 +1,18 @@
 package mudgame.server;
 
+import core.claiming.ClaimedArea;
+import core.claiming.ClaimedAreaView;
 import core.entities.EntityBoard;
 import core.entities.EntityBoardView;
 import core.entities.model.Entity;
 import core.event.Action;
 import core.fogofwar.FogOfWar;
+import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.EntityPathfinder;
 import core.pathfinder.Pathfinder;
+import core.spawning.SpawnManager;
 import core.terrain.TerrainView;
 import core.terrain.generators.RectangleLandGenerator;
 import core.terrain.generators.StartingTerrainGenerator;
@@ -21,19 +25,15 @@ import core.turns.PlayerManager;
 import core.turns.TurnView;
 import lombok.extern.slf4j.Slf4j;
 import mudgame.controls.actions.AttackEntityAction;
-import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
+import mudgame.server.rules.PlayerCanCreateEntity;
 import mudgame.server.rules.attack.AttackedEntityIsInAttackRange;
 import mudgame.server.rules.attack.AttackerSeesAttackedEntity;
 import mudgame.server.rules.attack.PlayerCannotAttackOwnEntities;
 import mudgame.server.rules.attack.PlayerOwnsAttackerEntity;
-import mudgame.server.rules.creation.CreationPositionIsEmpty;
-import mudgame.server.rules.creation.CreationPositionIsLand;
-import mudgame.server.rules.creation.PlayerOwnsCreatedEntity;
-import mudgame.server.rules.creation.PlayerSeesCreationPosition;
 import mudgame.server.rules.movement.MoveDestinationIsEmpty;
 import mudgame.server.rules.movement.MoveDestinationIsLand;
 import mudgame.server.rules.movement.MoveDestinationIsReachable;
@@ -84,13 +84,15 @@ public final class MudServerCore {
         PlayerManager playerManager = new PlayerManager(playerCount);
         FogOfWar fow = new FogOfWar(playerManager.getPlayerIDs());
         EntityBoard entityBoard = new EntityBoard();
+        ClaimedArea claimedArea = new ClaimedArea();
 
         return new ServerGameState(
                 playerManager,
                 entityBoard,
                 fow,
                 terrain,
-                defaultRules(playerManager, entityBoard, fow, terrain)
+                claimedArea,
+                defaultRules(playerManager, entityBoard, fow, terrain, claimedArea)
         );
     }
 
@@ -120,22 +122,24 @@ public final class MudServerCore {
     public static List<ActionRule> defaultRules(
             TurnView turnView,
             EntityBoardView entityBoard,
-            FogOfWar fow,
-            TerrainView terrain
+            FogOfWarView fow,
+            TerrainView terrain,
+            ClaimedAreaView claimedArea
     ) {
         Pathfinder pathfinder = new EntityPathfinder(terrain, entityBoard, fow);
+        SpawnManager spawnManager = new SpawnManager(
+                entityBoard,
+                fow,
+                claimedArea,
+                terrain
+        );
 
         return List.of(
                 // turn rules
                 new PlayerTakesActionDuringOwnTurn(turnView),
 
                 // entity creation rules
-                groupRules(
-                        new PlayerOwnsCreatedEntity(),
-                        new CreationPositionIsEmpty(entityBoard),
-                        new PlayerSeesCreationPosition(fow),
-                        new CreationPositionIsLand(terrain)
-                ).forActions(CreateEntity.class),
+                new PlayerCanCreateEntity(spawnManager),
 
                 // entity movement rules
                 groupRules(
@@ -173,5 +177,6 @@ public final class MudServerCore {
         PlayerID owner = state.playerManager().getPlayerIDs().get(i);
         Entity entity = state.entityBoard().createEntity(BASE, owner, position);
         state.fogOfWar().playerFogOfWar(owner).placeEntity(entity, position);
+        state.claimedArea().placeEntity(entity, position);
     }
 }

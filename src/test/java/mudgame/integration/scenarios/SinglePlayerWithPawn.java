@@ -3,9 +3,9 @@ package mudgame.integration.scenarios;
 import core.entities.model.Entity;
 import mudgame.integration.utils.Scenario;
 
-import static mudgame.integration.utils.Entities.pawn;
-import static mudgame.integration.utils.Players.PLAYER_0;
-import static mudgame.integration.utils.Positions.pos;
+import static testutils.Entities.pawn;
+import static testutils.Players.PLAYER_0;
+import static testutils.Positions.pos;
 
 public class SinglePlayerWithPawn extends Scenario<SinglePlayerWithPawn> {
     public Entity pawn;

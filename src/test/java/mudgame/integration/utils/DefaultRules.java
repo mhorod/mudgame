@@ -1,7 +1,8 @@
 package mudgame.integration.utils;
 
+import core.claiming.ClaimedAreaView;
 import core.entities.EntityBoardView;
-import core.fogofwar.FogOfWar;
+import core.fogofwar.FogOfWarView;
 import core.terrain.TerrainView;
 import core.turns.TurnView;
 import mudgame.server.MudServerCore;
@@ -14,14 +15,16 @@ public class DefaultRules implements RuleProvider {
     public List<ActionRule> rules(
             TurnView turnView,
             EntityBoardView entityBoard,
-            FogOfWar fow,
-            TerrainView terrain
+            FogOfWarView fow,
+            TerrainView terrain,
+            ClaimedAreaView claimedArea
     ) {
         return MudServerCore.defaultRules(
                 turnView,
                 entityBoard,
                 fow,
-                terrain
+                terrain,
+                claimedArea
         );
     }
 }

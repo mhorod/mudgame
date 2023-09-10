@@ -9,12 +9,14 @@ import mudgame.controls.events.VisibilityChange;
 
 import java.util.List;
 
+import static core.entities.model.EntityType.PAWN;
+
 public class Normal extends WorldState {
 
     public Normal(CommonState state) {
         super(state);
         state.map().setPath(List.of());
-        state.map().setHighlightedTiles(null);
+        state.map().setHighlightedTiles(state.spawnManager().allowedSpawnPositions(PAWN));
     }
 
     @Override

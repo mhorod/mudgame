@@ -9,10 +9,11 @@ import core.model.Position;
 import core.terrain.TerrainView;
 import lombok.RequiredArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class PlayerSpawnManager {
+public class PlayerSpawnManager implements Serializable {
     private final PlayerID player;
     private final EntityBoardView entityBoard;
     private final PlayerFogOfWarView fow;
@@ -24,7 +25,13 @@ public class PlayerSpawnManager {
                 .stream()
                 .filter(terrain::contains)
                 .filter(this::owns)
+                .filter(this::unoccupied)
                 .toList();
+    }
+
+
+    private boolean unoccupied(Position position) {
+        return entityBoard.entitiesAt(position).isEmpty();
     }
 
     private boolean owns(Position position) {

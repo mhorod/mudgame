@@ -4,7 +4,6 @@ import core.entities.model.Entity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.PlaceEntity;
 import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.SpawnEntity;
 import mudgame.integration.scenarios.SinglePlayerWithBase;
 import mudgame.integration.scenarios.SinglePlayerWithPawn;
 import mudgame.integration.utils.RectangleTerrain;
@@ -14,28 +13,12 @@ import org.junit.jupiter.api.Test;
 
 import static mudgame.integration.assertions.ClientScenarioResultAssert.assertThatClient;
 import static mudgame.integration.scenarios.Scenarios.*;
-import static mudgame.integration.utils.Entities.pawn;
-import static mudgame.integration.utils.Players.PLAYER_0;
-import static mudgame.integration.utils.Players.PLAYER_1;
-import static mudgame.integration.utils.Positions.pos;
+import static testutils.Entities.*;
+import static testutils.Players.PLAYER_0;
+import static testutils.Players.PLAYER_1;
+import static testutils.Positions.pos;
 
 class MovementIntegrationTest extends IntegrationTestBase {
-    @Test
-    void no_actions_are_performed_when_player_has_no_entities() {
-        // given
-        Scenario<?> scenario = single_player_no_base();
-
-        // when
-        ScenarioResult result = scenario
-                .act(PLAYER_0, createPawn(PLAYER_0, pos(0, 0)))
-                .finish();
-
-        // then
-        assertIntegrity(result);
-        assertNoEvents(result);
-    }
-
-
     @Test
     void base_cannot_be_moved() {
         // given
@@ -51,20 +34,6 @@ class MovementIntegrationTest extends IntegrationTestBase {
         assertNoEvents(result);
     }
 
-    @Test
-    void player_can_create_pawn_near_base() {
-        // given
-        SinglePlayerWithBase scenario = single_player_with_base();
-
-        // when
-        ScenarioResult result = scenario
-                .act(PLAYER_0, createPawn(PLAYER_0, pos(0, 1)))
-                .finish();
-
-        // then
-        assertIntegrity(result);
-        assertThatClient(result, PLAYER_0).receivedEventTypes(SpawnEntity.class);
-    }
 
     @Test
     void pawn_can_be_moved() {
@@ -135,5 +104,28 @@ class MovementIntegrationTest extends IntegrationTestBase {
         assertThatClient(result, PLAYER_1)
                 .receivedEventTypes(MoveEntityAlongPath.class, RemoveEntity.class)
                 .doesNotSeeEntities(pawn0);
+    }
+
+    @Test
+    void moving_marsh_wiggle_changes_claimed_area() {
+        Entity marshWiggle = marshWiggle(PLAYER_0);
+        Scenario<?> scenario = single_player()
+                .with(RectangleTerrain.land(6, 6))
+                .with(base(PLAYER_0), pos(0, 0))
+                .with(marshWiggle, pos(0, 1));
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, move(marshWiggle, pos(3, 3)))
+                .act(PLAYER_0, move(marshWiggle, pos(5, 5)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(MoveEntityAlongPath.class, MoveEntityAlongPath.class);
+        assertThatClient(result, PLAYER_0)
+                .owns(pos(4, 4))
+                .doesNotOwn(pos(3, 3));
     }
 }

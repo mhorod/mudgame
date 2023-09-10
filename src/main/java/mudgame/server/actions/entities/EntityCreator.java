@@ -34,16 +34,29 @@ final class EntityCreator {
         if (player.equals(action.owner()))
             return EventOccurrence.of(ownerEvent(createdEntity, action.position()), player);
         else
-            return EventOccurrence.of(otherEvent(createdEntity, action.position()), player);
+            return EventOccurrence.of(otherEvent(player, createdEntity, action.position()), player);
     }
 
     private SpawnEntity ownerEvent(CreatedEntity createdEntity, Position position) {
         VisibilityChange ownerVisibilityChange = visibility.convert(
                 createdEntity.changedPositions());
-        return new SpawnEntity(createdEntity.entity(), position, ownerVisibilityChange);
+        return new SpawnEntity(
+                createdEntity.entity(),
+                position,
+                ownerVisibilityChange,
+                createdEntity.claimChange()
+        );
     }
 
-    private SpawnEntity otherEvent(CreatedEntity createdEntity, Position position) {
-        return new SpawnEntity(createdEntity.entity(), position, VisibilityChange.empty());
+    private SpawnEntity otherEvent(
+            PlayerID player, CreatedEntity createdEntity, Position position
+    ) {
+        return new SpawnEntity(
+                createdEntity.entity(),
+                position,
+                VisibilityChange.empty(),
+                createdEntity.claimChange().applyFogOfWar(fow.playerFogOfWar(player))
+        );
     }
+
 }
