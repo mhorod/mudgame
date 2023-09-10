@@ -105,7 +105,7 @@ public class EntityPathfinder implements Pathfinder, Serializable {
             return false;
         else if (!entityBoard.entitiesAt(destination).isEmpty())
             return false;
-        else if (!fow.isVisible(destination, entity.owner()))
+        else if (!fow.playerSees(destination, entity.owner()))
             return false;
         else
             return true;

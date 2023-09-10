@@ -41,11 +41,11 @@ public record ScenarioResult(
     }
 
     public PlayerID serverTurn() {
-        return serverState.turnManager().getCurrentPlayer();
+        return serverState.turnManager().currentPlayer();
     }
 
     public PlayerID clientTurn(PlayerID player) {
-        return clientStates.get(player).turnManager().getCurrentPlayer();
+        return clientStates.get(player).turnManager().currentPlayer();
     }
 
     public ClientGameState clientState(PlayerID player) {

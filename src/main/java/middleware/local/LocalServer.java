@@ -19,7 +19,7 @@ public final class LocalServer {
     private final Map<PlayerID, LocalClient> clientMap = new HashMap<>();
 
     public LocalServer(ServerGameState state) {
-        for (PlayerID playerID : state.turnManager().getPlayerIDs()) {
+        for (PlayerID playerID : state.turnManager().players()) {
             LocalClient client = new LocalClient(state.toClientGameState(playerID), this);
             clients.add(client);
             clientMap.put(playerID, client);

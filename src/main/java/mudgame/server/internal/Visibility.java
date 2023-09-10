@@ -1,4 +1,4 @@
-package mudgame.server.actions.entities;
+package mudgame.server.internal;
 
 import core.claiming.ClaimedAreaView;
 import core.entities.EntityBoardView;
@@ -13,21 +13,25 @@ import mudgame.controls.events.VisibilityChange.ShowPosition;
 import java.util.Set;
 
 
+/**
+ * Collects information received when visibility of fields changes.
+ */
 @RequiredArgsConstructor
 final class Visibility {
-    private final EntityBoardView entityBoard;
     private final TerrainView terrain;
+    private final EntityBoardView entityBoard;
     private final ClaimedAreaView claimedArea;
 
-    VisibilityChange convert(Set<PositionVisibility> positions) {
+
+    VisibilityChange get(Set<PositionVisibility> positions) {
         return new VisibilityChange(
                 positions.stream()
                         .filter(p -> terrain.contains(p.position()))
-                        .map(this::convert).toList()
+                        .map(this::get).toList()
         );
     }
 
-    private PositionVisibilityChange convert(PositionVisibility pv) {
+    private PositionVisibilityChange get(PositionVisibility pv) {
         if (!pv.isVisible())
             return new HidePosition(pv.position());
         else {

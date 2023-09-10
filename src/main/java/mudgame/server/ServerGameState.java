@@ -26,7 +26,7 @@ public record ServerGameState(
     public ClientGameState toClientGameState(PlayerID playerID) {
         PlayerTurnManager newTurnManager = new PlayerTurnManager(
                 playerID,
-                turnManager.getCurrentPlayer()
+                turnManager.currentPlayer()
         );
         PlayerFogOfWar newFogOfWar = SerializationUtils.clone(fogOfWar.playerFogOfWar(playerID));
 

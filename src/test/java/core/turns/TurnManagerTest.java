@@ -17,7 +17,7 @@ class TurnManagerTest {
         TurnManager turnManager = new TurnManager(4);
 
         // when
-        List<PlayerID> playerIDs = turnManager.getPlayerIDs();
+        List<PlayerID> playerIDs = turnManager.players();
 
         // then
         assertThat(playerIDs).hasSize(4);
@@ -36,7 +36,7 @@ class TurnManagerTest {
         TurnManager turnManager = new TurnManager(4);
 
         // when
-        List<PlayerID> playerIDs = turnManager.getPlayerIDs();
+        List<PlayerID> playerIDs = turnManager.players();
 
         // then
         assertThat(playerIDs).doesNotHaveDuplicates();
@@ -46,40 +46,40 @@ class TurnManagerTest {
     void completing_turn_switches_current_player() {
         // given
         TurnManager turnManager = new TurnManager(2);
-        PlayerID first = turnManager.getCurrentPlayer();
+        PlayerID first = turnManager.currentPlayer();
 
         // when
         turnManager.completeTurn();
 
         // then
-        assertThat(turnManager.getCurrentPlayer()).isNotEqualTo(first);
+        assertThat(turnManager.currentPlayer()).isNotEqualTo(first);
     }
 
     @Test
     void turn_cycles_back_to_starting_player_after_each_player_completes_turn() {
         // given
         TurnManager turnManager = new TurnManager(3);
-        PlayerID first = turnManager.getCurrentPlayer();
+        PlayerID first = turnManager.currentPlayer();
 
         // when
         for (int i = 0; i < 3; i++)
             turnManager.completeTurn();
 
         // then
-        assertThat(turnManager.getCurrentPlayer()).isEqualTo(first);
+        assertThat(turnManager.currentPlayer()).isEqualTo(first);
     }
 
     @Test
     void each_player_takes_turn_once_during_one_cycle() {
         // given
         TurnManager turnManager = new TurnManager(3);
-        List<PlayerID> playerIDs = turnManager.getPlayerIDs();
+        List<PlayerID> playerIDs = turnManager.players();
 
         // when
         List<PlayerID> turns = new LinkedList<>();
 
         for (int i = 0; i < 3; i++) {
-            turns.add(turnManager.getCurrentPlayer());
+            turns.add(turnManager.currentPlayer());
             turnManager.completeTurn();
         }
 

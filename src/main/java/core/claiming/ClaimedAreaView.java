@@ -19,7 +19,7 @@ public interface ClaimedAreaView {
             return new ClaimChange(List.of(), List.of());
         }
 
-        public ClaimChange mask(TerrainView terrain) {
+        public ClaimChange masked(TerrainView terrain) {
             return new ClaimChange(
                     claimedPositions.stream()
                             .filter(p -> terrain.contains(p.position))
@@ -30,7 +30,7 @@ public interface ClaimedAreaView {
             );
         }
 
-        public ClaimChange mask(PlayerFogOfWarView fow, TerrainView terrain) {
+        public ClaimChange masked(PlayerFogOfWarView fow, TerrainView terrain) {
             return new ClaimChange(
                     claimedPositions.stream()
                             .filter(p -> terrain.contains(p.position))

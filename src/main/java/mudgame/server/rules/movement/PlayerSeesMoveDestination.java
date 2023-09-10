@@ -14,7 +14,7 @@ public final class PlayerSeesMoveDestination implements ActionRule {
     @Override
     public boolean isSatisfied(Action action, PlayerID actor) {
         if (action instanceof MoveEntity moveEntity)
-            return fow.isVisible(moveEntity.destination(), actor);
+            return fow.playerSees(moveEntity.destination(), actor);
         else
             return true;
     }

@@ -36,7 +36,7 @@ public final class Room {
         this.core = new MudServerCore(state, this::eventObserver);
 
         server.putRoom(this);
-        for (PlayerID playerID : state.turnManager().getPlayerIDs())
+        for (PlayerID playerID : state.turnManager().players())
             toUserMap.put(playerID, Optional.empty());
     }
 

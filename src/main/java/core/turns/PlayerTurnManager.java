@@ -20,7 +20,7 @@ public class PlayerTurnManager implements PlayerTurnView, Serializable {
     }
 
     @Override
-    public PlayerID getCurrentPlayer() {
+    public PlayerID currentPlayer() {
         return currentPlayerID;
     }
 

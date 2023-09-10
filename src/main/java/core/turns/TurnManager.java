@@ -22,11 +22,11 @@ public final class TurnManager implements TurnView, Serializable {
         currentTurn = 0;
     }
 
-    public List<PlayerID> getPlayerIDs() {
+    public List<PlayerID> players() {
         return playerIDs;
     }
 
-    public PlayerID getCurrentPlayer() { return playerIDs.get(currentTurn); }
+    public PlayerID currentPlayer() { return playerIDs.get(currentTurn); }
 
     public void completeTurn() {
         currentTurn = nextTurn();

@@ -28,7 +28,7 @@ class EntityPathfinderTest extends PathfinderTestBase {
         entityBoard = new EntityBoard();
         terrain = simpleTerrain();
         fow = mock(FogOfWar.class);
-        when(fow.isVisible(any(), any())).thenReturn(true);
+        when(fow.playerSees(any(), any())).thenReturn(true);
 
         pathfinder = new EntityPathfinder(terrain, entityBoard, fow);
     }
@@ -97,7 +97,7 @@ class EntityPathfinderTest extends PathfinderTestBase {
     @Test
     void avoids_tiles_in_fog_of_war() {
         // given
-        when(fow.isVisible(eq(new Position(0, 1)), any())).thenReturn(false);
+        when(fow.playerSees(eq(new Position(0, 1)), any())).thenReturn(false);
 
         int movement = 5;
         Entity entity = entityBoard.createEntity(

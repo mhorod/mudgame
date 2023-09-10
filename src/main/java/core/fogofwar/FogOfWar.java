@@ -27,7 +27,7 @@ public final class FogOfWar implements FogOfWarView, Serializable {
     }
 
     @Override
-    public boolean isVisible(Position position, PlayerID viewer) {
+    public boolean playerSees(Position position, PlayerID viewer) {
         return fows.get(viewer).isVisible(position);
     }
 

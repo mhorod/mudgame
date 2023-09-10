@@ -48,7 +48,7 @@ public final class User {
         public void loadGame(PlayerID myPlayerID, ServerGameState state) {
             if (sendErrorIfInRoom())
                 return;
-            if (!state.turnManager().getPlayerIDs().contains(myPlayerID)) {
+            if (!state.turnManager().players().contains(myPlayerID)) {
                 sendError("Invalid PlayerID");
                 return;
             }

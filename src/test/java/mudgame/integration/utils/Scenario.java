@@ -47,7 +47,7 @@ public class Scenario<T extends Scenario<T>> {
     public Scenario(int playerCount) {
         turnManager = new TurnManager(playerCount);
         entityBoard = new EntityBoard();
-        fow = new FogOfWar(turnManager.getPlayerIDs());
+        fow = new FogOfWar(turnManager.players());
         claimedArea = new ClaimedArea();
         ruleProvider = new DefaultRules();
     }

@@ -14,7 +14,7 @@ public final class PlayerSeesCreationPosition implements ActionRule {
     @Override
     public boolean isSatisfied(Action action, PlayerID actor) {
         if (action instanceof CreateEntity moveEntity)
-            return fow.isVisible(moveEntity.position(), actor);
+            return fow.playerSees(moveEntity.position(), actor);
         else
             return true;
     }
