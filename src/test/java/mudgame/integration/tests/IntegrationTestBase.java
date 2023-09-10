@@ -11,6 +11,7 @@ import mudgame.controls.actions.MoveEntity;
 import mudgame.integration.utils.ScenarioResult;
 
 import static core.entities.EntityBoardAssert.assertThatEntityBoard;
+import static core.entities.model.EntityType.MARSH_WIGGLE;
 import static core.entities.model.EntityType.PAWN;
 import static core.fogofwar.PlayerFogOfWarAssert.assertThatPlayerFow;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +40,10 @@ abstract class IntegrationTestBase {
 
     protected Action createPawn(PlayerID player, Position position) {
         return new CreateEntity(PAWN, player, position);
+    }
+
+    protected Action createMarshWiggle(PlayerID player, Position position) {
+        return new CreateEntity(MARSH_WIGGLE, player, position);
     }
 
     protected Action attack(EntityID attacker, EntityID attacked) {

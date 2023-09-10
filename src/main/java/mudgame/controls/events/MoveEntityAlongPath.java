@@ -1,5 +1,6 @@
 package mudgame.controls.events;
 
+import core.claiming.ClaimedAreaView.ClaimChange;
 import core.event.Event;
 import core.model.EntityID;
 import core.model.Position;
@@ -21,7 +22,8 @@ import java.util.Optional;
 public record MoveEntityAlongPath(EntityID entityID, List<SingleMove> moves) implements Event {
     public record SingleMove(
             Position destinationNullable,
-            VisibilityChange visibilityChange
+            VisibilityChange visibilityChange,
+            ClaimChange claimChange
     ) implements Serializable {
         public Optional<Position> destination() {
             return Optional.ofNullable(destinationNullable);
@@ -31,12 +33,12 @@ public record MoveEntityAlongPath(EntityID entityID, List<SingleMove> moves) imp
             return destinationNullable == null;
         }
 
-        public static SingleMove hidden() {
-            return new SingleMove(null, VisibilityChange.empty());
+        public static SingleMove hidden(ClaimChange claimChange) {
+            return new SingleMove(null, VisibilityChange.empty(), claimChange);
         }
 
         public SingleMove withoutVisibilityChange() {
-            return new SingleMove(destinationNullable, VisibilityChange.empty());
+            return new SingleMove(destinationNullable, VisibilityChange.empty(), claimChange);
         }
     }
 }

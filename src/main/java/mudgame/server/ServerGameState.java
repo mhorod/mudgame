@@ -1,5 +1,6 @@
 package mudgame.server;
 
+import core.claiming.ClaimedArea;
 import core.entities.EntityBoard;
 import core.fogofwar.FogOfWar;
 import core.fogofwar.PlayerFogOfWar;
@@ -18,6 +19,7 @@ public record ServerGameState(
         EntityBoard entityBoard,
         FogOfWar fogOfWar,
         Terrain terrain,
+        ClaimedArea claimedArea,
         List<ActionRule> rules
 ) implements Serializable {
     public ClientGameState toClientGameState(PlayerID playerID) {
@@ -31,6 +33,7 @@ public record ServerGameState(
                 entityBoard.applyFogOfWar(newFogOfWar),
                 newFogOfWar,
                 terrain.applyFogOfWar(newFogOfWar),
+                claimedArea.applyFogOfWar(newFogOfWar),
                 rules
         );
     }

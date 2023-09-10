@@ -17,9 +17,9 @@ import java.util.List;
 import static core.entities.model.EntityType.PAWN;
 import static mudgame.integration.assertions.ClientScenarioResultAssert.assertThatClient;
 import static mudgame.integration.scenarios.Scenarios.*;
-import static mudgame.integration.utils.Entities.*;
-import static mudgame.integration.utils.Players.*;
-import static mudgame.integration.utils.Positions.pos;
+import static testutils.Entities.*;
+import static testutils.Players.*;
+import static testutils.Positions.pos;
 
 class AttackIntegrationTest extends IntegrationTestBase {
     @Test

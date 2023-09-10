@@ -15,6 +15,7 @@ import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.VisibilityChange;
 import mudgame.server.actions.Sender;
+import mudgame.server.actions.entities.EntityManager.RemovedEntity;
 
 @RequiredArgsConstructor
 class EntityAttacker {
@@ -55,14 +56,23 @@ class EntityAttacker {
 
     private void kill(Entity entity) {
         Position position = entityBoard.entityPosition(entity.id());
-        VisibilityChange visibilityChange = visibility.convert(
-                entityManager.removeEntity(entity.id()));
+
+        RemovedEntity removedEntity = entityManager.removeEntity(entity.id());
+        VisibilityChange visibilityChange = visibility.convert(removedEntity.changedPositions());
 
         for (PlayerID player : fow.players()) {
             if (player.equals(entity.owner()))
-                sender.send(new KillEntity(entity.id(), visibilityChange), player);
+                sender.send(
+                        new KillEntity(entity.id(), visibilityChange, removedEntity.claimChange()),
+                        player);
             else if (fow.isVisible(position, player))
-                sender.send(new KillEntity(entity.id(), VisibilityChange.empty()), player);
+                sender.send(
+                        new KillEntity(
+                                entity.id(),
+                                VisibilityChange.empty(),
+                                removedEntity.claimChange()
+                                        .applyFogOfWar(fow.playerFogOfWar(player))),
+                        player);
         }
     }
 

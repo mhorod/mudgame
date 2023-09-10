@@ -1,9 +1,11 @@
 package mudgame.integration.assertions;
 
 import core.entities.model.Entity;
+import core.entities.model.EntityType;
 import core.event.Event;
 import core.model.PlayerID;
 import core.model.Position;
+import core.spawning.PlayerSpawnManager;
 import lombok.RequiredArgsConstructor;
 import mudgame.client.ClientGameState;
 import mudgame.integration.utils.ScenarioResult;
@@ -15,16 +17,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor
 public final class ClientScenarioResultAssert {
 
+    private final PlayerID player;
     private final ClientGameState state;
     private final List<Event> receivedEvents;
+    private final PlayerSpawnManager spawnManager;
 
 
     public static ClientScenarioResultAssert assertThatClient(
             ScenarioResult scenarioResult, PlayerID player
     ) {
+        ClientGameState state = scenarioResult.clientState(player);
         return new ClientScenarioResultAssert(
-                scenarioResult.clientState(player),
-                scenarioResult.clientEvents(player)
+                player,
+                state,
+                scenarioResult.clientEvents(player),
+                new PlayerSpawnManager(
+                        player,
+                        state.entityBoard(),
+                        state.fogOfWar(),
+                        state.claimedArea(),
+                        state.terrain()
+                )
         );
     }
 
@@ -65,6 +78,37 @@ public final class ClientScenarioResultAssert {
 
     public ClientScenarioResultAssert turn(PlayerID player) {
         assertThat(state.playerManager().getCurrentPlayer()).isEqualTo(player);
+        return this;
+    }
+
+    public ClientScenarioResultAssert canCreateEntityExactlyOn(
+            EntityType type, Position... positions
+    ) {
+        assertThat(spawnManager.allowedSpawnPositions(type)).containsExactly(positions);
+        return this;
+    }
+
+    public ClientScenarioResultAssert cannotCreateEntityOn(EntityType type, Position... positions) {
+        assertThat(spawnManager.allowedSpawnPositions(type)).doesNotContain(positions);
+        return this;
+    }
+
+    public ClientScenarioResultAssert cannotCreate(EntityType type) {
+        assertThat(spawnManager.allowedSpawnPositions(type)).isEmpty();
+        return this;
+    }
+
+    public ClientScenarioResultAssert owns(Position... positions) {
+        assertThat(positions).allMatch(
+                p -> player.equals(state.claimedArea().owner(p).orElse(null))
+        );
+        return this;
+    }
+
+    public ClientScenarioResultAssert doesNotOwn(Position... positions) {
+        assertThat(positions).noneMatch(
+                p -> player.equals(state.claimedArea().owner(p).orElse(null))
+        );
         return this;
     }
 }

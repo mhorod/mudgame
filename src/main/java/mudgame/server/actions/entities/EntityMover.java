@@ -1,5 +1,6 @@
 package mudgame.server.actions.entities;
 
+import core.claiming.ClaimedAreaView.ClaimChange;
 import core.entities.model.Entity;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.EntityID;
@@ -15,6 +16,7 @@ import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.VisibilityChange;
 import mudgame.server.ServerGameState;
 import mudgame.server.actions.Sender;
+import mudgame.server.actions.entities.EntityManager.MovedEntity;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -30,7 +32,11 @@ public class EntityMover {
     public EntityMover(ServerGameState state, Sender sender) {
         this.state = state;
         this.sender = sender;
-        entityManager = new EntityManager(state.entityBoard(), state.fogOfWar());
+        entityManager = new EntityManager(
+                state.entityBoard(),
+                state.fogOfWar(),
+                state.claimedArea()
+        );
         visibility = new Visibility(state.entityBoard(), state.terrain());
         pathfinder = new EntityPathfinder(
                 state.terrain(),
@@ -56,7 +62,7 @@ public class EntityMover {
         if (player.equals(owner)) {
             sender.send(new MoveEntityAlongPath(entityID, moves), player);
         } else {
-            List<SingleMove> masked = maskedMoves(player, moves);
+            List<SingleMove> masked = masked(player, moves);
             if (!masked.isEmpty()) {
                 Position start = masked.get(0).destinationNullable();
                 Position end = masked.get(masked.size() - 1).destinationNullable();
@@ -74,8 +80,8 @@ public class EntityMover {
         return state.entityBoard().findEntityByID(entityID);
     }
 
-    private List<SingleMove> maskedMoves(PlayerID player, List<SingleMove> moves) {
-        LinkedList<SingleMove> masked = new LinkedList<>();
+    private List<SingleMove> masked(PlayerID player, List<SingleMove> moves) {
+        LinkedList<SingleMove> result = new LinkedList<>();
         PlayerFogOfWar playerFow = fow(player);
         for (int i = 0; i < moves.size(); i++) {
             SingleMove m = moves.get(i);
@@ -86,16 +92,20 @@ public class EntityMover {
 
             if (playerFow.isVisible(previous) || playerFow.isVisible(current) ||
                 playerFow.isVisible(next))
-                masked.add(m.withoutVisibilityChange());
+                result.add(m.withoutVisibilityChange());
             else
-                masked.add(SingleMove.hidden());
+                result.add(SingleMove.hidden(masked(player, m.claimChange())));
         }
 
-        while (!masked.isEmpty() && masked.get(0).isHidden())
-            masked.removeFirst();
-        while (!masked.isEmpty() && masked.get(masked.size() - 1).isHidden())
-            masked.removeLast();
-        return masked;
+        while (!result.isEmpty() && result.get(0).isHidden())
+            result.removeFirst();
+        while (!result.isEmpty() && result.get(result.size() - 1).isHidden())
+            result.removeLast();
+        return result;
+    }
+
+    private ClaimChange masked(PlayerID player, ClaimChange claimChange) {
+        return claimChange.applyFogOfWar(fow(player));
     }
 
     private PlayerFogOfWar fow(PlayerID player) {
@@ -107,9 +117,9 @@ public class EntityMover {
         List<Position> path = pathfinder.findPath(a.entityID(), a.destination());
 
         for (Position next : path) {
-            VisibilityChange visibilityChange = visibility.convert(
-                    entityManager.moveEntity(a.entityID(), next));
-            result.add(new SingleMove(next, visibilityChange));
+            MovedEntity movedEntity = entityManager.moveEntity(a.entityID(), next);
+            VisibilityChange visibilityChange = visibility.convert(movedEntity.changedPositions());
+            result.add(new SingleMove(next, visibilityChange, movedEntity.claimChange()));
         }
         return result;
     }

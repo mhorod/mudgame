@@ -1,4 +1,4 @@
-package mudgame.integration.utils;
+package testutils;
 
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
@@ -22,5 +22,9 @@ public class Entities {
 
     public static Entity warrior(PlayerID owner) {
         return new Entity(EntityData.warrior(), new EntityID(nextID++), owner);
+    }
+
+    public static Entity marshWiggle(PlayerID owner) {
+        return new Entity(EntityData.marshWiggle(), new EntityID(nextID++), owner);
     }
 }
