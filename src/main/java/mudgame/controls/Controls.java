@@ -13,7 +13,7 @@ import mudgame.controls.actions.MoveEntity;
 
 import java.util.function.Consumer;
 
-import static core.entities.model.EntityType.PAWN;
+import static core.entities.model.EntityType.MARSH_WIGGLE;
 
 @RequiredArgsConstructor
 public class Controls {
@@ -22,10 +22,11 @@ public class Controls {
 
     public void moveEntity(EntityID id, Position destination) {
         actionConsumer.accept(new MoveEntity(id, destination));
+        completeTurn();
     }
 
     public void createEntity(Position position) {
-        actionConsumer.accept(new CreateEntity(PAWN, player, position));
+        actionConsumer.accept(new CreateEntity(MARSH_WIGGLE, player, position));
     }
 
     public void createEntity(EntityType type, Position position) {

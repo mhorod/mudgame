@@ -91,12 +91,11 @@ public class GameView extends SimpleView {
                 me.getCore().state().entityBoard(),
                 me.getCore().state().terrain(),
                 me.getCore().pathfinder(),
+                me.getCore().spawnManager(),
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
                         me.getControls().moveEntity(id, destination);
-                        me.getControls().completeTurn();
-                        ;
                     }
 
                     @Override
