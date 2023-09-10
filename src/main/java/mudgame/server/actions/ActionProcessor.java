@@ -4,7 +4,8 @@ import core.event.Action;
 import core.event.Event;
 import core.event.EventOccurrence;
 import core.model.PlayerID;
-import core.turns.CompleteTurn;
+import mudgame.controls.actions.CompleteTurn;
+import mudgame.controls.events.SetTurn;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.ServerGameState;
 import mudgame.server.actions.entities.EntityActionProcessor;
@@ -39,11 +40,12 @@ public final class ActionProcessor {
     }
 
     private void completeTurn(CompleteTurn action) {
-        state.playerManager().completeTurn();
-        eventOccurrenceObserver.receive(seenByEveryone(action));
+        state.turnManager().completeTurn();
+        SetTurn event = new SetTurn(state.turnManager().getCurrentPlayer());
+        eventOccurrenceObserver.receive(seenByEveryone(event));
     }
 
     private EventOccurrence seenByEveryone(Event event) {
-        return new EventOccurrence(event, state.playerManager().getPlayerIDs());
+        return new EventOccurrence(event, state.turnManager().getPlayerIDs());
     }
 }

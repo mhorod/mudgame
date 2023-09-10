@@ -83,13 +83,13 @@ public class GameView extends SimpleView {
             // --------------------------------------------------
         }
 
-        map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
+        map = new Map(me.getCore().terrain(), me.getCore().entityBoard());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
         worldController = new WorldController(
                 map,
-                me.getCore().state().entityBoard(),
-                me.getCore().state().terrain(),
+                me.getCore().entityBoard(),
+                me.getCore().terrain(),
                 me.getCore().pathfinder(),
                 me.getCore().spawnManager(),
                 new Controls() {

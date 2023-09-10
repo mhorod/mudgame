@@ -10,14 +10,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-class PlayerManagerTest {
+class TurnManagerTest {
     @Test
     void playerManager_returns_as_many_player_ids_as_there_are_players() {
         // given
-        PlayerManager playerManager = new PlayerManager(4);
+        TurnManager turnManager = new TurnManager(4);
 
         // when
-        List<PlayerID> playerIDs = playerManager.getPlayerIDs();
+        List<PlayerID> playerIDs = turnManager.getPlayerIDs();
 
         // then
         assertThat(playerIDs).hasSize(4);
@@ -25,18 +25,18 @@ class PlayerManagerTest {
 
     @Test
     void playerManager_throws_exception_when_created_with_non_positive_player_count() {
-        assertThatThrownBy(() -> new PlayerManager(0)).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new PlayerManager(-1)).isInstanceOf(
+        assertThatThrownBy(() -> new TurnManager(0)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new TurnManager(-1)).isInstanceOf(
                 IllegalArgumentException.class);
     }
 
     @Test
     void player_ids_are_unique() {
         // given
-        PlayerManager playerManager = new PlayerManager(4);
+        TurnManager turnManager = new TurnManager(4);
 
         // when
-        List<PlayerID> playerIDs = playerManager.getPlayerIDs();
+        List<PlayerID> playerIDs = turnManager.getPlayerIDs();
 
         // then
         assertThat(playerIDs).doesNotHaveDuplicates();
@@ -45,42 +45,42 @@ class PlayerManagerTest {
     @Test
     void completing_turn_switches_current_player() {
         // given
-        PlayerManager playerManager = new PlayerManager(2);
-        PlayerID first = playerManager.getCurrentPlayer();
+        TurnManager turnManager = new TurnManager(2);
+        PlayerID first = turnManager.getCurrentPlayer();
 
         // when
-        playerManager.completeTurn();
+        turnManager.completeTurn();
 
         // then
-        assertThat(playerManager.getCurrentPlayer()).isNotEqualTo(first);
+        assertThat(turnManager.getCurrentPlayer()).isNotEqualTo(first);
     }
 
     @Test
     void turn_cycles_back_to_starting_player_after_each_player_completes_turn() {
         // given
-        PlayerManager playerManager = new PlayerManager(3);
-        PlayerID first = playerManager.getCurrentPlayer();
+        TurnManager turnManager = new TurnManager(3);
+        PlayerID first = turnManager.getCurrentPlayer();
 
         // when
         for (int i = 0; i < 3; i++)
-            playerManager.completeTurn();
+            turnManager.completeTurn();
 
         // then
-        assertThat(playerManager.getCurrentPlayer()).isEqualTo(first);
+        assertThat(turnManager.getCurrentPlayer()).isEqualTo(first);
     }
 
     @Test
     void each_player_takes_turn_once_during_one_cycle() {
         // given
-        PlayerManager playerManager = new PlayerManager(3);
-        List<PlayerID> playerIDs = playerManager.getPlayerIDs();
+        TurnManager turnManager = new TurnManager(3);
+        List<PlayerID> playerIDs = turnManager.getPlayerIDs();
 
         // when
         List<PlayerID> turns = new LinkedList<>();
 
         for (int i = 0; i < 3; i++) {
-            turns.add(playerManager.getCurrentPlayer());
-            playerManager.completeTurn();
+            turns.add(turnManager.getCurrentPlayer());
+            turnManager.completeTurn();
         }
 
         // then

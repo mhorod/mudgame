@@ -5,9 +5,9 @@ import core.event.Action;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
-import core.turns.CompleteTurn;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.AttackEntityAction;
+import mudgame.controls.actions.CompleteTurn;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;
 

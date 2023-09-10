@@ -5,6 +5,7 @@ import core.event.Event;
 import core.model.PlayerID;
 import mudgame.client.ClientGameState;
 import mudgame.client.MudClientCore;
+import mudgame.client.MudClientCoreView;
 import mudgame.controls.Controls;
 
 import java.util.ArrayDeque;
@@ -21,11 +22,11 @@ public abstract class AbstractGameClient implements GameClient {
 
     @Override
     public PlayerID myPlayerID() {
-        return core.state().playerID();
+        return core.myPlayerID();
     }
 
     @Override
-    public MudClientCore getCore() {
+    public MudClientCoreView getCore() {
         return core;
     }
 

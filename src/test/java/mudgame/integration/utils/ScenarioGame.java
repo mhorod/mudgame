@@ -36,14 +36,14 @@ public class ScenarioGame {
     public ScenarioGame(ServerGameState initialState) {
         EventSender sender = new EventSender();
         serverCore = new MudServerCore(initialState, sender);
-        clientCores = initialState.playerManager()
+        clientCores = initialState.turnManager()
                 .getPlayerIDs()
                 .stream()
                 .collect(toMap(
                         p -> p,
                         p -> new MudClientCore(initialState.toClientGameState(p))
                 ));
-        receivedEvents = initialState.playerManager()
+        receivedEvents = initialState.turnManager()
                 .getPlayerIDs()
                 .stream()
                 .collect(toMap(

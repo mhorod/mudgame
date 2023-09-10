@@ -54,7 +54,7 @@ public class EntityMover {
     }
 
     private List<PlayerID> players() {
-        return state.playerManager().getPlayerIDs();
+        return state.turnManager().getPlayerIDs();
     }
 
     private void sendMovesTo(PlayerID player, List<SingleMove> moves, EntityID entityID) {
