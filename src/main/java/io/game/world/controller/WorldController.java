@@ -10,10 +10,8 @@ import io.animation.Finishable;
 import io.animation.FutureExecutor;
 import io.game.world.Map;
 import io.game.world.controller.states.Normal;
-import mudgame.controls.events.HideEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
 
@@ -84,16 +82,6 @@ public class WorldController implements WorldBehavior {
     @Override
     public void onRemoveEntity(RemoveEntity event) {
         state.onRemoveEntity(event);
-    }
-
-    @Override
-    public void onShowEntity(ShowEntity event) {
-        state.onShowEntity(event);
-    }
-
-    @Override
-    public void onHideEntity(HideEntity event) {
-        state.onHideEntity(event);
     }
 
     @Override

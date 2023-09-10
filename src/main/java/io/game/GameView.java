@@ -24,10 +24,8 @@ import middleware.clients.ServerClient;
 import middleware.local.LocalServer;
 import middleware.remote.RemoteNetworkClient;
 import middleware.remote.SocketConnection;
-import mudgame.controls.events.HideEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
 
@@ -129,12 +127,6 @@ public class GameView extends SimpleView {
         } else if (event instanceof RemoveEntity e) {
             eventObserved = true;
             worldController.onRemoveEntity(e);
-        } else if (event instanceof ShowEntity e) {
-            eventObserved = true;
-            worldController.onShowEntity(e);
-        } else if (event instanceof HideEntity e) {
-            eventObserved = true;
-            worldController.onHideEntity(e);
         }
     }
 
@@ -144,8 +136,6 @@ public class GameView extends SimpleView {
                          && !(event instanceof VisibilityChange)
                          && !(event instanceof SpawnEntity)
                          && !(event instanceof RemoveEntity)
-                         && !(event instanceof ShowEntity)
-                         && !(event instanceof HideEntity)
         );
     }
 
