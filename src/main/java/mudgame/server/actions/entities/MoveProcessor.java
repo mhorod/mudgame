@@ -15,9 +15,8 @@ import mudgame.server.actions.Sender;
 import mudgame.server.internal.EntityMover.MovedEntity;
 import mudgame.server.internal.InteractiveState;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 
 public class MoveProcessor {
@@ -31,67 +30,99 @@ public class MoveProcessor {
         this.pathfinder = state.pathfinder();
     }
 
-
     public void moveEntity(MoveEntity a) {
-        List<SingleMove> moves = getMoves(a);
-        for (PlayerID player : state.players())
-            sendMovesTo(player, moves, a.entityID());
+        List<SingleMove> moves = getMoves(a.entityID(), a.destination());
+        state.players().forEach(player -> sendMovesTo(player, moves, a.entityID()));
     }
 
     private void sendMovesTo(PlayerID player, List<SingleMove> moves, EntityID entityID) {
-        PlayerID owner = state.entityOwner(entityID);
-        if (player.equals(owner)) {
-            sender.send(new MoveEntityAlongPath(entityID, moves), player);
-        } else {
-            List<SingleMove> masked = masked(player, moves);
-            if (!masked.isEmpty()) {
-                Position start = masked.get(0).destinationNullable();
-                Position end = masked.get(masked.size() - 1).destinationNullable();
-                if (!state.playerSees(player, start))
-                    sender.send(new PlaceEntity(state.findEntityByID(entityID), start), player);
-                sender.send(new MoveEntityAlongPath(entityID, masked), player);
-                if (!state.playerSees(player, end))
-                    sender.send(new RemoveEntity(entityID), player);
+        if (player.equals(state.entityOwner(entityID)))
+            sendMovesToOwner(player, entityID, moves);
+        else
+            sendMovesToOther(player, entityID, moves);
+    }
 
-            }
+    private void sendMovesToOwner(PlayerID player, EntityID entityID, List<SingleMove> moves) {
+        sender.send(new MoveEntityAlongPath(entityID, moves), player);
+    }
+
+    private void sendMovesToOther(PlayerID player, EntityID entityID, List<SingleMove> moves) {
+        List<SingleMove> masked = masked(player, moves);
+        if (!masked.isEmpty()) {
+            prepare(player, entityID, masked);
+            sender.send(new MoveEntityAlongPath(entityID, masked), player);
+            cleanup(player, entityID, masked);
         }
+    }
+
+    private void prepare(PlayerID player, EntityID entityID, List<SingleMove> masked) {
+        Position start = masked.get(0).destinationNullable();
+        if (!state.playerSees(player, start))
+            sender.send(new PlaceEntity(state.findEntityByID(entityID), start), player);
+    }
+
+    private void cleanup(PlayerID player, EntityID entityID, List<SingleMove> masked) {
+        Position end = masked.get(masked.size() - 1).destinationNullable();
+        if (!state.playerSees(player, end))
+            sender.send(new RemoveEntity(entityID), player);
     }
 
     private List<SingleMove> masked(PlayerID player, List<SingleMove> moves) {
-        LinkedList<SingleMove> result = new LinkedList<>();
-        for (int i = 0; i < moves.size(); i++) {
-            SingleMove m = moves.get(i);
-
-            Position previous = i > 0 ? moves.get(i - 1).destinationNullable() : null;
-            Position next = i < moves.size() - 1 ? moves.get(i + 1).destinationNullable() : null;
-            Position current = m.destinationNullable();
-
-            ClaimChange maskedClaimChange = state.maskedFor(player, m.claimChange());
-
-            if (state.playerSeesAny(player, previous, next, current))
-                result.add(new SingleMove(m.destinationNullable(), VisibilityChange.empty(),
-                                          maskedClaimChange));
-            else
-                result.add(SingleMove.hidden(maskedClaimChange));
-        }
-
-        while (!result.isEmpty() && result.get(0).isHidden())
-            result.removeFirst();
-        while (!result.isEmpty() && result.get(result.size() - 1).isHidden())
-            result.removeLast();
-        return result;
+        return stripEnds(maskedMoves(player, moves));
     }
 
-    private List<SingleMove> getMoves(MoveEntity a) {
-        List<SingleMove> result = new ArrayList<>();
-        List<Position> path = pathfinder.findPath(a.entityID(), a.destination());
-
-        for (Position next : path) {
-            MovedEntity movedEntity = state.moveEntity(a.entityID(), next);
-            result.add(new SingleMove(next, movedEntity.visibilityChange(),
-                                      movedEntity.claimChange()));
-        }
-        return result;
+    private List<SingleMove> maskedMoves(PlayerID player, List<SingleMove> moves) {
+        return IntStream.range(0, moves.size())
+                .mapToObj(i -> maskedIthMove(player, i, moves))
+                .toList();
     }
 
+    private SingleMove maskedIthMove(PlayerID player, int i, List<SingleMove> moves) {
+        if (shouldSeeDestination(player, i, moves))
+            return shown(player, moves.get(i));
+        else
+            return hidden(player, moves.get(i));
+    }
+
+    private SingleMove hidden(PlayerID player, SingleMove move) {
+        ClaimChange maskedClaimChange = state.maskedFor(player, move.claimChange());
+        return new SingleMove(null, VisibilityChange.empty(), maskedClaimChange);
+    }
+
+    private SingleMove shown(PlayerID player, SingleMove move) {
+        Position destination = move.destinationNullable();
+        ClaimChange maskedClaimChange = state.maskedFor(player, move.claimChange());
+        return new SingleMove(destination, VisibilityChange.empty(), maskedClaimChange);
+    }
+
+    private boolean shouldSeeDestination(PlayerID player, int i, List<SingleMove> moves) {
+        Position previous = i > 0 ? moves.get(i - 1).destinationNullable() : null;
+        Position next = i < moves.size() - 1 ? moves.get(i + 1).destinationNullable() : null;
+        Position current = moves.get(i).destinationNullable();
+        return state.playerSeesAny(player, previous, next, current);
+    }
+
+
+    private List<SingleMove> stripEnds(List<SingleMove> result) {
+        return result.stream()
+                .dropWhile(SingleMove::isHidden)
+                .takeWhile(SingleMove::isShown)
+                .toList();
+    }
+
+    private List<SingleMove> getMoves(EntityID entityID, Position destination) {
+        return pathfinder.findPath(entityID, destination)
+                .stream()
+                .map(p -> moveEntity(entityID, p))
+                .toList();
+    }
+
+    private SingleMove moveEntity(EntityID entityID, Position destination) {
+        MovedEntity movedEntity = state.moveEntity(entityID, destination);
+        return new SingleMove(
+                destination,
+                movedEntity.visibilityChange(),
+                movedEntity.claimChange()
+        );
+    }
 }
