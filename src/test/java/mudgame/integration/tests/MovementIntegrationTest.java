@@ -123,9 +123,70 @@ class MovementIntegrationTest extends IntegrationTestBase {
         // then
         assertIntegrity(result);
         assertThatClient(result, PLAYER_0)
-                .receivedEventTypes(MoveEntityAlongPath.class, MoveEntityAlongPath.class);
-        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(MoveEntityAlongPath.class, MoveEntityAlongPath.class)
                 .owns(pos(4, 4))
                 .doesNotOwn(pos(3, 3));
+    }
+
+    @Test
+    void moving_entity_shows_opponent_claimed_area() {
+        Entity pawn = pawn(PLAYER_0);
+        Scenario<?> scenario = two_players()
+                .with(RectangleTerrain.land(5, 5))
+                .with(pawn, pos(0, 0))
+                .with(base(PLAYER_1), pos(0, 4));
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, move(pawn, pos(0, 2)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(MoveEntityAlongPath.class)
+                .seesClaim(PLAYER_1, pos(0, 2), pos(0, 3));
+    }
+
+    @Test
+    void moving_entity_away_hides_opponent_claimed_area() {
+        Entity pawn = pawn(PLAYER_0);
+        Scenario<?> scenario = two_players()
+                .with(RectangleTerrain.land(5, 5))
+                .with(pawn, pos(0, 2))
+                .with(base(PLAYER_1), pos(0, 4));
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, move(pawn, pos(0, 0)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(MoveEntityAlongPath.class)
+                .seesClaim(PLAYER_1, pos(0, 2))
+                .doesNotSeeClaim(PLAYER_1, pos(0, 3));
+    }
+
+    @Test
+    void player_sees_changed_claim_when_opponent_moves_marsh_wiggle_into_view() {
+        Entity marshWiggle = marshWiggle(PLAYER_0);
+        Scenario<?> scenario = two_players()
+                .with(RectangleTerrain.land(7, 7))
+                .with(base(PLAYER_0), pos(0, 0))
+                .with(base(PLAYER_1), pos(6, 6))
+                .with(marshWiggle, pos(0, 1));
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, move(marshWiggle, pos(3, 3)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertThatClient(result, PLAYER_1)
+                .receivedEventTypes(PlaceEntity.class, MoveEntityAlongPath.class)
+                .seesClaim(PLAYER_0, pos(3, 3));
     }
 }

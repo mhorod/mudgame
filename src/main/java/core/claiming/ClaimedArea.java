@@ -3,10 +3,11 @@ package core.claiming;
 import core.entities.components.Claim;
 import core.entities.components.visitors.GetClaim;
 import core.entities.model.Entity;
-import core.fogofwar.PlayerFogOfWar;
+import core.fogofwar.PlayerFogOfWarView;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import core.terrain.TerrainView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,11 +37,12 @@ public class ClaimedArea implements ClaimedAreaView, Serializable {
     }
 
 
-    public PlayerClaimedArea applyFogOfWar(PlayerFogOfWar fow) {
+    public PlayerClaimedArea mask(PlayerFogOfWarView fow, TerrainView terrain) {
         Map<Position, PlayerID> maskedClaimed = claimed
                 .entrySet()
                 .stream()
                 .filter(e -> fow.isVisible(e.getKey()))
+                .filter(e -> terrain.contains(e.getKey()))
                 .collect(toMap(Entry::getKey, Entry::getValue));
         return new PlayerClaimedArea(maskedClaimed);
     }

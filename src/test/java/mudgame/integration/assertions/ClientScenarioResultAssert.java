@@ -111,5 +111,21 @@ public final class ClientScenarioResultAssert {
         );
         return this;
     }
+
+    public ClientScenarioResultAssert seesClaim(PlayerID expectedOwner, Position... positions) {
+        assertThat(positions).allMatch(
+                p -> expectedOwner.equals(state.claimedArea().owner(p).orElse(null))
+        );
+        return this;
+    }
+
+    public ClientScenarioResultAssert doesNotSeeClaim(
+            PlayerID expectedOwner, Position... positions
+    ) {
+        assertThat(positions).noneMatch(
+                p -> expectedOwner.equals(state.claimedArea().owner(p).orElse(null))
+        );
+        return this;
+    }
 }
 

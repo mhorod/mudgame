@@ -10,6 +10,7 @@ import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;
 import mudgame.integration.utils.ScenarioResult;
 
+import static core.claiming.PlayerClaimedAreaAssert.assertThatPlayerClaimedArea;
 import static core.entities.EntityBoardAssert.assertThatEntityBoard;
 import static core.entities.model.EntityType.MARSH_WIGGLE;
 import static core.entities.model.EntityType.PAWN;
@@ -22,11 +23,29 @@ abstract class IntegrationTestBase {
     protected void assertIntegrity(ScenarioResult result) {
         for (PlayerID player : result.players()) {
             System.out.println("Asserting integrity for player: " + player);
-            assertThatPlayerFow(result.clientFow(player)).isEqualTo(result.serverFow(player));
-            assertThatEntityBoard(result.clientEntityBoard(player))
-                    .isEqualTo(result.serverEntityBoard(player));
-            assertThat(result.clientTurn(player)).isEqualTo(result.serverTurn());
+            assertTurnIntegrity(result, player);
+            assertFowIntegrity(result, player);
+            assertEntityBoardIntegrity(result, player);
+            assertClaimedAreaIntegrity(result, player);
         }
+    }
+
+    private void assertTurnIntegrity(ScenarioResult result, PlayerID player) {
+        assertThat(result.clientTurn(player)).isEqualTo(result.serverTurn());
+    }
+
+    private void assertClaimedAreaIntegrity(ScenarioResult result, PlayerID player) {
+        assertThatPlayerClaimedArea(result.clientClaimedArea(player)).isEqualTo(
+                result.serverClaimedArea(player));
+    }
+
+    private void assertEntityBoardIntegrity(ScenarioResult result, PlayerID player) {
+        assertThatEntityBoard(result.clientEntityBoard(player)).isEqualTo(
+                result.serverEntityBoard(player));
+    }
+
+    private void assertFowIntegrity(ScenarioResult result, PlayerID player) {
+        assertThatPlayerFow(result.clientFow(player)).isEqualTo(result.serverFow(player));
     }
 
 

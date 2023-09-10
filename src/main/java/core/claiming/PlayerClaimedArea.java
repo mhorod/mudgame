@@ -45,8 +45,16 @@ public class PlayerClaimedArea implements ClaimedAreaView {
             claimed.put(position, player);
     }
 
+    public void claim(PlayerID player, Position position) {
+        claimed.put(position, player);
+    }
+
     public void unclaim(List<Position> positions) {
         for (Position position : positions)
             claimed.remove(position);
+    }
+
+    public void unclaim(Position position) {
+        claimed.remove(position);
     }
 }

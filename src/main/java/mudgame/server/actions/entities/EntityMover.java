@@ -37,7 +37,7 @@ public class EntityMover {
                 state.fogOfWar(),
                 state.claimedArea()
         );
-        visibility = new Visibility(state.entityBoard(), state.terrain());
+        visibility = new Visibility(state.entityBoard(), state.terrain(), state.claimedArea());
         pathfinder = new EntityPathfinder(
                 state.terrain(),
                 state.entityBoard(),
@@ -90,11 +90,14 @@ public class EntityMover {
             Position next = i < moves.size() - 1 ? moves.get(i + 1).destinationNullable() : null;
             Position current = m.destinationNullable();
 
+            ClaimChange maskedClaimChange = masked(player, m.claimChange());
+
             if (playerFow.isVisible(previous) || playerFow.isVisible(current) ||
                 playerFow.isVisible(next))
-                result.add(m.withoutVisibilityChange());
+                result.add(new SingleMove(m.destinationNullable(), VisibilityChange.empty(),
+                                          maskedClaimChange));
             else
-                result.add(SingleMove.hidden(masked(player, m.claimChange())));
+                result.add(SingleMove.hidden(maskedClaimChange));
         }
 
         while (!result.isEmpty() && result.get(0).isHidden())
@@ -105,7 +108,7 @@ public class EntityMover {
     }
 
     private ClaimChange masked(PlayerID player, ClaimChange claimChange) {
-        return claimChange.applyFogOfWar(fow(player));
+        return claimChange.mask(fow(player), state.terrain());
     }
 
     private PlayerFogOfWar fow(PlayerID player) {
@@ -119,7 +122,8 @@ public class EntityMover {
         for (Position next : path) {
             MovedEntity movedEntity = entityManager.moveEntity(a.entityID(), next);
             VisibilityChange visibilityChange = visibility.convert(movedEntity.changedPositions());
-            result.add(new SingleMove(next, visibilityChange, movedEntity.claimChange()));
+            ClaimChange claimChange = movedEntity.claimChange().mask(state.terrain());
+            result.add(new SingleMove(next, visibilityChange, claimChange));
         }
         return result;
     }

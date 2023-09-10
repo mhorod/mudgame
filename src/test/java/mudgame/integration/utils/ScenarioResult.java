@@ -1,5 +1,6 @@
 package mudgame.integration.utils;
 
+import core.claiming.PlayerClaimedArea;
 import core.entities.EntityBoard;
 import core.event.Event;
 import core.fogofwar.PlayerFogOfWar;
@@ -49,5 +50,13 @@ public record ScenarioResult(
 
     public ClientGameState clientState(PlayerID player) {
         return clientStates().get(player);
+    }
+
+    public PlayerClaimedArea clientClaimedArea(PlayerID player) {
+        return clientStates.get(player).claimedArea();
+    }
+
+    public PlayerClaimedArea serverClaimedArea(PlayerID player) {
+        return serverState.claimedArea().mask(serverFow(player), serverState.terrain());
     }
 }

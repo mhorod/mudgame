@@ -7,6 +7,7 @@ import core.entities.model.Entity;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
+import core.terrain.TerrainView;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.events.AttackEntityEvent;
@@ -24,6 +25,7 @@ class EntityAttacker {
     private final FogOfWar fow;
     private final EntityManager entityManager;
     private final Visibility visibility;
+    private final TerrainView terrain;
 
     private final GetAttack getAttack = new GetAttack();
     private final GetHealth getHealth = new GetHealth();
@@ -71,7 +73,7 @@ class EntityAttacker {
                                 entity.id(),
                                 VisibilityChange.empty(),
                                 removedEntity.claimChange()
-                                        .applyFogOfWar(fow.playerFogOfWar(player))),
+                                        .mask(fow.playerFogOfWar(player), terrain)),
                         player);
         }
     }

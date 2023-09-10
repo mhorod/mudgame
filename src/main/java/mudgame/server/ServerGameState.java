@@ -33,7 +33,7 @@ public record ServerGameState(
                 entityBoard.applyFogOfWar(newFogOfWar),
                 newFogOfWar,
                 terrain.applyFogOfWar(newFogOfWar),
-                claimedArea.applyFogOfWar(newFogOfWar),
+                claimedArea.mask(newFogOfWar, terrain),
                 rules
         );
     }

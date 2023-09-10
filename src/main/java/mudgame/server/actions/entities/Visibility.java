@@ -1,5 +1,6 @@
 package mudgame.server.actions.entities;
 
+import core.claiming.ClaimedAreaView;
 import core.entities.EntityBoardView;
 import core.fogofwar.PlayerFogOfWar.PositionVisibility;
 import core.terrain.TerrainView;
@@ -16,6 +17,7 @@ import java.util.Set;
 final class Visibility {
     private final EntityBoardView entityBoard;
     private final TerrainView terrain;
+    private final ClaimedAreaView claimedArea;
 
     VisibilityChange convert(Set<PositionVisibility> positions) {
         return new VisibilityChange(
@@ -32,7 +34,8 @@ final class Visibility {
             return new ShowPosition(
                     pv.position(),
                     terrain.terrainAt(pv.position()),
-                    entityBoard.entitiesAt(pv.position())
+                    entityBoard.entitiesAt(pv.position()),
+                    claimedArea.owner(pv.position()).orElse(null)
             );
         }
 
