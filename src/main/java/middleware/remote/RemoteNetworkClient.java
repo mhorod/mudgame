@@ -16,6 +16,7 @@ import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
 import mudgame.client.ClientGameState;
+import mudgame.server.ServerGameState;
 
 import java.net.Socket;
 import java.time.Duration;
@@ -46,7 +47,6 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
 
     private Instant lastIncoming = Instant.EPOCH;
     private Instant lastPing = Instant.EPOCH;
-    private Instant connectionBegan = Instant.EPOCH;
 
     private void verifyNetworkStatus() {
         if (networkStatus == NetworkStatus.OK) {
@@ -60,10 +60,6 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
                 sender.pingToServer();
                 lastPing = Instant.now();
             } else if (Duration.between(lastPing, Instant.now()).compareTo(PING_TIMEOUT) > 0)
-                clearStateAndSetStatus(NetworkStatus.FAILED);
-        }
-        if (networkStatus == NetworkStatus.ATTEMPTING && networkDevice != null) {
-            if (Duration.between(connectionBegan, Instant.now()).compareTo(USER_ID_TIMEOUT) > 0)
                 clearStateAndSetStatus(NetworkStatus.FAILED);
         }
     }
@@ -101,19 +97,17 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
                 message -> {
                     if (networkStatus != NetworkStatus.OK)
                         throw new RuntimeException("Attempting to send message using disconnected NetworkClient");
-                    log.debug("[SND]: " + message);
+                    log.debug("[SND]: {}", message);
                 }
         ));
         networkDevice = device;
 
-        connectionBegan = Instant.now();
         log.info("setConnection() is successful, status is now ATTEMPTING");
         networkStatus = NetworkStatus.ATTEMPTING;
     }
 
     public void setSocketConnection(Socket socket) {
-        log.info("setSocketConnection() called, socket is closed: %b, is connected: %b "
-                .formatted(socket.isClosed(), socket.isConnected()));
+        log.info("setSocketConnection() called, socket is closed: {}, is connected: {}", socket.isClosed(), socket.isConnected());
 
         SocketSender<MessageToServer> socketSender = new SocketSender<>(socket);
         new SocketReceiver<>(messageQueue::add, socket, MessageToClient.class);
@@ -141,7 +135,7 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
         verifyNetworkStatus();
         while (!messageQueue.isEmpty()) {
             MessageToClient message = messageQueue.remove();
-            log.info("[REC] " + message);
+            log.info("[REC] {}", message);
             lastIncoming = Instant.now();
 
             message.execute(messageToClientHandler);
@@ -190,17 +184,18 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
         }
 
         @Override
-        public void setUserID(UserID userID) {
-            if (networkStatus != NetworkStatus.ATTEMPTING)
-                throw new RuntimeException("setUserId() should only be called when network status is ATTEMPTING");
-
-            currentServerClient = new RemoteServerClient(userID, RemoteNetworkClient.this);
-            networkStatus = NetworkStatus.OK;
+        public void kick() {
+            clearStateAndSetStatus(NetworkStatus.DISCONNECTED);
         }
 
         @Override
-        public void kick() {
-            clearStateAndSetStatus(NetworkStatus.DISCONNECTED);
+        public void changeName(String name) {
+            Objects.requireNonNull(currentServerClient).changeName(name);
+        }
+
+        @Override
+        public void setDownloadedState(ServerGameState state) {
+            Objects.requireNonNull(currentServerClient).setDownloadedState(state);
         }
     };
 }

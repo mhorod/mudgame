@@ -27,8 +27,8 @@ public class RoomTest {
         TestUser user2 = new TestUser(server);
 
         // then
-        SetRoomListMessage message1 = (SetRoomListMessage) user1.sent.get(1);
-        SetRoomListMessage message2 = (SetRoomListMessage) user2.sent.get(1);
+        SetRoomListMessage message1 = (SetRoomListMessage) user1.sent.get(0);
+        SetRoomListMessage message2 = (SetRoomListMessage) user2.sent.get(0);
 
         assertThat(message1.roomList()).isEmpty();
         assertThat(message2.roomList()).isEqualTo(server.getRoomList());
@@ -87,7 +87,7 @@ public class RoomTest {
     void room_info_after_creating_is_correct() {
         // given
         GameServer server = new GameServer();
-        TestUser user = new TestUser(server);
+        TestUser user = new TestUser(server, "user");
 
         // when
         user.receive().createRoom(new PlayerID(1), 2);
@@ -95,11 +95,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user.user.getUserID()))
+                .matches(info -> info.owner().equals("user"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), null);
-                    put(new PlayerID(1), user.user.getUserID());
+                    put(new PlayerID(1), "user");
                 }}));
     }
 
@@ -107,7 +107,7 @@ public class RoomTest {
     void room_info_after_loading_is_correct() {
         // given
         GameServer server = new GameServer();
-        TestUser user = new TestUser(server);
+        TestUser user = new TestUser(server, "user");
 
         // when
         user.receive().loadGame(new PlayerID(1), MudServerCore.newState(2));
@@ -115,11 +115,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user.user.getUserID()))
+                .matches(info -> info.owner().equals("user"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), null);
-                    put(new PlayerID(1), user.user.getUserID());
+                    put(new PlayerID(1), "user");
                 }}));
     }
 
@@ -127,9 +127,9 @@ public class RoomTest {
     void room_info_after_joining_is_correct() {
         // given
         GameServer server = new GameServer();
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(1), 2);
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
 
         // when
         user2.receive().joinRoom(new PlayerID(0), server.getRoomList().get(0).roomID());
@@ -137,11 +137,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user1.user.getUserID()))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
-                    put(new PlayerID(0), user2.user.getUserID());
-                    put(new PlayerID(1), user1.user.getUserID());
+                    put(new PlayerID(0), "user2");
+                    put(new PlayerID(1), "user1");
                 }}));
     }
 
@@ -149,9 +149,9 @@ public class RoomTest {
     void room_info_after_joining_and_owner_leaving_is_correct() {
         // given
         GameServer server = new GameServer();
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(1), 2);
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
         user2.receive().joinRoom(new PlayerID(0), server.getRoomList().get(0).roomID());
 
         // when
@@ -160,10 +160,10 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user2.user.getUserID()))
+                .matches(info -> info.owner().equals("user2"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
-                    put(new PlayerID(0), user2.user.getUserID());
+                    put(new PlayerID(0), "user2");
                     put(new PlayerID(1), null);
                 }}));
     }
@@ -172,9 +172,9 @@ public class RoomTest {
     void room_info_after_joining_and_other_leaving_is_correct() {
         // given
         GameServer server = new GameServer();
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(1), 2);
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
         user2.receive().joinRoom(new PlayerID(0), server.getRoomList().get(0).roomID());
 
         // when
@@ -183,11 +183,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user1.user.getUserID()))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), null);
-                    put(new PlayerID(1), user1.user.getUserID());
+                    put(new PlayerID(1), "user1");
                 }}));
     }
 
@@ -195,7 +195,7 @@ public class RoomTest {
     void room_info_after_starting_is_correct() {
         // given
         GameServer server = new GameServer();
-        TestUser user = new TestUser(server);
+        TestUser user = new TestUser(server, "user");
         user.receive().createRoom(new PlayerID(1), 2);
 
         // when
@@ -204,11 +204,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user.user.getUserID()))
+                .matches(info -> info.owner().equals("user"))
                 .matches(RoomInfo::isRunning)
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), null);
-                    put(new PlayerID(1), user.user.getUserID());
+                    put(new PlayerID(1), "user");
                 }}));
     }
 
@@ -247,9 +247,9 @@ public class RoomTest {
     void non_owner_cannot_start_game() {
         // given
         GameServer server = new GameServer();
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(1), 2);
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
         user2.receive().joinRoom(new PlayerID(0), server.getRoomList().get(0).roomID());
 
         user1.sent.clear();
@@ -261,11 +261,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user1.user.getUserID()))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
-                    put(new PlayerID(0), user2.user.getUserID());
-                    put(new PlayerID(1), user1.user.getUserID());
+                    put(new PlayerID(0), "user2");
+                    put(new PlayerID(1), "user1");
                 }}));
         assertThat(user1.sent).isEmpty();
         assertThat(user2.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
@@ -296,9 +296,9 @@ public class RoomTest {
     void joining_game_using_duplicate_player_id() {
         // given
         GameServer server = new GameServer();
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(1), 2);
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
         user2.sent.clear();
 
         // when
@@ -307,11 +307,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user1.user.getUserID()))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), null);
-                    put(new PlayerID(1), user1.user.getUserID());
+                    put(new PlayerID(1), "user1");
                 }}));
         assertThat(user2.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
     }
@@ -320,9 +320,9 @@ public class RoomTest {
     void joining_game_using_out_of_range_player_id() {
         // given
         GameServer server = new GameServer();
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(1), 2);
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
         user2.sent.clear();
 
         // when
@@ -331,11 +331,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user1.user.getUserID()))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), null);
-                    put(new PlayerID(1), user1.user.getUserID());
+                    put(new PlayerID(1), "user1");
                 }}));
         assertThat(user2.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
     }
@@ -344,9 +344,9 @@ public class RoomTest {
     void joining_game_using_null_player_id() {
         // given
         GameServer server = new GameServer();
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(1), 2);
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
         user2.sent.clear();
 
         // when
@@ -355,11 +355,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user1.user.getUserID()))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), null);
-                    put(new PlayerID(1), user1.user.getUserID());
+                    put(new PlayerID(1), "user1");
                 }}));
         assertThat(user2.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
     }
@@ -368,9 +368,9 @@ public class RoomTest {
     void joining_game_using_null_room_id() {
         // given
         GameServer server = new GameServer();
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(1), 2);
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
         user2.sent.clear();
 
         // when
@@ -379,11 +379,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user1.user.getUserID()))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), null);
-                    put(new PlayerID(1), user1.user.getUserID());
+                    put(new PlayerID(1), "user1");
                 }}));
         assertThat(user2.sent).anyMatch(message -> message instanceof ErrorMessage);
     }
@@ -392,9 +392,9 @@ public class RoomTest {
     void joining_game_using_invalid_room_id() {
         // given
         GameServer server = new GameServer();
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(1), 2);
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
         user2.sent.clear();
 
         // when
@@ -403,11 +403,11 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user1.user.getUserID()))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(info -> !info.isRunning())
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), null);
-                    put(new PlayerID(1), user1.user.getUserID());
+                    put(new PlayerID(1), "user1");
                 }}));
         assertThat(user2.sent).anyMatch(message -> message instanceof ErrorMessage);
         assertThat(user2.user.getRoom()).isNull();
@@ -564,11 +564,11 @@ public class RoomTest {
         // given
         GameServer server = new GameServer();
 
-        TestUser user1 = new TestUser(server);
+        TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(0), 2);
         user1.receive().startGame();
 
-        TestUser user2 = new TestUser(server);
+        TestUser user2 = new TestUser(server, "user2");
 
         // when
         user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
@@ -576,11 +576,100 @@ public class RoomTest {
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals(user1.user.getUserID()))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(RoomInfo::isRunning)
                 .matches(info -> info.players().equals(new HashMap<>() {{
-                    put(new PlayerID(0), user1.user.getUserID());
-                    put(new PlayerID(1), user2.user.getUserID());
+                    put(new PlayerID(0), "user1");
+                    put(new PlayerID(1), "user2");
                 }}));
+    }
+
+    @Test
+    void room_info_after_username_change_is_correct() {
+        // given
+        GameServer server = new GameServer();
+
+        TestUser user1 = new TestUser(server, "user1");
+        user1.receive().createRoom(new PlayerID(0), 2);
+        TestUser user2 = new TestUser(server, "user2");
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+
+        // when
+        user1.receive().setName("new_name");
+
+        // then
+        assertThat(server.getRoomList()).hasSize(1).first()
+                .matches(info -> info.roomID() != null)
+                .matches(info -> info.owner().equals("new_name"))
+                .matches(info -> !info.isRunning())
+                .matches(info -> info.players().equals(new HashMap<>() {{
+                    put(new PlayerID(0), "new_name");
+                    put(new PlayerID(1), "user2");
+                }}));
+    }
+
+    @Test
+    void room_info_is_send_after_someone_changes_username() {
+        // given
+        GameServer server = new GameServer();
+
+        TestUser user1 = new TestUser(server, "user1");
+        user1.receive().createRoom(new PlayerID(0), 2);
+        TestUser user2 = new TestUser(server, "user2");
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+
+        user1.sent.clear();
+        user2.sent.clear();
+
+        // when
+        user1.receive().setName("new_name");
+
+        // then
+        assertThat(user1.sent)
+                .anyMatch(message -> message instanceof SetCurrentRoomMessage);
+        assertThat(user2.sent)
+                .anyMatch(message -> message instanceof SetCurrentRoomMessage);
+    }
+
+    @Test
+    void owner_can_download_state() {
+        // given
+        GameServer server = new GameServer();
+
+        TestUser user1 = new TestUser(server, "user1");
+        user1.receive().createRoom(new PlayerID(0), 2);
+        TestUser user2 = new TestUser(server, "user2");
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+
+        // when
+        user1.receive().downloadState();
+
+        // then
+        assertThat(user1.sent)
+                .anyMatch(message -> message instanceof SetDownloadedStateMessage)
+                .noneMatch(message -> message instanceof ErrorMessage);
+        assertThat(user2.sent)
+                .noneMatch(message -> message instanceof SetDownloadedStateMessage);
+    }
+
+    @Test
+    void non_owner_cannot_download_state() {
+        // given
+        GameServer server = new GameServer();
+
+        TestUser user1 = new TestUser(server, "user1");
+        user1.receive().createRoom(new PlayerID(0), 2);
+        TestUser user2 = new TestUser(server, "user2");
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+
+        // when
+        user2.receive().downloadState();
+
+        // then
+        assertThat(user1.sent)
+                .noneMatch(message -> message instanceof SetDownloadedStateMessage);
+        assertThat(user2.sent)
+                .noneMatch(message -> message instanceof SetDownloadedStateMessage)
+                .anyMatch(message -> message instanceof ErrorMessage);
     }
 }

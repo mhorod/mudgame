@@ -25,4 +25,8 @@ public interface MessageToServerHandler {
     void pongToServer();
 
     void disconnect();
+
+    void setName(String name);
+
+    void downloadState();
 }

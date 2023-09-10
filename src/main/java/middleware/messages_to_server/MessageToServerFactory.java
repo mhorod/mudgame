@@ -63,4 +63,14 @@ public final class MessageToServerFactory implements MessageToServerHandler {
     public void disconnect() {
         consumer.accept(new DisconnectMessage());
     }
+
+    @Override
+    public void setName(String name) {
+        consumer.accept(new SetNameMessage(name));
+    }
+
+    @Override
+    public void downloadState() {
+        consumer.accept(new DownloadStateMessage());
+    }
 }

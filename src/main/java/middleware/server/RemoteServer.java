@@ -65,15 +65,12 @@ public final class RemoteServer {
                     MessageToServer.class
             );
 
-            log.info("New connection from %s got %s".formatted(
-                    socket.getInetAddress().toString(),
-                    user.getUserID().toString()
-            ));
+            log.info("New connection from {} got {}", socket.getInetAddress(), user.getUserID());
         }
     }
 
     private void workReceiveConnections() {
-        log.info("Started listening on port " + serverSocket.getLocalPort());
+        log.info("Started listening on port {}", serverSocket.getLocalPort());
 
         try {
             while (!serverSocket.isClosed()) {

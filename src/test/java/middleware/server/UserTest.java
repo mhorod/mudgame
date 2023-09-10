@@ -2,6 +2,9 @@ package middleware.server;
 
 import core.model.PlayerID;
 import core.turns.CompleteTurn;
+import middleware.messages_to_server.MessageToServer.*;
+import middleware.messages_to_client.MessageToClient.*;
+import middleware.model.UserID;
 import mudgame.server.MudServerCore;
 import org.junit.jupiter.api.Test;
 
@@ -21,9 +24,8 @@ public class UserTest {
         TestUser user = new TestUser(server);
 
         // then
-        assertThat(user.sent).hasSize(2);
-        assertThat(user.sent.get(0)).isInstanceOf(SetUserIDMessage.class);
-        assertThat(user.sent.get(1)).isInstanceOf(SetRoomListMessage.class);
+        assertThat(user.sent).hasSize(1);
+        assertThat(user.sent.get(0)).isInstanceOf(SetRoomListMessage.class);
     }
 
     @Test
@@ -42,23 +44,6 @@ public class UserTest {
                 user2.user.getUserID(),
                 user3.user.getUserID()
         )).doesNotHaveDuplicates().doesNotContainNull();
-    }
-
-    @Test
-    void correct_user_ids_are_sent() {
-        // given
-        GameServer server = new GameServer();
-
-        // when
-        TestUser user1 = new TestUser(server);
-        TestUser user2 = new TestUser(server);
-
-        // then
-        SetUserIDMessage message1 = (SetUserIDMessage) user1.sent.get(0);
-        SetUserIDMessage message2 = (SetUserIDMessage) user2.sent.get(0);
-
-        assertThat(user1.user.getUserID()).isEqualTo(message1.userID());
-        assertThat(user2.user.getUserID()).isEqualTo(message2.userID());
     }
 
     @Test
@@ -252,5 +237,71 @@ public class UserTest {
         assertThat(user.sent).anyMatch(
                 message -> message instanceof PongToClientMessage
         );
+    }
+
+    @Test
+    void default_name() {
+        // given
+        GameServer server = new GameServer();
+
+        // when
+        TestUser user = new TestUser(server);
+
+        // then
+        assertThat(user.user.getName()).isEqualTo(UserID.DEFAULT_NAME);
+    }
+
+    @Test
+    void users_can_change_name() {
+        // given
+        GameServer server = new GameServer();
+        TestUser user = new TestUser(server);
+        user.sent.clear();
+
+        // when
+        user.receive().setName("new_name");
+
+        // then
+        assertThat(user.sent)
+                .contains(new ChangeNameMessage("new_name"))
+                .noneMatch(message -> message instanceof ErrorMessage);
+    }
+
+    @Test
+    void multiple_users_with_same_name_can_coexist() {
+        // given
+        GameServer server = new GameServer();
+        TestUser user1 = new TestUser(server);
+        TestUser user2 = new TestUser(server);
+        user1.sent.clear();
+        user2.sent.clear();
+
+        // when
+        user1.receive().setName("new_name");
+        user2.receive().setName("new_name");
+
+        // then
+        assertThat(user1.sent)
+                .contains(new ChangeNameMessage("new_name"))
+                .noneMatch(message -> message instanceof ErrorMessage);
+        assertThat(user2.sent)
+                .contains(new ChangeNameMessage("new_name"))
+                .noneMatch(message -> message instanceof ErrorMessage);
+
+    }
+
+    @Test
+    void cannot_download_state_while_not_in_room() {
+        // given
+        GameServer server = new GameServer();
+        TestUser user = new TestUser(server);
+
+        // when
+        user.receive().downloadState();
+
+        // then
+        assertThat(user.sent)
+                .noneMatch(message -> message instanceof SetDownloadedStateMessage)
+                .anyMatch(message -> message instanceof ErrorMessage);
     }
 }

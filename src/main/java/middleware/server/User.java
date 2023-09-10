@@ -29,6 +29,7 @@ public final class User {
 
     private Room currentRoom;
     private PlayerID currentPlayerID;
+    private String name = UserID.DEFAULT_NAME;
 
     private final MessageToServerHandler messageToServerHandler = new MessageToServerHandler() {
         @Override
@@ -110,6 +111,21 @@ public final class User {
         public void disconnect() {
             kick();
         }
+
+        @Override
+        public void setName(String nameFromClient) {
+            name = nameFromClient;
+            sender.changeName(name);
+            if (currentRoom != null)
+                currentRoom.sendUpdatedInfo();
+        }
+
+        @Override
+        public void downloadState() {
+            if (sendErrorIfNotInRoom())
+                return;
+            currentRoom.downloadState(User.this);
+        }
     };
 
     private int sinceLastCheck = 0;
@@ -121,11 +137,10 @@ public final class User {
         this.userID = new UserID(nextUserID++);
 
         this.sender = new MessageToClientFactory(sender.andThen(
-                message -> log.debug("[TO: " + userID + "]: " + message)
+                message -> log.debug("[TO: {}]: {}", userID, message)
         ));
 
         this.server.putUser(this);
-        this.sender.setUserID(userID);
         sendRoomList();
     }
 
@@ -154,7 +169,7 @@ public final class User {
 
     public void processMessage(MessageToServer message) {
         synchronized (server) {
-            log.debug("[FROM: " + userID + "]: " + message);
+            log.debug("[FROM: {}]: {}", userID, message);
             if (networkDevice.isClosedOrScheduledToClose()) {
                 kick();
                 return;
@@ -192,12 +207,20 @@ public final class User {
         sender.setGameState(state);
     }
 
+    public void setDownloadedState(ServerGameState state) {
+        sender.setDownloadedState(state);
+    }
+
     public UserID getUserID() {
         return userID;
     }
 
     public Room getRoom() {
         return currentRoom;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public PlayerID getPlayerID() {
