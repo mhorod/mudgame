@@ -4,6 +4,7 @@ import core.event.EventOccurrence;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
+import core.terrain.TerrainView;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.events.SpawnEntity;
@@ -16,6 +17,7 @@ final class EntityCreator {
     private final Sender sender;
     private final EntityManager entityManager;
     private final FogOfWar fow;
+    private final TerrainView terrain;
     private final Visibility visibility;
 
     public void createEntity(CreateEntity a) {
@@ -55,7 +57,7 @@ final class EntityCreator {
                 createdEntity.entity(),
                 position,
                 VisibilityChange.empty(),
-                createdEntity.claimChange().applyFogOfWar(fow.playerFogOfWar(player))
+                createdEntity.claimChange().mask(fow.playerFogOfWar(player), terrain)
         );
     }
 

@@ -56,11 +56,16 @@ final class EntityEventProcessor {
                 .map(Entity::id)
                 .forEach(entityManager::removeEntity);
         state.terrain().setTerrainAt(h.position(), UNKNOWN);
+        claimedArea.unclaim(h.position());
     }
 
     private void showPosition(ShowPosition s) {
         state.terrain().setTerrainAt(s.position(), s.terrain());
         s.entities().forEach(e -> entityManager.placeEntity(e, s.position()));
+        if (s.positionOwner() != null)
+            claimedArea.claim(s.positionOwner(), s.position());
+        else
+            claimedArea.unclaim(s.position());
     }
 
     public void moveEntityAlongPath(MoveEntityAlongPath e) {

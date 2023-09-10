@@ -2,6 +2,7 @@ package mudgame.controls.events;
 
 import core.entities.model.Entity;
 import core.event.Event;
+import core.model.PlayerID;
 import core.model.Position;
 import core.terrain.model.TerrainType;
 
@@ -21,7 +22,8 @@ public record VisibilityChange(List<PositionVisibilityChange> positions)
     public record ShowPosition(
             Position position,
             TerrainType terrain,
-            List<Entity> entities
+            List<Entity> entities,
+            PlayerID positionOwner
     ) implements PositionVisibilityChange {
     }
 

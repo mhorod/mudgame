@@ -18,11 +18,22 @@ public final class EntityActionProcessor {
                 state.fogOfWar(),
                 state.claimedArea()
         );
-        Visibility visibility = new Visibility(state.entityBoard(), state.terrain());
-        entityCreator = new EntityCreator(sender, entityManager, state.fogOfWar(), visibility);
+        Visibility visibility = new Visibility(state.entityBoard(), state.terrain(),
+                                               state.claimedArea());
+        entityCreator = new EntityCreator(sender,
+                                          entityManager,
+                                          state.fogOfWar(),
+                                          state.terrain(),
+                                          visibility
+        );
         entityMover = new EntityMover(state, sender);
-        entityAttacker = new EntityAttacker(sender, state.entityBoard(), state.fogOfWar(),
-                                            entityManager, visibility);
+        entityAttacker = new EntityAttacker(sender,
+                                            state.entityBoard(),
+                                            state.fogOfWar(),
+                                            entityManager,
+                                            visibility,
+                                            state.terrain()
+        );
     }
 
     public void process(Action action) {

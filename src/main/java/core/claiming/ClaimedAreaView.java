@@ -1,8 +1,9 @@
 package core.claiming;
 
-import core.fogofwar.PlayerFogOfWar;
+import core.fogofwar.PlayerFogOfWarView;
 import core.model.PlayerID;
 import core.model.Position;
+import core.terrain.TerrainView;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,10 +19,27 @@ public interface ClaimedAreaView {
             return new ClaimChange(List.of(), List.of());
         }
 
-        public ClaimChange applyFogOfWar(PlayerFogOfWar fow) {
+        public ClaimChange mask(TerrainView terrain) {
             return new ClaimChange(
-                    claimedPositions.stream().filter(p -> fow.isVisible(p.position)).toList(),
-                    unclaimedPositions.stream().toList().stream().filter(fow::isVisible).toList()
+                    claimedPositions.stream()
+                            .filter(p -> terrain.contains(p.position))
+                            .toList(),
+                    unclaimedPositions.stream()
+                            .filter(terrain::contains)
+                            .toList()
+            );
+        }
+
+        public ClaimChange mask(PlayerFogOfWarView fow, TerrainView terrain) {
+            return new ClaimChange(
+                    claimedPositions.stream()
+                            .filter(p -> terrain.contains(p.position))
+                            .filter(p -> fow.isVisible(p.position))
+                            .toList(),
+                    unclaimedPositions.stream()
+                            .filter(terrain::contains)
+                            .filter(fow::isVisible)
+                            .toList()
             );
         }
     }
