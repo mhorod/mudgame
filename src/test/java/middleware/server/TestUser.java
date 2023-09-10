@@ -22,6 +22,11 @@ public final class TestUser {
         );
     }
 
+    TestUser(GameServer server, String name) {
+        this(server);
+        receive().setName(name);
+    }
+
     public MessageToServerHandler receive() {
         return new MessageToServerFactory(user::processMessage);
     }

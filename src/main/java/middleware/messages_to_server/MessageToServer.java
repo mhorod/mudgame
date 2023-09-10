@@ -79,4 +79,18 @@ public interface MessageToServer extends Serializable {
             handler.startGame();
         }
     }
+
+    record SetNameMessage(String name) implements MessageToServer {
+        @Override
+        public void execute(MessageToServerHandler handler) {
+            handler.setName(name);
+        }
+    }
+
+    record DownloadStateMessage() implements MessageToServer {
+        @Override
+        public void execute(MessageToServerHandler handler) {
+            handler.downloadState();
+        }
+    }
 }

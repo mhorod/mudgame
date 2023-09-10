@@ -18,17 +18,18 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class RemoteServerClient implements ServerClient {
-    private final UserID myUserID;
     private final RemoteNetworkClient client;
 
     private List<RoomInfo> roomList = List.of();
-    private RoomInfo currentRoom;
+    private Optional<RoomInfo> currentRoom = Optional.empty();
+    ;
+    private String name = UserID.DEFAULT_NAME;
 
+    private Optional<ServerGameState> downloadedState = Optional.empty();
     private boolean coreChanged = false;
     private RemoteGameClient currentGameClient;
 
-    public RemoteServerClient(UserID myUserID, RemoteNetworkClient client) {
-        this.myUserID = myUserID;
+    public RemoteServerClient(RemoteNetworkClient client) {
         this.client = client;
     }
 
@@ -54,7 +55,7 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     public void setCurrentRoom(RoomInfo roomInfo) {
-        currentRoom = roomInfo;
+        currentRoom = Optional.ofNullable(roomInfo);
     }
 
     public void registerEvent(Event event) {
@@ -77,12 +78,7 @@ public final class RemoteServerClient implements ServerClient {
 
     @Override
     public Optional<RoomInfo> currentRoom() {
-        return Optional.ofNullable(currentRoom);
-    }
-
-    @Override
-    public UserID myUsedID() {
-        return myUserID;
+        return currentRoom;
     }
 
     @Override
@@ -113,6 +109,36 @@ public final class RemoteServerClient implements ServerClient {
     @Override
     public void startGame() {
         getServerHandler().startGame();
+    }
+
+    @Override
+    public void setName(String name) {
+        getServerHandler().setName(name);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void changeName(String nameFromServer) {
+        name = nameFromServer;
+    }
+
+    @Override
+    public void downloadState() {
+        getServerHandler().downloadState();
+    }
+
+    @Override
+    public Optional<ServerGameState> getDownloadedState() {
+        Optional<ServerGameState> state = downloadedState;
+        downloadedState = Optional.empty();
+        return state;
+    }
+
+    public void setDownloadedState(ServerGameState state) {
+        downloadedState = Optional.of(state);
     }
 
     public void makeAction(Action action) {

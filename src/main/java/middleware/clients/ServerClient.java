@@ -3,7 +3,6 @@ package middleware.clients;
 import core.model.PlayerID;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
-import middleware.model.UserID;
 import mudgame.server.ServerGameState;
 
 import java.util.List;
@@ -18,8 +17,6 @@ public interface ServerClient {
 
     Optional<RoomInfo> currentRoom();
 
-    UserID myUsedID();
-
     void leaveCurrentRoom();
 
     void refreshRoomList();
@@ -31,4 +28,12 @@ public interface ServerClient {
     void createRoom(PlayerID myPlayerID, ServerGameState state);
 
     void startGame();
+
+    void setName(String name);
+
+    String getName();
+
+    void downloadState();
+
+    Optional<ServerGameState> getDownloadedState();
 }
