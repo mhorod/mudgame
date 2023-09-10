@@ -4,7 +4,8 @@ import core.event.Action;
 import core.event.Event;
 import core.model.PlayerID;
 import lombok.extern.slf4j.Slf4j;
-import middleware.communication.NetworkDevice;
+import middleware.clients.NetworkDevice;
+import middleware.clients.NetworkDevice.NetworkDeviceBuilder;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_client.MessageToClientFactory;
 import middleware.messages_to_client.MessageToClientHandler;
@@ -16,19 +17,18 @@ import mudgame.client.ClientGameState;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 
-import java.util.function.Consumer;
+import java.util.Optional;
 
 @Slf4j
 public final class User {
     private static long nextUserID = 0;
 
-    private final MessageToClientHandler sender;
-    private final NetworkDevice networkDevice;
+    private final NetworkDevice<MessageToClient, MessageToServer> networkDevice;
     private final GameServer server;
     private final UserID userID;
 
-    private Room currentRoom;
-    private PlayerID currentPlayerID;
+    private Optional<Room> currentRoom = Optional.empty();
+    private Optional<PlayerID> currentPlayerID = Optional.empty();
     private String name = UserID.DEFAULT_NAME;
 
     private final MessageToServerHandler messageToServerHandler = new MessageToServerHandler() {
@@ -79,7 +79,7 @@ public final class User {
         public void leaveRoom() {
             if (sendErrorIfNotInRoom())
                 return;
-            currentRoom.leaveRoom(User.this);
+            currentRoom.orElseThrow().leaveRoom(User.this);
             sendRoomList();
         }
 
@@ -87,19 +87,19 @@ public final class User {
         public void startGame() {
             if (sendErrorIfNotInRoom())
                 return;
-            currentRoom.start(User.this);
+            currentRoom.orElseThrow().start(User.this);
         }
 
         @Override
         public void makeAction(Action action) {
             if (sendErrorIfNotInRoom())
                 return;
-            currentRoom.processAction(action, User.this);
+            currentRoom.orElseThrow().processAction(action, User.this);
         }
 
         @Override
         public void pingToServer() {
-            sender.pongToClient();
+            getClientHandler().pongToClient();
         }
 
         @Override
@@ -115,37 +115,39 @@ public final class User {
         @Override
         public void setName(String nameFromClient) {
             name = nameFromClient;
-            sender.changeName(name);
-            if (currentRoom != null)
-                currentRoom.sendUpdatedInfo();
+            getClientHandler().changeName(name);
+            currentRoom.ifPresent(Room::sendUpdatedInfo);
         }
 
         @Override
         public void downloadState() {
             if (sendErrorIfNotInRoom())
                 return;
-            currentRoom.downloadState(User.this);
+            currentRoom.orElseThrow().downloadState(User.this);
         }
     };
 
     private int sinceLastCheck = 0;
     private boolean last0 = false;
 
-    public User(Consumer<MessageToClient> sender, NetworkDevice networkDevice, GameServer server) {
-        this.networkDevice = networkDevice;
+    public User(NetworkDeviceBuilder builder, GameServer server) {
+        this.networkDevice = builder.build(this::processMessage, MessageToServer.class);
         this.server = server;
         this.userID = new UserID(nextUserID++);
-
-        this.sender = new MessageToClientFactory(sender.andThen(
-                message -> log.debug("[TO: {}]: {}", userID, message)
-        ));
 
         this.server.putUser(this);
         sendRoomList();
     }
 
+    public MessageToClientHandler getClientHandler() {
+        return new MessageToClientFactory(message -> {
+            log.debug("[TO: {}]: {}", userID, message);
+            networkDevice.sendMessage(message);
+        });
+    }
+
     public boolean checkRemoval() {
-        if (networkDevice.isClosedOrScheduledToClose())
+        if (networkDevice.isClosed())
             return true;
         if (sinceLastCheck > 0) {
             sinceLastCheck = 0;
@@ -155,22 +157,21 @@ public final class User {
         if (last0)
             return true;
         last0 = true;
-        sender.pingToClient();
+        getClientHandler().pingToClient();
         return false;
     }
 
     public void kick() {
-        if (currentRoom != null)
-            currentRoom.leaveRoom(this);
-        sender.kick();
-        networkDevice.scheduleToClose();
+        currentRoom.ifPresent(room -> room.leaveRoom(this));
+        getClientHandler().kick();
+        networkDevice.close();
         server.removeUser(this);
     }
 
     public void processMessage(MessageToServer message) {
         synchronized (server) {
             log.debug("[FROM: {}]: {}", userID, message);
-            if (networkDevice.isClosedOrScheduledToClose()) {
+            if (networkDevice.isClosed()) {
                 kick();
                 return;
             }
@@ -186,53 +187,53 @@ public final class User {
     }
 
     public void setRoom(Room newRoom, PlayerID newPlayerID) {
-        if (currentRoom != null)
+        if (currentRoom.isPresent())
             throw new RuntimeException();
-        currentRoom = newRoom;
-        currentPlayerID = newPlayerID;
+        currentRoom = Optional.of(newRoom);
+        currentPlayerID = Optional.of(newPlayerID);
     }
 
     public void clearRoom() {
-        if (currentRoom == null)
+        if (currentRoom.isEmpty())
             throw new RuntimeException();
-        currentRoom = null;
-        currentPlayerID = null;
+        currentRoom = Optional.empty();
+        currentPlayerID = Optional.empty();
     }
 
     public void registerEvent(Event event) {
-        sender.registerEvent(event);
+        getClientHandler().registerEvent(event);
     }
 
     public void setGameState(ClientGameState state) {
-        sender.setGameState(state);
+        getClientHandler().setGameState(state);
     }
 
     public void setDownloadedState(ServerGameState state) {
-        sender.setDownloadedState(state);
+        getClientHandler().setDownloadedState(state);
     }
 
     public UserID getUserID() {
         return userID;
     }
 
-    public Room getRoom() {
-        return currentRoom;
-    }
-
     public String getName() {
         return name;
     }
 
-    public PlayerID getPlayerID() {
+    public Optional<Room> getRoom() {
+        return currentRoom;
+    }
+
+    public Optional<PlayerID> getPlayerID() {
         return currentPlayerID;
     }
 
     public void sendError(String errorText) {
-        sender.error(errorText);
+        getClientHandler().error(errorText);
     }
 
     public boolean sendErrorIfInRoom() {
-        if (currentRoom != null) {
+        if (currentRoom.isPresent()) {
             sendError("You are already in a room");
             sendCurrentRoom();
             return true;
@@ -241,7 +242,7 @@ public final class User {
     }
 
     public boolean sendErrorIfNotInRoom() {
-        if (currentRoom == null) {
+        if (currentRoom.isEmpty()) {
             sendError("You are not in any room");
             sendCurrentRoom();
             return true;
@@ -250,10 +251,10 @@ public final class User {
     }
 
     public void sendCurrentRoom() {
-        sender.setCurrentRoom(currentRoom == null ? null : currentRoom.getRoomInfo());
+        getClientHandler().setCurrentRoom(currentRoom.map(Room::getRoomInfo).orElse(null));
     }
 
     public void sendRoomList() {
-        sender.setRoomList(server.getRoomList());
+        getClientHandler().setRoomList(server.getRoomList());
     }
 }

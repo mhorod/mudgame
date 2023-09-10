@@ -7,11 +7,7 @@ import middleware.clients.GameClient;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class LocalServer {
     private final MudServerCore core;

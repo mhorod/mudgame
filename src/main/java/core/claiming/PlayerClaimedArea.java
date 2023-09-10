@@ -3,15 +3,18 @@ package core.claiming;
 import core.model.PlayerID;
 import core.model.Position;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class PlayerClaimedArea implements ClaimedAreaView {
+public class PlayerClaimedArea implements ClaimedAreaView, Serializable {
     private final Map<Position, PlayerID> claimed;
 
-    PlayerClaimedArea() { this.claimed = new HashMap<>(); }
+    PlayerClaimedArea() {
+        this.claimed = new HashMap<>();
+    }
 
     PlayerClaimedArea(Map<Position, PlayerID> claimed) {
         this.claimed = new HashMap<>(claimed);

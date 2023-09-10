@@ -1,25 +1,26 @@
 package middleware.server;
 
-import middleware.communication.NetworkDevice;
+import middleware.clients.NetworkDevice;
+import middleware.clients.NetworkDevice.NetworkDeviceBuilder;
 import middleware.messages_to_client.MessageToClient;
+import middleware.messages_to_server.MessageToServer;
 import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 public final class TestUser {
     public final User user;
     public final List<MessageToClient> sent = new ArrayList<>();
-    public final NetworkDevice device = new DummyNetworkDevice();
+    public final DummyNetworkDevice device = new DummyNetworkDevice();
+    public Consumer<MessageToServer> consumer;
 
     TestUser(GameServer server) {
-        user = new User(
-                sent::add,
-                device,
-                server
-        );
+        user = new User(new DummyNetworkDeviceBuilder(), server);
     }
 
     TestUser(GameServer server, String name) {
@@ -28,16 +29,11 @@ public final class TestUser {
     }
 
     public MessageToServerHandler receive() {
-        return new MessageToServerFactory(user::processMessage);
+        return new MessageToServerFactory(consumer);
     }
 
-    public static final class DummyNetworkDevice implements NetworkDevice {
+    public final class DummyNetworkDevice implements NetworkDevice<MessageToClient, MessageToServer> {
         private final AtomicBoolean closed = new AtomicBoolean();
-
-        @Override
-        public void scheduleToClose() {
-            closed.set(true);
-        }
 
         @Override
         public void close() {
@@ -45,13 +41,22 @@ public final class TestUser {
         }
 
         @Override
-        public boolean isClosedOrScheduledToClose() {
+        public boolean isClosed() {
             return closed.get();
         }
 
         @Override
-        public boolean isClosed() {
-            return closed.get();
+        public void sendMessage(MessageToClient message) {
+            sent.add(message);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public final class DummyNetworkDeviceBuilder implements NetworkDeviceBuilder {
+        @Override
+        public <S extends Serializable, R extends Serializable> NetworkDevice<S, R> build(Consumer<R> observer, Class<R> clazz) {
+            consumer = (Consumer<MessageToServer>) observer;
+            return (NetworkDevice<S, R>) device;
         }
     }
 }

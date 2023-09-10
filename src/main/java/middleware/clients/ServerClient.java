@@ -29,9 +29,9 @@ public interface ServerClient {
 
     void startGame();
 
-    void setName(String name);
-
     String getName();
+
+    void setName(String name);
 
     void downloadState();
 

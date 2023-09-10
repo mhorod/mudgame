@@ -60,13 +60,13 @@ public class UserTest {
         GameServer server = new GameServer();
         TestUser user = new TestUser(server);
         user.receive().createRoom(new PlayerID(0), 2);
-        Room room = user.user.getRoom();
+        Room room = user.user.getRoom().orElseThrow();
 
         // then
         assertThatThrownBy(
-                () -> user.user.setRoom(user.user.getRoom(), new PlayerID(0))
+                () -> user.user.setRoom(user.user.getRoom().orElseThrow(), new PlayerID(0))
         ).isInstanceOf(RuntimeException.class);
-        assertThat(user.user.getRoom()).isEqualTo(room);
+        assertThat(user.user.getRoom().orElseThrow()).isEqualTo(room);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class UserTest {
         user.receive().createRoom(new PlayerID(0), -5);
 
         // then
-        assertThat(user.user.getRoom()).isNull();
+        assertThat(user.user.getRoom()).isEmpty();
         assertThat(server.getRoomList()).isEmpty();
         assertThat(user.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
     }
@@ -96,7 +96,7 @@ public class UserTest {
         user.receive().createRoom(new PlayerID(2), 2);
 
         // then
-        assertThat(user.user.getRoom()).isNull();
+        assertThat(user.user.getRoom()).isEmpty();
         assertThat(server.getRoomList()).isEmpty();
         assertThat(user.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
     }
@@ -107,14 +107,14 @@ public class UserTest {
         GameServer server = new GameServer();
         TestUser user = new TestUser(server);
         user.receive().createRoom(new PlayerID(0), 2);
-        Room room = user.user.getRoom();
+        Room room = user.user.getRoom().orElseThrow();
         user.sent.clear();
 
         // when
         user.receive().createRoom(new PlayerID(0), 2);
 
         // then
-        assertThat(user.user.getRoom()).isEqualTo(room);
+        assertThat(user.user.getRoom().orElseThrow()).isEqualTo(room);
         assertThat(server.getRoomList()).containsExactly(room.getRoomInfo());
         assertThat(user.sent).anyMatch(
                 message -> message instanceof ErrorMessage
@@ -132,7 +132,7 @@ public class UserTest {
         user.receive().loadGame(new PlayerID(0), null);
 
         // then
-        assertThat(user.user.getRoom()).isNull();
+        assertThat(user.user.getRoom()).isEmpty();
         assertThat(server.getRoomList()).isEmpty();
         assertThat(user.sent).anyMatch(
                 message -> message instanceof ErrorMessage
@@ -150,7 +150,7 @@ public class UserTest {
         user.receive().loadGame(new PlayerID(2), MudServerCore.newState(2));
 
         // then
-        assertThat(user.user.getRoom()).isNull();
+        assertThat(user.user.getRoom()).isEmpty();
         assertThat(server.getRoomList()).isEmpty();
         assertThat(user.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
     }
@@ -161,14 +161,14 @@ public class UserTest {
         GameServer server = new GameServer();
         TestUser user = new TestUser(server);
         user.receive().createRoom(new PlayerID(0), 2);
-        Room room = user.user.getRoom();
+        Room room = user.user.getRoom().orElseThrow();
         user.sent.clear();
 
         // when
         user.receive().loadGame(new PlayerID(0), MudServerCore.newState(2));
 
         // then
-        assertThat(user.user.getRoom()).isEqualTo(room);
+        assertThat(user.user.getRoom().orElseThrow()).isEqualTo(room);
         assertThat(server.getRoomList()).containsExactly(room.getRoomInfo());
         assertThat(user.sent).anyMatch(
                 message -> message instanceof ErrorMessage

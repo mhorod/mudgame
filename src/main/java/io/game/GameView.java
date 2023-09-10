@@ -21,9 +21,9 @@ import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
+import middleware.communication.SocketDevice.SocketConnectionBuilder;
 import middleware.local.LocalServer;
 import middleware.remote.RemoteNetworkClient;
-import middleware.remote.SocketConnection;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.SpawnEntity;
@@ -61,7 +61,7 @@ public class GameView extends SimpleView {
             // --------------------------------------------------
             // if this causes many merge conflicts remove it
             try {
-                RemoteNetworkClient.GLOBAL_CLIENT.connect(new SocketConnection("localhost", 6789));
+                RemoteNetworkClient.GLOBAL_CLIENT.connect(new SocketConnectionBuilder("localhost", 6789));
 
                 while (RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().isEmpty())
                     RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
@@ -133,9 +133,9 @@ public class GameView extends SimpleView {
     private boolean canEatEvent() {
         return me.peekEvent().stream().anyMatch(
                 event -> !(event instanceof MoveEntityAlongPath)
-                         && !(event instanceof VisibilityChange)
-                         && !(event instanceof SpawnEntity)
-                         && !(event instanceof RemoveEntity)
+                        && !(event instanceof VisibilityChange)
+                        && !(event instanceof SpawnEntity)
+                        && !(event instanceof RemoveEntity)
         );
     }
 

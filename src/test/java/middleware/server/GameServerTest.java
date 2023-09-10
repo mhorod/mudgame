@@ -181,7 +181,7 @@ class GameServerTest {
         GameServer server = new GameServer();
         TestUser user = new TestUser(server);
         user.receive().createRoom(new PlayerID(0), 2);
-        Room room = user.user.getRoom();
+        Room room = user.user.getRoom().orElseThrow();
 
         // then
         assertThatThrownBy(() -> server.putRoom(room)).isInstanceOf(IllegalArgumentException.class);
@@ -193,7 +193,7 @@ class GameServerTest {
         GameServer server = new GameServer();
         TestUser user = new TestUser(server);
         user.receive().createRoom(new PlayerID(0), 2);
-        Room room = user.user.getRoom();
+        Room room = user.user.getRoom().orElseThrow();
         user.receive().disconnect();
 
         // then
@@ -224,7 +224,7 @@ class GameServerTest {
         server.stop();
 
         // then
-        assertThat(user.user.getRoom()).isNull();
+        assertThat(user.user.getRoom()).isEmpty();
         assertThat(server.getRoomList()).isEmpty();
     }
 
