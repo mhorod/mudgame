@@ -34,6 +34,7 @@ public class MudClientCore implements MudClientCoreView {
                 state.entityBoard(),
                 state.fogOfWar(),
                 state.claimedArea(),
+                state().resourceManager(),
                 state.terrain()
         );
     }

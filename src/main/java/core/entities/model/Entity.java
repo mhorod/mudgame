@@ -1,7 +1,9 @@
 package core.entities.model;
 
-import core.entities.components.Component;
-import core.entities.components.Health;
+import core.entities.model.components.Component;
+import core.entities.model.components.Cost;
+import core.entities.model.components.Health;
+import core.entities.model.components.Production;
 import core.model.EntityID;
 import core.model.PlayerID;
 
@@ -33,4 +35,17 @@ public record Entity(EntityData data, EntityID id, PlayerID owner)
                 })
                 .findFirst();
     }
+
+    public Optional<Health> getHealth() {
+        return data.getHealth();
+    }
+
+    public Optional<Cost> getCost() {
+        return data.getCost();
+    }
+
+    public Optional<Production> getProduction() {
+        return data.getProduction();
+    }
+
 }

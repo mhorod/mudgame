@@ -1,4 +1,4 @@
-package core.entities.components;
+package core.entities.model.components;
 
 public interface ComponentVisitor<T> {
     default T visit(Component component) {
@@ -13,11 +13,19 @@ public interface ComponentVisitor<T> {
         return null;
     }
 
+    default T visit(Cost component) {
+        return null;
+    }
+
     default T visit(Health component) {
         return null;
     }
 
     default T visit(Movement component) {
+        return null;
+    }
+
+    default T visit(Production component) {
         return null;
     }
 

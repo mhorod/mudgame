@@ -5,6 +5,7 @@ import core.entities.EntityBoard;
 import core.fogofwar.FogOfWar;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
+import core.resources.ResourceManager;
 import core.terrain.model.Terrain;
 import core.turns.PlayerTurnManager;
 import core.turns.TurnManager;
@@ -21,6 +22,7 @@ public record ServerGameState(
         FogOfWar fogOfWar,
         Terrain terrain,
         ClaimedArea claimedArea,
+        ResourceManager resourceManager,
         List<ActionRule> rules
 ) implements Serializable {
     public ClientGameState toClientGameState(PlayerID playerID) {
@@ -38,6 +40,7 @@ public record ServerGameState(
                 newFogOfWar,
                 terrain.applyFogOfWar(newFogOfWar),
                 claimedArea.mask(newFogOfWar, terrain),
+                resourceManager.playerResources(playerID),
                 rules
         );
     }

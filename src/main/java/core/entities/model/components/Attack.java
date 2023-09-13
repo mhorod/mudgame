@@ -1,4 +1,4 @@
-package core.entities.components;
+package core.entities.model.components;
 
 public record Attack(int damage, int range) implements Component {
     @Override

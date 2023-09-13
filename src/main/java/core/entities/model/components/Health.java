@@ -1,4 +1,4 @@
-package core.entities.components;
+package core.entities.model.components;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

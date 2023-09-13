@@ -1,7 +1,7 @@
 package mudgame.server.actions.entities;
 
-import core.entities.components.visitors.GetAttack;
-import core.entities.components.visitors.GetHealth;
+import core.entities.model.components.visitors.GetAttack;
+import core.entities.model.components.visitors.GetHealth;
 import core.entities.model.Entity;
 import core.event.Event;
 import core.model.PlayerID;
@@ -52,9 +52,10 @@ class AttackProcessor {
         if (!state.containsEntity(attacker.id()) ||
             !state.containsEntity(attacked.id()))
             return false;
-        else if (getAttack.getAttack(attacker) == null || getHealth.getHealth(attacked) == null)
+        else if (getAttack.getAttack(attacker) == null || attacked.getHealth().isEmpty())
             return false;
-        else if (getAttack.getAttack(attacker) == null || getHealth.getHealth(attacked) <= 0)
+        else if (getAttack.getAttack(attacker) == null ||
+                 attacked.getHealth().get().getCurrentHealth() <= 0)
             return false;
         else
             return true;

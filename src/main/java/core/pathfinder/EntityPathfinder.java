@@ -1,8 +1,8 @@
 package core.pathfinder;
 
 import core.entities.EntityBoardView;
-import core.entities.components.ComponentVisitor;
-import core.entities.components.Movement;
+import core.entities.model.components.ComponentVisitor;
+import core.entities.model.components.Movement;
 import core.entities.model.Entity;
 import core.fogofwar.FogOfWarView;
 import core.model.EntityID;

@@ -8,6 +8,7 @@ import mudgame.integration.utils.ScenarioResult;
 import org.junit.jupiter.api.Test;
 
 import static core.entities.model.EntityType.PAWN;
+import static core.resources.ResourceType.MUD;
 import static mudgame.integration.assertions.ClientScenarioResultAssert.assertThatClient;
 import static mudgame.integration.scenarios.Scenarios.*;
 import static testutils.Entities.base;
@@ -33,9 +34,26 @@ class CreationIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void player_cannot_create_entity_when_has_no_resources() {
+        // given
+        SinglePlayerWithBase scenario = single_player_with_base()
+                .withResources(PLAYER_0, MUD, 0);
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, createPawn(PLAYER_0, pos(0, 1)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertNoEvents(result);
+    }
+
+    @Test
     void player_can_create_pawn_near_base_on_claimed_position() {
         // given
-        SinglePlayerWithBase scenario = single_player_with_base();
+        SinglePlayerWithBase scenario = single_player_with_base()
+                .withResources(PLAYER_0, MUD, 10);
 
         // when
         ScenarioResult result = scenario
@@ -69,6 +87,7 @@ class CreationIntegrationTest extends IntegrationTestBase {
     @Test
     void creating_marsh_wiggle_claims_area() {
         Scenario<?> scenario = single_player()
+                .withResources(PLAYER_0, MUD, 10)
                 .with(RectangleTerrain.land(5, 5))
                 .with(base(PLAYER_0), pos(0, 0));
 
