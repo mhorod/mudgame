@@ -5,9 +5,6 @@ import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import mudgame.server.ServerGameState;
-import mudgame.server.internal.EntityCreator.CreatedEntity;
-import mudgame.server.internal.EntityMover.MovedEntity;
-import mudgame.server.internal.EntityRemover.RemovedEntity;
 
 /**
  * Functional facade for the {@link ServerGameState}.

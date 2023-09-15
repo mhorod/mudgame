@@ -3,6 +3,7 @@ package core.entities.model;
 import core.entities.model.components.Component;
 import core.entities.model.components.Cost;
 import core.entities.model.components.Health;
+import core.entities.model.components.Production;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.resources.Resources;
@@ -42,5 +43,9 @@ public record Entity(EntityData data, EntityID id, PlayerID owner)
 
     public Optional<Resources> getCost() {
         return data.getCost().map(Cost::resources);
+    }
+
+    public Optional<Resources> getProduction() {
+        return data.getProduction().map(Production::resources);
     }
 }

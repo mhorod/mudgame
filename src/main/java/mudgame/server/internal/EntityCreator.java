@@ -13,15 +13,9 @@ import mudgame.server.ServerGameState;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class EntityCreator {
+class EntityCreator {
     private final ServerGameState state;
     private final Visibility visibility;
-
-    public record CreatedEntity(
-            Entity entity,
-            VisibilityChange visibilityChange,
-            ClaimChange claimChange
-    ) { }
 
     public CreatedEntity createEntity(EntityType type, PlayerID owner, Position position) {
         Entity entity = state.entityBoard().createEntity(type, owner, position);

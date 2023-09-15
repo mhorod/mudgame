@@ -1,8 +1,8 @@
 package mudgame.server.actions.entities;
 
+import core.entities.model.Entity;
 import core.entities.model.components.visitors.GetAttack;
 import core.entities.model.components.visitors.GetHealth;
-import core.entities.model.Entity;
 import core.event.Event;
 import core.model.PlayerID;
 import core.model.Position;
@@ -13,8 +13,8 @@ import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.VisibilityChange;
 import mudgame.server.actions.Sender;
-import mudgame.server.internal.EntityRemover.RemovedEntity;
 import mudgame.server.internal.InteractiveState;
+import mudgame.server.internal.RemovedEntity;
 
 class AttackProcessor {
     private final InteractiveState state;

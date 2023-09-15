@@ -7,7 +7,7 @@ import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
 import mudgame.server.actions.Sender;
-import mudgame.server.internal.EntityCreator.CreatedEntity;
+import mudgame.server.internal.CreatedEntity;
 import mudgame.server.internal.InteractiveState;
 
 /**
