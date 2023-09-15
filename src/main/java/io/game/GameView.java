@@ -94,6 +94,7 @@ public class GameView extends SimpleView {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
                         me.getControls().moveEntity(id, destination);
+                        me.getControls().completeTurn();
                     }
 
                     @Override

@@ -1,14 +1,16 @@
 package core.turns;
 
 import core.model.PlayerID;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 
+@Slf4j
 public class PlayerTurnManager implements PlayerTurnView, Serializable {
     private final PlayerID myPlayerID;
     private PlayerID currentPlayerID;
-    private int currentTurn = 0;
-    private int playerCount = 0;
+    private int currentTurn;
+    private final int playerCount;
 
     public PlayerTurnManager(
             PlayerID myPlayerID, PlayerID currentPlayerID, int currentTurn, int playerCount

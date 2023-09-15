@@ -22,7 +22,6 @@ public class Controls {
 
     public void moveEntity(EntityID id, Position destination) {
         actionConsumer.accept(new MoveEntity(id, destination));
-        completeTurn();
     }
 
     public void createEntity(Position position) {
