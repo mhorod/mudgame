@@ -55,4 +55,8 @@ public class Resources implements Serializable {
     public void set(ResourceType type, int amount) {
         this.amount.put(type, amount);
     }
+
+    public int amount(ResourceType resourceType) {
+        return amount.get(resourceType);
+    }
 }

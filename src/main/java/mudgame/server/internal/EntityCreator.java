@@ -25,6 +25,8 @@ public class EntityCreator {
 
     public CreatedEntity createEntity(EntityType type, PlayerID owner, Position position) {
         Entity entity = state.entityBoard().createEntity(type, owner, position);
+        entity.getCost().ifPresent(r -> state.resourceManager().subtract(owner, r));
+
         Set<PositionVisibility> positions = state.fogOfWar()
                 .playerFogOfWar(owner)
                 .placeEntity(entity, position);

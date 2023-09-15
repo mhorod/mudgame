@@ -5,6 +5,7 @@ import core.entities.model.EntityType;
 import core.event.Event;
 import core.model.PlayerID;
 import core.model.Position;
+import core.resources.ResourceType;
 import core.spawning.PlayerSpawnManager;
 import lombok.RequiredArgsConstructor;
 import mudgame.client.ClientGameState;
@@ -126,6 +127,11 @@ public final class ClientScenarioResultAssert {
         assertThat(positions).noneMatch(
                 p -> expectedOwner.equals(state.claimedArea().owner(p).orElse(null))
         );
+        return this;
+    }
+
+    public ClientScenarioResultAssert has(int amount, ResourceType resourceType) {
+        assertThat(state.resourceManager().amount(resourceType)).isEqualTo(amount);
         return this;
     }
 }

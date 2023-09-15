@@ -50,7 +50,7 @@ class CreationIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    void player_can_create_pawn_near_base_on_claimed_position() {
+    void player_can_create_pawn_near_base_on_claimed_position_when_has_enough_resources() {
         // given
         SinglePlayerWithBase scenario = single_player_with_base()
                 .withResources(PLAYER_0, MUD, 10);
@@ -65,6 +65,25 @@ class CreationIntegrationTest extends IntegrationTestBase {
         assertThatClient(result, PLAYER_0)
                 .receivedEventTypes(SpawnEntity.class)
                 .cannotCreateEntityOn(PAWN, pos(0, 1));
+    }
+
+    @Test
+    void creating_entity_uses_resources() {
+        // given
+        SinglePlayerWithBase scenario = single_player_with_base()
+                .withResources(PLAYER_0, MUD, 1);
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, createPawn(PLAYER_0, pos(0, 1)))
+                .act(PLAYER_0, createPawn(PLAYER_0, pos(1, 1)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(SpawnEntity.class)
+                .has(0, MUD);
     }
 
     @Test

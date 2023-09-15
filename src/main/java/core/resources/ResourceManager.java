@@ -35,4 +35,8 @@ public class ResourceManager implements ResourcesView, Serializable {
     public void set(PlayerID player, ResourceType type, int amount) {
         playerManagers.get(player).set(type, amount);
     }
+
+    public void add(PlayerID player, int amount, ResourceType type) {
+        playerManagers.get(player).add(Resources.of(Map.of(type, amount)));
+    }
 }

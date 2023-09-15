@@ -24,4 +24,8 @@ public class PlayerResourceManager implements PlayerResourcesView, Serializable 
     public void set(ResourceType type, int amount) {
         resources.set(type, amount);
     }
+
+    public int amount(ResourceType resourceType) {
+        return resources.amount(resourceType);
+    }
 }

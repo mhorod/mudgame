@@ -47,6 +47,7 @@ import mudgame.server.rules.turn.PlayerTakesActionDuringOwnTurn;
 import java.util.List;
 
 import static core.entities.model.EntityType.BASE;
+import static core.resources.ResourceType.MUD;
 import static mudgame.server.rules.RuleGroup.groupRules;
 
 @Slf4j
@@ -89,6 +90,8 @@ public final class MudServerCore {
         EntityBoard entityBoard = new EntityBoard();
         ClaimedArea claimedArea = new ClaimedArea();
         ResourceManager resourceManager = new ResourceManager(turnManager.players());
+        turnManager.players()
+                .forEach(p -> resourceManager.add(p, 10, MUD));
 
         return new ServerGameState(
                 turnManager,
