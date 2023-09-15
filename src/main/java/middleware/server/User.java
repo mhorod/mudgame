@@ -178,7 +178,7 @@ public final class User {
             try {
                 message.execute(messageToServerHandler);
             } catch (RuntimeException exc) {
-                log.warn(exc.toString());
+                log.error("Exception happened while processing a message: ", exc);
                 sendError("Exception happened while processing your message");
                 kick();
             }

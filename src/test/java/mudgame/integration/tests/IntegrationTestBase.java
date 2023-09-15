@@ -6,6 +6,7 @@ import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import mudgame.controls.actions.AttackEntityAction;
+import mudgame.controls.actions.CompleteTurn;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;
 import mudgame.integration.utils.ScenarioResult;
@@ -27,7 +28,12 @@ abstract class IntegrationTestBase {
             assertFowIntegrity(result, player);
             assertEntityBoardIntegrity(result, player);
             assertClaimedAreaIntegrity(result, player);
+            assertResourcesIntegrity(result, player);
         }
+    }
+
+    private void assertResourcesIntegrity(ScenarioResult result, PlayerID player) {
+        assertThat(result.clientResources(player)).isEqualTo(result.serverResources(player));
     }
 
     private void assertTurnIntegrity(ScenarioResult result, PlayerID player) {
@@ -71,6 +77,10 @@ abstract class IntegrationTestBase {
 
     protected Action attack(Entity attacker, Entity attacked) {
         return new AttackEntityAction(attacker.id(), attacked.id());
+    }
+
+    protected Action completeTurn() {
+        return new CompleteTurn();
     }
 
 }

@@ -6,6 +6,7 @@ import core.entities.model.EntityType;
 import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.model.Position;
+import core.resources.ResourcesView;
 import core.terrain.TerrainView;
 
 import java.io.Serializable;
@@ -16,11 +17,11 @@ import static java.util.stream.Collectors.toMap;
 public class SpawnManager implements Serializable {
     private final Map<PlayerID, PlayerSpawnManager> playerSpawnManagers;
 
-
     public SpawnManager(
             EntityBoardView entityBoard,
             FogOfWarView fow,
             ClaimedAreaView claimedArea,
+            ResourcesView resources,
             TerrainView terrain
     ) {
         playerSpawnManagers = fow.players().stream()
@@ -32,6 +33,7 @@ public class SpawnManager implements Serializable {
                                         entityBoard,
                                         fow.playerFogOfWarView(p),
                                         claimedArea,
+                                        resources.playerResources(p),
                                         terrain
                                 ))
                 );

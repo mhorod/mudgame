@@ -1,5 +1,6 @@
 package mudgame.integration.tests;
 
+import mudgame.controls.events.ChargeResources;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.integration.scenarios.SinglePlayerWithBase;
 import mudgame.integration.utils.RectangleTerrain;
@@ -8,6 +9,7 @@ import mudgame.integration.utils.ScenarioResult;
 import org.junit.jupiter.api.Test;
 
 import static core.entities.model.EntityType.PAWN;
+import static core.resources.ResourceType.MUD;
 import static mudgame.integration.assertions.ClientScenarioResultAssert.assertThatClient;
 import static mudgame.integration.scenarios.Scenarios.*;
 import static testutils.Entities.base;
@@ -33,9 +35,26 @@ class CreationIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    void player_can_create_pawn_near_base_on_claimed_position() {
+    void player_cannot_create_entity_when_has_no_resources() {
         // given
-        SinglePlayerWithBase scenario = single_player_with_base();
+        SinglePlayerWithBase scenario = single_player_with_base()
+                .withResources(PLAYER_0, MUD, 0);
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, createPawn(PLAYER_0, pos(0, 1)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertNoEvents(result);
+    }
+
+    @Test
+    void player_can_create_pawn_near_base_on_claimed_position_when_has_enough_resources() {
+        // given
+        SinglePlayerWithBase scenario = single_player_with_base()
+                .withResources(PLAYER_0, MUD, 10);
 
         // when
         ScenarioResult result = scenario
@@ -45,8 +64,32 @@ class CreationIntegrationTest extends IntegrationTestBase {
         // then
         assertIntegrity(result);
         assertThatClient(result, PLAYER_0)
-                .receivedEventTypes(SpawnEntity.class)
+                .receivedEventTypes(SpawnEntity.class, ChargeResources.class)
                 .cannotCreateEntityOn(PAWN, pos(0, 1));
+    }
+
+    @Test
+    void creating_entity_uses_resources() {
+        // given
+        Scenario<?> scenario = two_players()
+                .with(base(PLAYER_0), pos(0, 0))
+                .with(base(PLAYER_1), pos(0, 2))
+                .withResources(PLAYER_0, MUD, 1);
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, createPawn(PLAYER_0, pos(0, 1)))
+                .act(PLAYER_0, createPawn(PLAYER_0, pos(1, 1)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(SpawnEntity.class, ChargeResources.class)
+                .has(0, MUD);
+        assertThatClient(result, PLAYER_1)
+                .receivedEventTypes(SpawnEntity.class);
+
     }
 
     @Test
@@ -69,6 +112,7 @@ class CreationIntegrationTest extends IntegrationTestBase {
     @Test
     void creating_marsh_wiggle_claims_area() {
         Scenario<?> scenario = single_player()
+                .withResources(PLAYER_0, MUD, 10)
                 .with(RectangleTerrain.land(5, 5))
                 .with(base(PLAYER_0), pos(0, 0));
 
@@ -79,7 +123,8 @@ class CreationIntegrationTest extends IntegrationTestBase {
 
         // then
         assertIntegrity(result);
-        assertThatClient(result, PLAYER_0).receivedEventTypes(SpawnEntity.class);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(SpawnEntity.class, ChargeResources.class);
         assertThatClient(result, PLAYER_0).owns(pos(3, 3));
     }
 

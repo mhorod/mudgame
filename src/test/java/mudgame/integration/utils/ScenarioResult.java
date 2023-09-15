@@ -5,6 +5,7 @@ import core.entities.EntityBoard;
 import core.event.Event;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
+import core.resources.PlayerResourceManager;
 import mudgame.client.ClientGameState;
 import mudgame.server.ServerGameState;
 
@@ -58,5 +59,13 @@ public record ScenarioResult(
 
     public PlayerClaimedArea serverClaimedArea(PlayerID player) {
         return serverState.claimedArea().mask(serverFow(player), serverState.terrain());
+    }
+
+    public PlayerResourceManager clientResources(PlayerID player) {
+        return clientStates.get(player).resourceManager();
+    }
+
+    public PlayerResourceManager serverResources(PlayerID player) {
+        return serverState.resourceManager().playerResources(player);
     }
 }

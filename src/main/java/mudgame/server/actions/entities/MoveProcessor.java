@@ -12,14 +12,14 @@ import mudgame.controls.events.PlaceEntity;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.VisibilityChange;
 import mudgame.server.actions.Sender;
-import mudgame.server.internal.EntityMover.MovedEntity;
 import mudgame.server.internal.InteractiveState;
+import mudgame.server.internal.MovedEntity;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
 
-public class MoveProcessor {
+final class MoveProcessor {
     private final InteractiveState state;
     private final Sender sender;
     private final Pathfinder pathfinder;

@@ -107,6 +107,14 @@ public final class EntityBoard implements EntityBoardView, Serializable {
         return entitiesById.get(entityID);
     }
 
+    @Override
+    public List<Entity> playerEntities(PlayerID currentPlayer) {
+        return allEntities()
+                .stream()
+                .filter(e -> currentPlayer.equals(e.owner()))
+                .toList();
+    }
+
     private EntityID newEntityID() {
         return new EntityID(nextEntityID++);
     }

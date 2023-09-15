@@ -1,7 +1,7 @@
-package core.entities.components.visitors;
+package core.entities.model.components.visitors;
 
-import core.entities.components.Attack;
-import core.entities.components.ComponentVisitor;
+import core.entities.model.components.Attack;
+import core.entities.model.components.ComponentVisitor;
 import core.entities.model.Entity;
 
 import java.io.Serializable;

@@ -1,9 +1,9 @@
-package core.entities.components;
+package core.entities.model.components;
 
 import java.io.Serializable;
 
 public sealed interface Component extends Serializable
         permits
-        Attack, Claim, Health, Movement, Vision {
+        Attack, Claim, Cost, Health, Movement, Production, Vision {
     <T> T accept(ComponentVisitor<T> visitor);
 }

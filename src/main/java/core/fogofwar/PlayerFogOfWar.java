@@ -1,8 +1,8 @@
 package core.fogofwar;
 
-import core.entities.components.Component;
-import core.entities.components.ComponentVisitor;
-import core.entities.components.Vision;
+import core.entities.model.components.Component;
+import core.entities.model.components.ComponentVisitor;
+import core.entities.model.components.Vision;
 import core.entities.model.Entity;
 import core.model.EntityID;
 import core.model.PlayerID;

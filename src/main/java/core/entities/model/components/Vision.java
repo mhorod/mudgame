@@ -1,4 +1,4 @@
-package core.entities.components;
+package core.entities.model.components;
 
 public record Vision(int range) implements Component {
     @Override

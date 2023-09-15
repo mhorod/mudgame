@@ -3,6 +3,7 @@ package mudgame.integration.utils;
 import core.claiming.ClaimedAreaView;
 import core.entities.EntityBoardView;
 import core.fogofwar.FogOfWarView;
+import core.resources.ResourcesView;
 import core.terrain.TerrainView;
 import core.turns.TurnView;
 import mudgame.server.MudServerCore;
@@ -16,6 +17,7 @@ public class DefaultRules implements RuleProvider {
             TurnView turnView,
             EntityBoardView entityBoard,
             FogOfWarView fow,
+            ResourcesView resources,
             TerrainView terrain,
             ClaimedAreaView claimedArea
     ) {
@@ -23,6 +25,7 @@ public class DefaultRules implements RuleProvider {
                 turnView,
                 entityBoard,
                 fow,
+                resources,
                 terrain,
                 claimedArea
         );

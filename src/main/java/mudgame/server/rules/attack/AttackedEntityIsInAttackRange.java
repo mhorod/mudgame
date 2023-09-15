@@ -1,7 +1,7 @@
 package mudgame.server.rules.attack;
 
 import core.entities.EntityBoardView;
-import core.entities.components.visitors.GetAttack;
+import core.entities.model.components.visitors.GetAttack;
 import core.entities.model.Entity;
 import core.event.Action;
 import core.model.EntityID;

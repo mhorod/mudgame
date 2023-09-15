@@ -12,15 +12,9 @@ import mudgame.server.ServerGameState;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class EntityMover {
+class EntityMover {
     private final ServerGameState state;
     private final Visibility visibility;
-
-    public record MovedEntity(
-            EntityID entityID,
-            VisibilityChange visibilityChange,
-            ClaimChange claimChange
-    ) { }
 
     public MovedEntity moveEntity(EntityID entityID, Position position) {
         Entity entity = state.entityBoard().findEntityByID(entityID);

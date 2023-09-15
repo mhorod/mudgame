@@ -12,6 +12,8 @@ import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.EntityPathfinder;
 import core.pathfinder.Pathfinder;
+import core.resources.ResourceManager;
+import core.resources.ResourcesView;
 import core.spawning.SpawnManager;
 import core.terrain.TerrainView;
 import core.terrain.generators.RectangleLandGenerator;
@@ -45,6 +47,7 @@ import mudgame.server.rules.turn.PlayerTakesActionDuringOwnTurn;
 import java.util.List;
 
 import static core.entities.model.EntityType.BASE;
+import static core.resources.ResourceType.MUD;
 import static mudgame.server.rules.RuleGroup.groupRules;
 
 @Slf4j
@@ -86,6 +89,9 @@ public final class MudServerCore {
         FogOfWar fow = new FogOfWar(turnManager.players());
         EntityBoard entityBoard = new EntityBoard();
         ClaimedArea claimedArea = new ClaimedArea();
+        ResourceManager resourceManager = new ResourceManager(turnManager.players());
+        turnManager.players()
+                .forEach(p -> resourceManager.add(p, 10, MUD));
 
         return new ServerGameState(
                 turnManager,
@@ -93,7 +99,8 @@ public final class MudServerCore {
                 fow,
                 terrain,
                 claimedArea,
-                defaultRules(turnManager, entityBoard, fow, terrain, claimedArea)
+                resourceManager,
+                defaultRules(turnManager, entityBoard, fow, resourceManager, terrain, claimedArea)
         );
     }
 
@@ -124,6 +131,7 @@ public final class MudServerCore {
             TurnView turnView,
             EntityBoardView entityBoard,
             FogOfWarView fow,
+            ResourcesView resources,
             TerrainView terrain,
             ClaimedAreaView claimedArea
     ) {
@@ -132,6 +140,7 @@ public final class MudServerCore {
                 entityBoard,
                 fow,
                 claimedArea,
+                resources,
                 terrain
         );
 
