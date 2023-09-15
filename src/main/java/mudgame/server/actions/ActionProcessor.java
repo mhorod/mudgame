@@ -1,11 +1,7 @@
 package mudgame.server.actions;
 
 import core.event.Action;
-import core.event.Event;
-import core.event.EventOccurrence;
 import core.model.PlayerID;
-import mudgame.controls.actions.CompleteTurn;
-import mudgame.controls.events.SetTurn;
 import mudgame.events.EventOccurrenceObserver;
 import mudgame.server.ServerGameState;
 import mudgame.server.actions.entities.EntityActionProcessor;
@@ -16,6 +12,7 @@ public final class ActionProcessor {
     private final InteractiveState state;
     private final Sender sender;
     private final EntityActionProcessor entityActionProcessor;
+    private final CompleteTurnProcessor completeTurnProcessor;
 
     public ActionProcessor(
             ServerGameState state,
@@ -25,6 +22,7 @@ public final class ActionProcessor {
         this.state = new InteractiveState(state);
         this.sender = new Sender(eventOccurrenceObserver);
         this.entityActionProcessor = new EntityActionProcessor(this.state, this.sender);
+        this.completeTurnProcessor = new CompleteTurnProcessor(this.state, this.sender);
     }
 
     public void process(Action action, PlayerID actor) {
@@ -32,17 +30,7 @@ public final class ActionProcessor {
             return;
 
         entityActionProcessor.process(action);
-        if (action instanceof CompleteTurn)
-            completeTurn();
+        completeTurnProcessor.process(action);
     }
 
-    private void completeTurn() {
-        state.completeTurn();
-        SetTurn event = new SetTurn(state.currentPlayer());
-        sender.send(seenByEveryone(event));
-    }
-
-    private EventOccurrence seenByEveryone(Event event) {
-        return new EventOccurrence(event, state.players());
-    }
 }

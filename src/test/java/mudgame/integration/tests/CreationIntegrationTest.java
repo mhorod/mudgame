@@ -1,5 +1,6 @@
 package mudgame.integration.tests;
 
+import mudgame.controls.events.ChargeResources;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.integration.scenarios.SinglePlayerWithBase;
 import mudgame.integration.utils.RectangleTerrain;
@@ -63,14 +64,16 @@ class CreationIntegrationTest extends IntegrationTestBase {
         // then
         assertIntegrity(result);
         assertThatClient(result, PLAYER_0)
-                .receivedEventTypes(SpawnEntity.class)
+                .receivedEventTypes(SpawnEntity.class, ChargeResources.class)
                 .cannotCreateEntityOn(PAWN, pos(0, 1));
     }
 
     @Test
     void creating_entity_uses_resources() {
         // given
-        SinglePlayerWithBase scenario = single_player_with_base()
+        Scenario<?> scenario = two_players()
+                .with(base(PLAYER_0), pos(0, 0))
+                .with(base(PLAYER_1), pos(0, 2))
                 .withResources(PLAYER_0, MUD, 1);
 
         // when
@@ -82,8 +85,11 @@ class CreationIntegrationTest extends IntegrationTestBase {
         // then
         assertIntegrity(result);
         assertThatClient(result, PLAYER_0)
-                .receivedEventTypes(SpawnEntity.class)
+                .receivedEventTypes(SpawnEntity.class, ChargeResources.class)
                 .has(0, MUD);
+        assertThatClient(result, PLAYER_1)
+                .receivedEventTypes(SpawnEntity.class);
+
     }
 
     @Test
@@ -117,7 +123,8 @@ class CreationIntegrationTest extends IntegrationTestBase {
 
         // then
         assertIntegrity(result);
-        assertThatClient(result, PLAYER_0).receivedEventTypes(SpawnEntity.class);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(SpawnEntity.class, ChargeResources.class);
         assertThatClient(result, PLAYER_0).owns(pos(3, 3));
     }
 

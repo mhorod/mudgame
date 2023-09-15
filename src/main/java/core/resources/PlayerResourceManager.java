@@ -1,7 +1,12 @@
 package core.resources;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.io.Serializable;
 
+@ToString
+@EqualsAndHashCode
 public class PlayerResourceManager implements PlayerResourcesView, Serializable {
     private final Resources resources;
 

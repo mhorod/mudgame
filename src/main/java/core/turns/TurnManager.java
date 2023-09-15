@@ -26,13 +26,19 @@ public final class TurnManager implements TurnView, Serializable {
         return playerIDs;
     }
 
-    public PlayerID currentPlayer() { return playerIDs.get(currentTurn); }
+    public PlayerID currentPlayer() { return playerIDs.get(currentTurn % playerCount); }
 
-    public void completeTurn() {
-        currentTurn = nextTurn();
+    @Override
+    public int currentTurn() {
+        return currentTurn;
     }
 
-    public void setTurn(int turn) { currentTurn = turn; }
+    @Override
+    public int playerCount() {
+        return playerCount;
+    }
 
-    private int nextTurn() { return (currentTurn + 1) % playerCount; }
+    public int completeTurn() {
+        return (++currentTurn) % playerCount;
+    }
 }

@@ -1,9 +1,10 @@
 package mudgame.server.actions.entities;
 
-import core.event.EventOccurrence;
 import core.model.PlayerID;
 import core.model.Position;
+import core.resources.Resources;
 import mudgame.controls.actions.CreateEntity;
+import mudgame.controls.events.ChargeResources;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
 import mudgame.server.actions.Sender;
@@ -28,17 +29,22 @@ final class CreationProcessor {
         state.players()
                 .stream()
                 .filter(p -> state.playerSees(p, a.position()))
-                .map(p -> eventOccurrenceFor(p, a, createdEntity))
-                .forEach(sender::send);
+                .forEach(p -> sendTo(p, a, createdEntity));
     }
 
-    private EventOccurrence eventOccurrenceFor(
+    private void sendTo(
             PlayerID player, CreateEntity action, CreatedEntity createdEntity
     ) {
-        if (player.equals(action.owner()))
-            return EventOccurrence.of(ownerEvent(createdEntity, action.position()), player);
-        else
-            return EventOccurrence.of(otherEvent(player, createdEntity, action.position()), player);
+        if (player.equals(action.owner())) {
+            sender.send(ownerEvent(createdEntity, action.position()), player);
+            sender.send(chargeResources(createdEntity), player);
+        } else {
+            sender.send(otherEvent(player, createdEntity, action.position()), player);
+        }
+    }
+
+    private ChargeResources chargeResources(CreatedEntity createdEntity) {
+        return new ChargeResources(createdEntity.entity().getCost().orElse(Resources.empty()));
     }
 
     private SpawnEntity ownerEvent(CreatedEntity createdEntity, Position position) {

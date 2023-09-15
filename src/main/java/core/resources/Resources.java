@@ -16,7 +16,8 @@ public class Resources implements Serializable {
     private final Map<ResourceType, Integer> amount;
 
     private Resources(Map<ResourceType, Integer> amount) {
-        this.amount = new EnumMap<>(amount);
+        this.amount = new EnumMap<>(ResourceType.class);
+        this.amount.putAll(amount);
         Arrays.stream(ResourceType.values())
                 .forEach(r -> this.amount.computeIfAbsent(r, k -> 0));
 
@@ -25,6 +26,15 @@ public class Resources implements Serializable {
     public Resources() {
         this.amount = Arrays.stream(ResourceType.values()).collect(toMap(r -> r, r -> 0));
     }
+
+    public static Resources merge(Resources r1, Resources r2) {
+        Map<ResourceType, Integer> amount = new EnumMap<>(ResourceType.class);
+        r1.amount.forEach((r, a) -> amount.put(r, a + amount.getOrDefault(r, 0)));
+        r2.amount.forEach((r, a) -> amount.put(r, a + amount.getOrDefault(r, 0)));
+        return new Resources(amount);
+    }
+
+    public static Resources empty() { return new Resources(Map.of()); }
 
     public static Resources of(Map<ResourceType, Integer> amount) {
         return new Resources(amount);
@@ -58,5 +68,9 @@ public class Resources implements Serializable {
 
     public int amount(ResourceType resourceType) {
         return amount.get(resourceType);
+    }
+
+    public boolean isEmpty() {
+        return amount.values().stream().noneMatch(r -> r > 0);
     }
 }

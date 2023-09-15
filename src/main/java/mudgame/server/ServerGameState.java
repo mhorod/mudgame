@@ -5,6 +5,7 @@ import core.entities.EntityBoard;
 import core.fogofwar.FogOfWar;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
+import core.resources.PlayerResourceManager;
 import core.resources.ResourceManager;
 import core.terrain.model.Terrain;
 import core.turns.PlayerTurnManager;
@@ -28,9 +29,13 @@ public record ServerGameState(
     public ClientGameState toClientGameState(PlayerID playerID) {
         PlayerTurnManager newTurnManager = new PlayerTurnManager(
                 playerID,
-                turnManager.currentPlayer()
+                turnManager.currentPlayer(),
+                turnManager.currentTurn(),
+                turnManager.playerCount()
         );
         PlayerFogOfWar newFogOfWar = SerializationUtils.clone(fogOfWar.playerFogOfWar(playerID));
+        PlayerResourceManager newResources = SerializationUtils.clone(
+                resourceManager.playerResources(playerID));
 
 
         return new ClientGameState(
@@ -40,7 +45,7 @@ public record ServerGameState(
                 newFogOfWar,
                 terrain.applyFogOfWar(newFogOfWar),
                 claimedArea.mask(newFogOfWar, terrain),
-                resourceManager.playerResources(playerID),
+                newResources,
                 rules
         );
     }
