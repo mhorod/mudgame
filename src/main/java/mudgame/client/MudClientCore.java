@@ -2,7 +2,7 @@ package mudgame.client;
 
 import core.claiming.ClaimedAreaView;
 import core.entities.EntityBoardView;
-import core.event.Event;
+import mudgame.controls.events.Event;
 import core.fogofwar.PlayerFogOfWarView;
 import core.model.PlayerID;
 import core.pathfinder.Pathfinder;
@@ -34,6 +34,7 @@ public class MudClientCore implements MudClientCoreView {
                 state.entityBoard(),
                 state.fogOfWar(),
                 state.claimedArea(),
+                state().resourceManager(),
                 state.terrain()
         );
     }

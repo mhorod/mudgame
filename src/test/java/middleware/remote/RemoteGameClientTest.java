@@ -1,11 +1,11 @@
 package middleware.remote;
 
-import core.event.Event;
 import core.model.PlayerID;
 import middleware.clients.GameClient;
 import middleware.clients.NetworkClient;
 import middleware.clients.ServerClient;
 import middleware.utils.TestServerClient;
+import mudgame.controls.events.Event;
 import mudgame.server.MudServerCore;
 import org.junit.jupiter.api.Test;
 

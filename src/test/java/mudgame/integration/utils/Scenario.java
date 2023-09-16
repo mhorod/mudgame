@@ -3,11 +3,13 @@ package mudgame.integration.utils;
 import core.claiming.ClaimedArea;
 import core.entities.EntityBoard;
 import core.entities.model.Entity;
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.fogofwar.FogOfWar;
 import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
 import core.model.Position;
+import core.resources.ResourceManager;
+import core.resources.ResourceType;
 import core.terrain.model.Terrain;
 import core.terrain.model.TerrainType;
 import core.turns.TurnManager;
@@ -21,6 +23,7 @@ public class Scenario<T extends Scenario<T>> {
     private FogOfWar fow;
     private Terrain terrain;
     private ClaimedArea claimedArea;
+    private ResourceManager resourceManager;
     private RuleProvider ruleProvider;
 
 
@@ -36,7 +39,14 @@ public class Scenario<T extends Scenario<T>> {
                 fow,
                 terrain,
                 claimedArea,
-                ruleProvider.rules(turnManager, entityBoard, fow, terrain, claimedArea)
+                resourceManager,
+                ruleProvider.rules(turnManager,
+                                   entityBoard,
+                                   fow,
+                                   resourceManager,
+                                   terrain,
+                                   claimedArea
+                )
         );
     }
 
@@ -50,6 +60,7 @@ public class Scenario<T extends Scenario<T>> {
         fow = new FogOfWar(turnManager.players());
         claimedArea = new ClaimedArea();
         ruleProvider = new DefaultRules();
+        resourceManager = new ResourceManager(turnManager.players());
     }
 
 
@@ -77,4 +88,8 @@ public class Scenario<T extends Scenario<T>> {
 
     public FogOfWarView fow() { return fow; }
 
+    public T withResources(PlayerID player, ResourceType mud, int amount) {
+        resourceManager.set(player, mud, amount);
+        return (T) this;
+    }
 }

@@ -1,6 +1,6 @@
 package mudgame.server.internal;
 
-import core.claiming.ClaimedAreaView.ClaimChange;
+import core.claiming.ClaimChange;
 import core.entities.model.Entity;
 import core.entities.model.EntityType;
 import core.fogofwar.PlayerFogOfWar.PositionVisibility;
@@ -13,18 +13,14 @@ import mudgame.server.ServerGameState;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class EntityCreator {
+class EntityCreator {
     private final ServerGameState state;
     private final Visibility visibility;
 
-    public record CreatedEntity(
-            Entity entity,
-            VisibilityChange visibilityChange,
-            ClaimChange claimChange
-    ) { }
-
     public CreatedEntity createEntity(EntityType type, PlayerID owner, Position position) {
         Entity entity = state.entityBoard().createEntity(type, owner, position);
+        entity.getCost().ifPresent(r -> state.resourceManager().subtract(owner, r));
+
         Set<PositionVisibility> positions = state.fogOfWar()
                 .playerFogOfWar(owner)
                 .placeEntity(entity, position);

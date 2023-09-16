@@ -1,6 +1,6 @@
 package core.fogofwar;
 
-import core.entities.components.Vision;
+import core.entities.model.components.Vision;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
 import core.model.EntityID;

@@ -1,7 +1,7 @@
 package core.claiming;
 
-import core.entities.components.Claim;
-import core.entities.components.visitors.GetClaim;
+import core.entities.model.components.Claim;
+import core.entities.model.components.visitors.GetClaim;
 import core.entities.model.Entity;
 import core.fogofwar.PlayerFogOfWarView;
 import core.model.EntityID;

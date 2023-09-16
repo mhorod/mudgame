@@ -1,7 +1,5 @@
 package middleware.server;
 
-import core.event.Action;
-import core.event.Event;
 import core.model.PlayerID;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.NetworkDevice;
@@ -13,6 +11,8 @@ import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomID;
 import middleware.model.UserID;
 import mudgame.client.ClientGameState;
+import mudgame.controls.actions.Action;
+import mudgame.controls.events.Event;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 
@@ -179,7 +179,7 @@ public final class User {
             try {
                 message.execute(messageToServerHandler);
             } catch (RuntimeException exc) {
-                log.warn(exc.toString());
+                log.error("Exception happened while processing a message: ", exc);
                 sendError("Exception happened while processing your message");
                 kick();
             }

@@ -1,7 +1,7 @@
 package mudgame.server.rules.movement;
 
 import core.entities.EntityBoardView;
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.MoveEntity;

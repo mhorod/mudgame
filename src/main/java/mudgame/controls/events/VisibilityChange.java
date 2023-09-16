@@ -1,7 +1,6 @@
 package mudgame.controls.events;
 
 import core.entities.model.Entity;
-import core.event.Event;
 import core.model.PlayerID;
 import core.model.Position;
 import core.terrain.model.TerrainType;

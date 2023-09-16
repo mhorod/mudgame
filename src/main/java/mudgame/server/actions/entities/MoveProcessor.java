@@ -1,6 +1,6 @@
 package mudgame.server.actions.entities;
 
-import core.claiming.ClaimedAreaView.ClaimChange;
+import core.claiming.ClaimChange;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -11,20 +11,20 @@ import mudgame.controls.events.MoveEntityAlongPath.SingleMove;
 import mudgame.controls.events.PlaceEntity;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.VisibilityChange;
-import mudgame.server.actions.Sender;
-import mudgame.server.internal.EntityMover.MovedEntity;
+import mudgame.server.actions.EventSender;
 import mudgame.server.internal.InteractiveState;
+import mudgame.server.internal.MovedEntity;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
 
-public class MoveProcessor {
+final class MoveProcessor {
     private final InteractiveState state;
-    private final Sender sender;
+    private final EventSender sender;
     private final Pathfinder pathfinder;
 
-    public MoveProcessor(InteractiveState state, Sender sender) {
+    public MoveProcessor(InteractiveState state, EventSender sender) {
         this.state = state;
         this.sender = sender;
         this.pathfinder = state.pathfinder();

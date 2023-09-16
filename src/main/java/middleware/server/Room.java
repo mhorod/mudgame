@@ -1,11 +1,11 @@
 package middleware.server;
 
-import core.event.Action;
-import core.event.EventOccurrence;
 import core.model.PlayerID;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
+import mudgame.controls.actions.Action;
+import mudgame.server.EventOccurrence;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 import org.apache.commons.lang3.SerializationUtils;

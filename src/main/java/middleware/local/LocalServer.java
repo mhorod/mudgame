@@ -1,9 +1,9 @@
 package middleware.local;
 
-import core.event.Action;
-import core.event.EventOccurrence;
 import core.model.PlayerID;
 import middleware.clients.GameClient;
+import mudgame.controls.actions.Action;
+import mudgame.server.EventOccurrence;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 

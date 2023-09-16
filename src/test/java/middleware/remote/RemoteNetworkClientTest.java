@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import static middleware.messages_to_server.MessageToServer.DisconnectMessage;
 import static middleware.remote.RemoteNetworkClient.CONNECTION_TIMEOUT;
-import static middleware.utils.Wait.verify_wait;
+import static middleware.utils.Wait.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 

@@ -1,6 +1,5 @@
 package middleware.remote;
 
-import core.event.Event;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.NetworkClient;
 import middleware.clients.NetworkDevice;
@@ -12,6 +11,7 @@ import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
+import mudgame.controls.events.Event;
 import mudgame.server.ServerGameState;
 
 import java.time.Duration;

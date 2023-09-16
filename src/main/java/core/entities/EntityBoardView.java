@@ -14,4 +14,5 @@ public interface EntityBoardView {
     boolean containsEntity(EntityID entityID);
     PlayerID entityOwner(EntityID entityID);
     Entity findEntityByID(EntityID entityID);
+    List<Entity> playerEntities(PlayerID currentPlayer);
 }

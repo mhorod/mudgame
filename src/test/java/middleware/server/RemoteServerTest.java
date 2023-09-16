@@ -10,7 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static middleware.utils.MockSockets.*;
-import static middleware.utils.Wait.verify_wait;
+import static middleware.utils.Wait.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 

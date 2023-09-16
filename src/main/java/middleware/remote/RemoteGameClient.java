@@ -1,9 +1,9 @@
 package middleware.remote;
 
-import core.event.Action;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.AbstractGameClient;
 import mudgame.client.ClientGameState;
+import mudgame.controls.actions.Action;
 
 @Slf4j
 public final class RemoteGameClient extends AbstractGameClient {

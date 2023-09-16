@@ -1,7 +1,7 @@
 package mudgame.server.rules.attack;
 
 import core.entities.EntityBoardView;
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.fogofwar.FogOfWarView;
 import core.model.EntityID;
 import core.model.PlayerID;

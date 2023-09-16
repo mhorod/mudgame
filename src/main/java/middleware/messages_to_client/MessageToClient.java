@@ -1,8 +1,8 @@
 package middleware.messages_to_client;
 
-import core.event.Event;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
+import mudgame.controls.events.Event;
 import mudgame.server.ServerGameState;
 
 import java.io.Serializable;

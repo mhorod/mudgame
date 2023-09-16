@@ -1,6 +1,6 @@
 package mudgame.server.actions;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

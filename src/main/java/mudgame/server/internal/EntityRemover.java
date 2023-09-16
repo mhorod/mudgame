@@ -1,6 +1,6 @@
 package mudgame.server.internal;
 
-import core.claiming.ClaimedAreaView.ClaimChange;
+import core.claiming.ClaimChange;
 import core.fogofwar.PlayerFogOfWar.PositionVisibility;
 import core.model.EntityID;
 import core.model.PlayerID;
@@ -11,15 +11,9 @@ import mudgame.server.ServerGameState;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class EntityRemover {
+class EntityRemover {
     private final ServerGameState state;
     private final Visibility visibility;
-
-    public record RemovedEntity(
-            EntityID entityID,
-            VisibilityChange visibilityChange,
-            ClaimChange claimChange
-    ) { }
 
     public RemovedEntity removeEntity(EntityID entityID) {
         PlayerID owner = state.entityBoard().entityOwner(entityID);
