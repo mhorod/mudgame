@@ -10,7 +10,11 @@ import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 import org.apache.commons.lang3.SerializationUtils;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public final class Room {
     private static long nextRoomID = 0;

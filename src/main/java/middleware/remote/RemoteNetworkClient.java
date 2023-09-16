@@ -8,7 +8,6 @@ import middleware.clients.NetworkStatus;
 import middleware.clients.ServerClient;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_client.MessageToClientHandler;
-import middleware.messages_to_server.MessageToServer;
 import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomInfo;
@@ -17,6 +16,7 @@ import mudgame.server.ServerGameState;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.InstantSource;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,20 +28,20 @@ import static middleware.clients.NetworkDevice.NetworkDeviceBuilder;
 
 @Slf4j
 public final class RemoteNetworkClient implements NetworkClient {
-    static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(10);
-    static final Duration PING_TIMEOUT = Duration.ofSeconds(5);
-    static final Duration PING_AFTER_IDLE = Duration.ofSeconds(15);
+    public static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(10);
+    public static final Duration PING_TIMEOUT = Duration.ofSeconds(5);
+    public static final Duration PING_AFTER_IDLE = Duration.ofSeconds(15);
 
     // TODO remove GLOBAL_CLIENT
-    public static NetworkClient GLOBAL_CLIENT = new RemoteNetworkClient();
+    public static NetworkClient GLOBAL_CLIENT = new RemoteNetworkClient(InstantSource.system());
 
+    private final InstantSource clock;
     private final Queue<MessageToClient> messageQueue = new LinkedBlockingQueue<>();
-    private final Queue<Optional<? extends NetworkDeviceBuilder>> builderQueue = new LinkedBlockingQueue<>();
+    private final Queue<Optional<NetworkDeviceBuilder>> builderQueue = new LinkedBlockingQueue<>();
 
     private NetworkStatus networkStatus = NetworkStatus.DISCONNECTED;
-    private NetworkDevice<MessageToServer, MessageToClient> networkDevice;
+    private NetworkDevice networkDevice;
     private RemoteServerClient currentServerClient;
-
     private final MessageToClientHandler messageToClientHandler = new MessageToClientHandler() {
         @Override
         public void error(String errorText) {
@@ -97,18 +97,22 @@ public final class RemoteNetworkClient implements NetworkClient {
     private Instant lastIncoming = Instant.EPOCH;
     private Instant lastPing = Instant.EPOCH;
 
+    public RemoteNetworkClient(InstantSource clock) {
+        this.clock = clock;
+    }
+
     private void verifyNetworkStatus() {
         if (networkStatus == NetworkStatus.OK) {
             if (networkDevice.isClosed()) {
                 clearStateAndSetStatus(NetworkStatus.FAILED);
                 return;
             }
-            if (Duration.between(lastIncoming, Instant.now()).compareTo(PING_AFTER_IDLE) < 0)
+            if (Duration.between(lastIncoming, clock.instant()).compareTo(PING_AFTER_IDLE) < 0)
                 return;
             if (lastPing.compareTo(lastIncoming) <= 0) {
                 getServerHandler().pingToServer();
-                lastPing = Instant.now();
-            } else if (Duration.between(lastPing, Instant.now()).compareTo(PING_TIMEOUT) > 0)
+                lastPing = clock.instant();
+            } else if (Duration.between(lastPing, clock.instant()).compareTo(PING_TIMEOUT) > 0)
                 clearStateAndSetStatus(NetworkStatus.FAILED);
         }
     }
@@ -133,13 +137,15 @@ public final class RemoteNetworkClient implements NetworkClient {
 
     @Override
     public void connect(NetworkDeviceBuilder builder) {
-        NetworkDevice<MessageToServer, MessageToClient> device = builder.build(messageQueue::add, MessageToClient.class);
+        Optional<NetworkDevice> device = builder.build(messageQueue::add, MessageToClient.class);
 
-        if (device.isClosed())
+        if (device.isEmpty())
             clearStateAndSetStatus(NetworkStatus.FAILED);
         else {
             clearStateAndSetStatus(NetworkStatus.OK);
-            networkDevice = device;
+            networkDevice = device.get();
+            currentServerClient = new RemoteServerClient(this);
+            lastIncoming = lastPing = clock.instant();
         }
     }
 
@@ -162,7 +168,7 @@ public final class RemoteNetworkClient implements NetworkClient {
 
     @Override
     public void processAllMessages() {
-        while (!messageQueue.isEmpty()) {
+        while (!builderQueue.isEmpty()) {
             Optional<? extends NetworkDeviceBuilder> builder = builderQueue.remove();
             if (builder.isPresent())
                 connect(builder.get());
@@ -170,14 +176,14 @@ public final class RemoteNetworkClient implements NetworkClient {
                 clearStateAndSetStatus(NetworkStatus.FAILED);
         }
 
-        verifyNetworkStatus();
         while (!messageQueue.isEmpty()) {
             MessageToClient message = messageQueue.remove();
             log.info("[REC] {}", message);
-            lastIncoming = Instant.now();
+            lastIncoming = clock.instant();
 
             message.execute(messageToClientHandler);
         }
+        verifyNetworkStatus();
     }
 
     public MessageToServerHandler getServerHandler() {
@@ -187,7 +193,7 @@ public final class RemoteNetworkClient implements NetworkClient {
                 return;
             }
             log.info("[SND]: {}", message);
-            networkDevice.sendMessage(message);
+            networkDevice.send(message);
         });
     }
 }

@@ -3,8 +3,12 @@ package middleware.communication;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.NetworkDevice;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.time.Duration;
@@ -16,18 +20,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 @Slf4j
-public final class SocketDevice<S extends Serializable, R extends Serializable> implements NetworkDevice<S, R> {
+public final class SocketDevice implements NetworkDevice {
     private final Socket socket;
-    private final Consumer<R> observer;
-    private final Class<R> clazz;
+    private final Consumer<Object> observer;
 
-    private final BlockingQueue<Optional<S>> queue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Optional<Object>> queue = new LinkedBlockingQueue<>();
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    public SocketDevice(Socket socket, Consumer<R> observer, Class<R> clazz) {
+    public SocketDevice(Socket socket, Consumer<Object> observer) {
         this.socket = socket;
         this.observer = observer;
-        this.clazz = clazz;
 
         new Thread(this::senderWork).start();
         new Thread(this::receiverWork).start();
@@ -45,9 +47,9 @@ public final class SocketDevice<S extends Serializable, R extends Serializable> 
     }
 
     @Override
-    public void sendMessage(S message) {
+    public void send(Object obj) {
         if (!isClosed())
-            queue.add(Optional.of(message));
+            queue.add(Optional.of(obj));
     }
 
     private void senderWork() {
@@ -55,10 +57,10 @@ public final class SocketDevice<S extends Serializable, R extends Serializable> 
             final ObjectOutputStream stream = new ObjectOutputStream(socket.getOutputStream());
 
             while (!socket.isClosed()) {
-                Optional<S> messageOrNull = queue.take();
+                Optional<Object> messageOrNull = queue.take();
                 if (messageOrNull.isEmpty())
                     break;
-                S message = messageOrNull.get();
+                Object message = messageOrNull.get();
                 log.debug(message.toString());
                 stream.writeObject(message);
             }
@@ -80,27 +82,23 @@ public final class SocketDevice<S extends Serializable, R extends Serializable> 
             final ObjectInputStream stream = new ObjectInputStream(socket.getInputStream());
 
             while (!isClosed()) {
-                R message = Objects.requireNonNull(clazz.cast(stream.readObject()));
+                Object message = Objects.requireNonNull(stream.readObject());
                 log.debug(message.toString());
                 observer.accept(message);
             }
-        } catch (IOException | ClassNotFoundException | NullPointerException exception) {
+        } catch (IOException | ClassNotFoundException exception) {
             log.debug(exception.toString());
-            if (causedByNotSerializableException(exception)) {
-                close();
+            if (causedByNotSerializableException(exception))
                 throw new RuntimeException(exception);
-            }
+        } finally {
+            close();
         }
     }
 
     private boolean causedByNotSerializableException(Exception exception) {
-        Throwable throwable = exception;
-        while (throwable != null) {
-            if (throwable instanceof NotSerializableException)
-                return true;
-            throwable = throwable.getCause();
-        }
-        return false;
+        return ExceptionUtils.getThrowableList(exception)
+                .stream()
+                .anyMatch(NotSerializableException.class::isInstance);
     }
 
     @AllArgsConstructor
@@ -108,8 +106,11 @@ public final class SocketDevice<S extends Serializable, R extends Serializable> 
         private final Socket socket;
 
         @Override
-        public <V extends Serializable, U extends Serializable> SocketDevice<V, U> build(Consumer<U> observer, Class<U> clazz) {
-            return new SocketDevice<>(socket, observer, clazz);
+        public Optional<NetworkDevice> build(Consumer<Object> observer) {
+            if (socket.isClosed())
+                return Optional.empty();
+            else
+                return Optional.of(new SocketDevice(socket, observer));
         }
     }
 
@@ -120,7 +121,7 @@ public final class SocketDevice<S extends Serializable, R extends Serializable> 
         private final int port;
 
         @Override
-        public Optional<SocketDeviceBuilder> connect(Duration timeout) {
+        public Optional<NetworkDeviceBuilder> connect(Duration timeout) {
             try {
                 Socket socket = new Socket();
                 socket.connect(new InetSocketAddress(address, port), (int) timeout.toMillis());

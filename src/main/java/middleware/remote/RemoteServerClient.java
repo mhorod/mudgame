@@ -3,8 +3,10 @@ package middleware.remote;
 import core.event.Action;
 import core.event.Event;
 import core.model.PlayerID;
+import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
+import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
@@ -16,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 public final class RemoteServerClient implements ServerClient {
     private final RemoteNetworkClient client;
 
@@ -42,8 +45,10 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     private MessageToServerHandler getServerHandler() {
-        if (!isActive())
-            throw new RuntimeException("Attempting to send message using inactive ServerClient");
+        if (!isActive()) {
+            log.warn("Attempting to send message using inactive ServerClient");
+            return new MessageToServerFactory(message -> { });
+        }
         return client.getServerHandler();
     }
 

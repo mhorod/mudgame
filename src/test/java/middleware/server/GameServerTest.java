@@ -1,6 +1,7 @@
 package middleware.server;
 
 import core.model.PlayerID;
+import middleware.utils.TestUser;
 import org.junit.jupiter.api.Test;
 
 import static middleware.messages_to_client.MessageToClient.PingToClientMessage;
@@ -35,6 +36,7 @@ class GameServerTest {
 
         // when
         server.checkRemoval();
+        user.allowKick();
         server.checkRemoval();
 
         // then
@@ -85,6 +87,7 @@ class GameServerTest {
         GameServer server = new GameServer();
 
         TestUser user = new TestUser(server);
+        user.allowKick();
         user.device.close();
         user.sent.clear();
 
@@ -110,6 +113,7 @@ class GameServerTest {
 
         // when
         user1.receive().pongToServer();
+        user3.allowKick();
         server.checkRemoval();
 
         // then
@@ -133,11 +137,14 @@ class GameServerTest {
         TestUser user5 = new TestUser(server);
 
         // when
+        user0.allowKick();
         user0.device.close();
         user3.receive().pongToServer();
         user4.receive().pongToServer();
         server.checkRemoval();
 
+        user1.allowKick();
+        user5.allowKick();
         user5.device.close();
         user2.receive().pongToServer();
         user4.receive().pongToServer();
@@ -161,7 +168,8 @@ class GameServerTest {
         TestUser user = new TestUser(server);
 
         // then
-        assertThatThrownBy(() -> server.putUser(user.user)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> server.putUser(user.user)).isInstanceOf(
+                IllegalArgumentException.class);
     }
 
     @Test
@@ -169,10 +177,12 @@ class GameServerTest {
         // given
         GameServer server = new GameServer();
         TestUser user = new TestUser(server);
+        user.allowKick();
         user.receive().disconnect();
 
         // then
-        assertThatThrownBy(() -> server.removeUser(user.user)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> server.removeUser(user.user)).isInstanceOf(
+                IllegalArgumentException.class);
     }
 
     @Test
@@ -194,10 +204,12 @@ class GameServerTest {
         TestUser user = new TestUser(server);
         user.receive().createRoom(new PlayerID(0), 2);
         Room room = user.user.getRoom().orElseThrow();
+        user.allowKick();
         user.receive().disconnect();
 
         // then
-        assertThatThrownBy(() -> server.removeRoom(room)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> server.removeRoom(room)).isInstanceOf(
+                IllegalArgumentException.class);
     }
 
     @Test
@@ -207,6 +219,7 @@ class GameServerTest {
         TestUser user = new TestUser(server);
 
         // when
+        user.allowKick();
         server.stop();
 
         // then
@@ -221,6 +234,7 @@ class GameServerTest {
         user.receive().createRoom(new PlayerID(0), 2);
 
         // when
+        user.allowKick();
         server.stop();
 
         // then

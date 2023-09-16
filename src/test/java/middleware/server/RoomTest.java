@@ -3,6 +3,7 @@ package middleware.server;
 import core.model.PlayerID;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
+import middleware.utils.TestUser;
 import mudgame.controls.actions.CompleteTurn;
 import mudgame.server.MudServerCore;
 import org.apache.commons.lang3.SerializationUtils;
@@ -386,7 +387,7 @@ public class RoomTest {
                     put(new PlayerID(0), null);
                     put(new PlayerID(1), "user1");
                 }}));
-        assertThat(user2.sent).anyMatch(message -> message instanceof ErrorMessage);
+        assertThat(user2.sent).anyMatch(ErrorMessage.class::isInstance);
     }
 
     @Test
@@ -410,7 +411,7 @@ public class RoomTest {
                     put(new PlayerID(0), null);
                     put(new PlayerID(1), "user1");
                 }}));
-        assertThat(user2.sent).anyMatch(message -> message instanceof ErrorMessage);
+        assertThat(user2.sent).anyMatch(ErrorMessage.class::isInstance);
         assertThat(user2.user.getRoom()).isEmpty();
         assertThat(user2.user.getPlayerID()).isEmpty();
     }
@@ -457,12 +458,8 @@ public class RoomTest {
         user1.receive().makeAction(new CompleteTurn());
 
         // then
-        assertThat(user1.sent).isNotEmpty().allMatch(
-                message -> message instanceof RegisterEventMessage
-        );
-        assertThat(user2.sent).isNotEmpty().allMatch(
-                message -> message instanceof RegisterEventMessage
-        );
+        assertThat(user1.sent).isNotEmpty().allMatch(RegisterEventMessage.class::isInstance);
+        assertThat(user2.sent).isNotEmpty().allMatch(RegisterEventMessage.class::isInstance);
     }
 
     @Test
@@ -507,11 +504,11 @@ public class RoomTest {
 
         // then
         assertThat(user1.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage)
-                .anyMatch(message -> message instanceof SetGameStateMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance)
+                .anyMatch(SetGameStateMessage.class::isInstance);
         assertThat(user2.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage)
-                .anyMatch(message -> message instanceof SetGameStateMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance)
+                .anyMatch(SetGameStateMessage.class::isInstance);
     }
 
     @Test
@@ -533,8 +530,8 @@ public class RoomTest {
 
         // then
         assertThat(user2.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage)
-                .anyMatch(message -> message instanceof SetGameStateMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance)
+                .anyMatch(SetGameStateMessage.class::isInstance);
     }
 
     @Test
@@ -648,9 +645,9 @@ public class RoomTest {
 
         // then
         assertThat(user1.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance);
         assertThat(user2.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance);
     }
 
     @Test
@@ -668,10 +665,10 @@ public class RoomTest {
 
         // then
         assertThat(user1.sent)
-                .anyMatch(message -> message instanceof SetDownloadedStateMessage)
-                .noneMatch(message -> message instanceof ErrorMessage);
+                .anyMatch(SetDownloadedStateMessage.class::isInstance)
+                .noneMatch(ErrorMessage.class::isInstance);
         assertThat(user2.sent)
-                .noneMatch(message -> message instanceof SetDownloadedStateMessage);
+                .noneMatch(SetDownloadedStateMessage.class::isInstance);
     }
 
     @Test
@@ -689,10 +686,10 @@ public class RoomTest {
 
         // then
         assertThat(user1.sent)
-                .noneMatch(message -> message instanceof SetDownloadedStateMessage);
+                .noneMatch(SetDownloadedStateMessage.class::isInstance);
         assertThat(user2.sent)
-                .noneMatch(message -> message instanceof SetDownloadedStateMessage)
-                .anyMatch(message -> message instanceof ErrorMessage);
+                .noneMatch(SetDownloadedStateMessage.class::isInstance)
+                .anyMatch(ErrorMessage.class::isInstance);
     }
 
     @Test
@@ -715,7 +712,7 @@ public class RoomTest {
         SetDownloadedStateMessage message2 = (SetDownloadedStateMessage) user.sent.get(0);
 
         // then
-        assertThat(message1.state().turnManager().currentPlayer()).isNotEqualTo(message2.state().turnManager().currentPlayer()
-        );
+        assertThat(message1.state().turnManager().currentPlayer()).isNotEqualTo(
+                message2.state().turnManager().currentPlayer());
     }
 }

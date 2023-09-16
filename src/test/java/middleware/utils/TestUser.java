@@ -1,29 +1,33 @@
-package middleware.server;
+package middleware.utils;
 
 import middleware.clients.NetworkDevice;
 import middleware.clients.NetworkDevice.NetworkDeviceBuilder;
 import middleware.messages_to_client.MessageToClient;
+import middleware.messages_to_client.MessageToClient.KickMessage;
 import middleware.messages_to_server.MessageToServer;
 import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
+import middleware.server.GameServer;
+import middleware.server.User;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public final class TestUser {
     public final User user;
-    public final List<MessageToClient> sent = new ArrayList<>();
     public final DummyNetworkDevice device = new DummyNetworkDevice();
-    public Consumer<MessageToServer> consumer;
+    public final List<MessageToClient> sent = new ArrayList<>();
+    private Consumer<MessageToServer> consumer;
+    private boolean allowKick = false;
 
-    TestUser(GameServer server) {
+    public TestUser(GameServer server) {
         user = new User(new DummyNetworkDeviceBuilder(), server);
     }
 
-    TestUser(GameServer server, String name) {
+    public TestUser(GameServer server, String name) {
         this(server);
         receive().setName(name);
     }
@@ -32,7 +36,11 @@ public final class TestUser {
         return new MessageToServerFactory(consumer);
     }
 
-    public final class DummyNetworkDevice implements NetworkDevice<MessageToClient, MessageToServer> {
+    public void allowKick() {
+        allowKick = true;
+    }
+
+    public final class DummyNetworkDevice implements NetworkDevice {
         private final AtomicBoolean closed = new AtomicBoolean();
 
         @Override
@@ -46,17 +54,18 @@ public final class TestUser {
         }
 
         @Override
-        public void sendMessage(MessageToClient message) {
-            sent.add(message);
+        public void send(Object obj) {
+            if (!allowKick && obj instanceof KickMessage)
+                throw new RuntimeException(user.getUserID() + " unexpectedly kicked!");
+            sent.add((MessageToClient) obj);
         }
     }
 
-    @SuppressWarnings("unchecked")
     public final class DummyNetworkDeviceBuilder implements NetworkDeviceBuilder {
         @Override
-        public <S extends Serializable, R extends Serializable> NetworkDevice<S, R> build(Consumer<R> observer, Class<R> clazz) {
-            consumer = (Consumer<MessageToServer>) observer;
-            return (NetworkDevice<S, R>) device;
+        public Optional<NetworkDevice> build(Consumer<Object> observer) {
+            consumer = observer::accept;
+            return Optional.of(device);
         }
     }
 }

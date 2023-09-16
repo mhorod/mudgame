@@ -6,7 +6,6 @@ import core.model.PlayerID;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.NetworkDevice;
 import middleware.clients.NetworkDevice.NetworkDeviceBuilder;
-import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_client.MessageToClientFactory;
 import middleware.messages_to_client.MessageToClientHandler;
 import middleware.messages_to_server.MessageToServer;
@@ -23,7 +22,7 @@ import java.util.Optional;
 public final class User {
     private static long nextUserID = 0;
 
-    private final NetworkDevice<MessageToClient, MessageToServer> networkDevice;
+    private final NetworkDevice networkDevice;
     private final GameServer server;
     private final UserID userID;
 
@@ -131,7 +130,8 @@ public final class User {
     private boolean last0 = false;
 
     public User(NetworkDeviceBuilder builder, GameServer server) {
-        this.networkDevice = builder.build(this::processMessage, MessageToServer.class);
+        this.networkDevice = builder.build(this::processMessage, MessageToServer.class)
+                .orElseThrow();
         this.server = server;
         this.userID = new UserID(nextUserID++);
 
@@ -142,7 +142,7 @@ public final class User {
     public MessageToClientHandler getClientHandler() {
         return new MessageToClientFactory(message -> {
             log.debug("[TO: {}]: {}", userID, message);
-            networkDevice.sendMessage(message);
+            networkDevice.send(message);
         });
     }
 

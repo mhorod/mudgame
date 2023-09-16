@@ -1,9 +1,11 @@
 package middleware.remote;
 
 import core.event.Action;
+import lombok.extern.slf4j.Slf4j;
 import middleware.clients.AbstractGameClient;
 import mudgame.client.ClientGameState;
 
+@Slf4j
 public final class RemoteGameClient extends AbstractGameClient {
     private final RemoteServerClient client;
 
@@ -18,8 +20,10 @@ public final class RemoteGameClient extends AbstractGameClient {
 
     @Override
     protected void sendAction(Action action) {
-        if (!isActive())
-            throw new RuntimeException("Attempting to send action using inactive GameClient");
+        if (!isActive()) {
+            log.warn("Attempting to send action using inactive GameClient");
+            return;
+        }
         client.makeAction(action);
     }
 }
