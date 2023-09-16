@@ -1,4 +1,4 @@
-package core.event;
+package mudgame.controls.events;
 
 import java.io.Serializable;
 

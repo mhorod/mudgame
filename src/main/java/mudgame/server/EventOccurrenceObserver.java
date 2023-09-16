@@ -1,8 +1,7 @@
-package mudgame.events;
+package mudgame.server;
 
-import core.event.Event;
-import core.event.EventOccurrence;
 import core.model.PlayerID;
+import mudgame.controls.events.Event;
 
 import java.util.List;
 

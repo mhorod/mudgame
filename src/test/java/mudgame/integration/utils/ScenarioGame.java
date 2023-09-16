@@ -1,12 +1,12 @@
 package mudgame.integration.utils;
 
-import core.event.Action;
-import core.event.Event;
-import core.event.EventOccurrence;
 import core.model.PlayerID;
 import mudgame.client.ClientGameState;
 import mudgame.client.MudClientCore;
-import mudgame.events.EventOccurrenceObserver;
+import mudgame.controls.actions.Action;
+import mudgame.controls.events.Event;
+import mudgame.server.EventOccurrence;
+import mudgame.server.EventOccurrenceObserver;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
 

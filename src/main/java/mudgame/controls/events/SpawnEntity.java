@@ -2,7 +2,6 @@ package mudgame.controls.events;
 
 import core.claiming.ClaimedAreaView;
 import core.entities.model.Entity;
-import core.event.Event;
 import core.model.Position;
 
 /**

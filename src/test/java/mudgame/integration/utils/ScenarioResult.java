@@ -2,7 +2,7 @@ package mudgame.integration.utils;
 
 import core.claiming.PlayerClaimedArea;
 import core.entities.EntityBoard;
-import core.event.Event;
+import mudgame.controls.events.Event;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
 import core.resources.PlayerResourceManager;

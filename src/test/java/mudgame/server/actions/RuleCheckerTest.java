@@ -1,6 +1,6 @@
 package mudgame.server.actions;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import mudgame.server.rules.ActionRule;
 import org.junit.jupiter.api.Test;

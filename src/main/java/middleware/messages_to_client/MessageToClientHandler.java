@@ -1,6 +1,6 @@
 package middleware.messages_to_client;
 
-import core.event.Event;
+import mudgame.controls.events.Event;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
 import mudgame.server.ServerGameState;

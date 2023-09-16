@@ -1,7 +1,7 @@
 package middleware.clients;
 
-import core.event.Action;
-import core.event.Event;
+import mudgame.controls.actions.Action;
+import mudgame.controls.events.Event;
 import core.model.PlayerID;
 import mudgame.client.ClientGameState;
 import mudgame.client.MudClientCore;

@@ -1,6 +1,6 @@
 package mudgame.server.actions.entities;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;

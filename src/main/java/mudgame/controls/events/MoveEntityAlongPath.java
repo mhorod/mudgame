@@ -1,7 +1,6 @@
 package mudgame.controls.events;
 
 import core.claiming.ClaimedAreaView.ClaimChange;
-import core.event.Event;
 import core.model.EntityID;
 import core.model.Position;
 

@@ -1,6 +1,6 @@
 package mudgame.server.rules.creation;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.server.rules.ActionRule;

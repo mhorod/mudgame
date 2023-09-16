@@ -1,7 +1,7 @@
 package mudgame.integration.tests;
 
 import core.entities.model.Entity;
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;

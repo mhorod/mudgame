@@ -3,7 +3,7 @@ package mudgame.integration.utils;
 import core.claiming.ClaimedArea;
 import core.entities.EntityBoard;
 import core.entities.model.Entity;
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.fogofwar.FogOfWar;
 import core.fogofwar.FogOfWarView;
 import core.model.PlayerID;
