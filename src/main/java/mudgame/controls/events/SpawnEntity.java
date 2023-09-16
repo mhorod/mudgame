@@ -1,6 +1,6 @@
 package mudgame.controls.events;
 
-import core.claiming.ClaimedAreaView;
+import core.claiming.ClaimChange;
 import core.entities.model.Entity;
 import core.model.Position;
 
@@ -12,5 +12,5 @@ public record SpawnEntity(
         Entity entity,
         Position position,
         VisibilityChange visibilityChange,
-        ClaimedAreaView.ClaimChange claimChange
+        ClaimChange claimChange
 ) implements Event { }

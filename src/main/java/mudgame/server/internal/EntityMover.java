@@ -1,6 +1,6 @@
 package mudgame.server.internal;
 
-import core.claiming.ClaimedAreaView.ClaimChange;
+import core.claiming.ClaimChange;
 import core.entities.model.Entity;
 import core.fogofwar.PlayerFogOfWar.PositionVisibility;
 import core.model.EntityID;

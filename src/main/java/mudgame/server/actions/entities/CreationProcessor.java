@@ -7,7 +7,7 @@ import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.events.ChargeResources;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
-import mudgame.server.actions.Sender;
+import mudgame.server.actions.EventSender;
 import mudgame.server.internal.CreatedEntity;
 import mudgame.server.internal.InteractiveState;
 
@@ -16,9 +16,9 @@ import mudgame.server.internal.InteractiveState;
  */
 final class CreationProcessor {
     private final InteractiveState state;
-    private final Sender sender;
+    private final EventSender sender;
 
-    public CreationProcessor(InteractiveState state, Sender sender) {
+    public CreationProcessor(InteractiveState state, EventSender sender) {
         this.state = state;
         this.sender = sender;
     }

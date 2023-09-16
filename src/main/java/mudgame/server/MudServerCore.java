@@ -31,7 +31,7 @@ import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.actions.MoveEntity;
 import mudgame.server.actions.ActionProcessor;
 import mudgame.server.rules.ActionRule;
-import mudgame.server.rules.PlayerCanCreateEntity;
+import mudgame.server.rules.creation.PlayerCanCreateEntity;
 import mudgame.server.rules.attack.AttackedEntityIsInAttackRange;
 import mudgame.server.rules.attack.AttackerSeesAttackedEntity;
 import mudgame.server.rules.attack.PlayerCannotAttackOwnEntities;

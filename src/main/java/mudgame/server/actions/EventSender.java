@@ -11,7 +11,7 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-public final class Sender {
+public final class EventSender {
     private final EventOccurrenceObserver eventOccurrenceObserver;
 
     public void send(List<EventOccurrence> eventOccurrences) {

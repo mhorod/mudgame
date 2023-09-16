@@ -15,7 +15,7 @@ import mudgame.server.internal.InteractiveState;
 @RequiredArgsConstructor
 final class CompleteTurnProcessor {
     private final InteractiveState state;
-    private final Sender sender;
+    private final EventSender sender;
 
     void process(Action action) {
         if (action instanceof CompleteTurn)

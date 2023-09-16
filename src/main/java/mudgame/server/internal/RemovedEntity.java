@@ -1,6 +1,6 @@
 package mudgame.server.internal;
 
-import core.claiming.ClaimedAreaView.ClaimChange;
+import core.claiming.ClaimChange;
 import core.model.EntityID;
 import mudgame.controls.events.VisibilityChange;
 
