@@ -1,6 +1,6 @@
 package mudgame.server.rules.turn;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import core.turns.TurnView;
 import lombok.RequiredArgsConstructor;

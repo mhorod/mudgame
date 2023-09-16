@@ -1,6 +1,6 @@
 package middleware.remote;
 
-import core.event.Event;
+import mudgame.controls.events.Event;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.Connection;
 import middleware.clients.NetworkClient;
@@ -14,7 +14,6 @@ import middleware.messages_to_server.MessageToServer;
 import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomInfo;
-import middleware.model.UserID;
 import mudgame.client.ClientGameState;
 import mudgame.server.ServerGameState;
 
@@ -87,7 +86,8 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
 
     public void setConnection(Consumer<MessageToServer> consumer, NetworkDevice device) {
         if (networkStatus != NetworkStatus.ATTEMPTING)
-            throw new RuntimeException("reportConnectionAttempt() should be called before setSocketConnection()");
+            throw new RuntimeException(
+                    "reportConnectionAttempt() should be called before setSocketConnection()");
         if (device.isClosedOrScheduledToClose()) {
             networkStatus = NetworkStatus.FAILED;
             return;
@@ -96,7 +96,8 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
         sender = new MessageToServerFactory(consumer.andThen(
                 message -> {
                     if (networkStatus != NetworkStatus.OK)
-                        throw new RuntimeException("Attempting to send message using disconnected NetworkClient");
+                        throw new RuntimeException(
+                                "Attempting to send message using disconnected NetworkClient");
                     log.debug("[SND]: {}", message);
                 }
         ));
@@ -107,7 +108,8 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
     }
 
     public void setSocketConnection(Socket socket) {
-        log.info("setSocketConnection() called, socket is closed: {}, is connected: {}", socket.isClosed(), socket.isConnected());
+        log.info("setSocketConnection() called, socket is closed: {}, is connected: {}",
+                 socket.isClosed(), socket.isConnected());
 
         SocketSender<MessageToServer> socketSender = new SocketSender<>(socket);
         new SocketReceiver<>(messageQueue::add, socket, MessageToClient.class);

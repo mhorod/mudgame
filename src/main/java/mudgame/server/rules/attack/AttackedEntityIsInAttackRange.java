@@ -3,7 +3,7 @@ package mudgame.server.rules.attack;
 import core.entities.EntityBoardView;
 import core.entities.model.components.visitors.GetAttack;
 import core.entities.model.Entity;
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;

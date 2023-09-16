@@ -1,6 +1,6 @@
 package middleware.messages_to_server;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import middleware.model.RoomID;
 import mudgame.server.ServerGameState;

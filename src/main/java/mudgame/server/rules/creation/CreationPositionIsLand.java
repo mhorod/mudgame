@@ -1,6 +1,6 @@
 package mudgame.server.rules.creation;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import core.terrain.TerrainView;
 import lombok.RequiredArgsConstructor;

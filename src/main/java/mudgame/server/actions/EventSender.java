@@ -1,17 +1,17 @@
 package mudgame.server.actions;
 
-import core.event.Event;
-import core.event.EventOccurrence;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mudgame.events.EventOccurrenceObserver;
+import mudgame.controls.events.Event;
+import mudgame.server.EventOccurrence;
+import mudgame.server.EventOccurrenceObserver;
 
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-public final class Sender {
+public final class EventSender {
     private final EventOccurrenceObserver eventOccurrenceObserver;
 
     public void send(List<EventOccurrence> eventOccurrences) {

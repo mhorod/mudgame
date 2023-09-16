@@ -1,6 +1,6 @@
 package middleware.local;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import middleware.clients.AbstractGameClient;
 import mudgame.client.ClientGameState;
 

@@ -1,6 +1,5 @@
 package mudgame.controls.actions;
 
-import core.event.Action;
 import core.model.EntityID;
 import core.model.Position;
 

@@ -1,10 +1,10 @@
 package mudgame.server.actions.entities;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.actions.MoveEntity;
-import mudgame.server.actions.Sender;
+import mudgame.server.actions.EventSender;
 import mudgame.server.internal.InteractiveState;
 
 public final class EntityActionProcessor {
@@ -12,7 +12,7 @@ public final class EntityActionProcessor {
     private final MoveProcessor moveProcessor;
     private final AttackProcessor attackProcessor;
 
-    public EntityActionProcessor(InteractiveState state, Sender sender) {
+    public EntityActionProcessor(InteractiveState state, EventSender sender) {
         creationProcessor = new CreationProcessor(state, sender);
         moveProcessor = new MoveProcessor(state, sender);
         attackProcessor = new AttackProcessor(state, sender);

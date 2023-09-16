@@ -1,7 +1,7 @@
 package middleware.server;
 
-import core.event.Action;
-import core.event.Event;
+import mudgame.controls.actions.Action;
+import mudgame.controls.events.Event;
 import core.model.PlayerID;
 import lombok.extern.slf4j.Slf4j;
 import middleware.communication.NetworkDevice;

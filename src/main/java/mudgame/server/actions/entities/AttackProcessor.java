@@ -3,7 +3,7 @@ package mudgame.server.actions.entities;
 import core.entities.model.Entity;
 import core.entities.model.components.visitors.GetAttack;
 import core.entities.model.components.visitors.GetHealth;
-import core.event.Event;
+import mudgame.controls.events.Event;
 import core.model.PlayerID;
 import core.model.Position;
 import mudgame.controls.actions.AttackEntityAction;
@@ -12,18 +12,18 @@ import mudgame.controls.events.AttackPosition;
 import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.VisibilityChange;
-import mudgame.server.actions.Sender;
+import mudgame.server.actions.EventSender;
 import mudgame.server.internal.InteractiveState;
 import mudgame.server.internal.RemovedEntity;
 
 class AttackProcessor {
     private final InteractiveState state;
-    private final Sender sender;
+    private final EventSender sender;
 
     private final GetAttack getAttack = new GetAttack();
     private final GetHealth getHealth = new GetHealth();
 
-    AttackProcessor(InteractiveState state, Sender sender) {
+    AttackProcessor(InteractiveState state, EventSender sender) {
         this.state = state;
         this.sender = sender;
     }

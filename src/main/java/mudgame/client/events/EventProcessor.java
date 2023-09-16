@@ -1,6 +1,6 @@
 package mudgame.client.events;
 
-import core.event.Event;
+import mudgame.controls.events.Event;
 import mudgame.client.ClientGameState;
 import mudgame.controls.events.AttackEntityEvent;
 import mudgame.controls.events.ChargeResources;

@@ -1,6 +1,6 @@
 package mudgame.server.rules.creation;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.fogofwar.FogOfWar;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;

@@ -1,21 +1,21 @@
 package mudgame.server.actions;
 
-import core.event.Action;
-import core.event.Event;
-import core.event.EventOccurrence;
 import core.resources.Resources;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mudgame.controls.actions.Action;
 import mudgame.controls.actions.CompleteTurn;
+import mudgame.controls.events.Event;
 import mudgame.controls.events.NextTurn;
 import mudgame.controls.events.ProduceResources;
+import mudgame.server.EventOccurrence;
 import mudgame.server.internal.InteractiveState;
 
 @Slf4j
 @RequiredArgsConstructor
 final class CompleteTurnProcessor {
     private final InteractiveState state;
-    private final Sender sender;
+    private final EventSender sender;
 
     void process(Action action) {
         if (action instanceof CompleteTurn)

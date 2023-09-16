@@ -1,7 +1,7 @@
 package io.game.world.controller;
 
 import core.entities.EntityBoardView;
-import core.event.Event;
+import mudgame.controls.events.Event;
 import core.pathfinder.Pathfinder;
 import core.spawning.PlayerSpawnManager;
 import core.terrain.TerrainView;

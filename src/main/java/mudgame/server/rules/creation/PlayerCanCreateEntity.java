@@ -1,10 +1,11 @@
-package mudgame.server.rules;
+package mudgame.server.rules.creation;
 
-import core.event.Action;
+import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import core.spawning.SpawnManager;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.actions.CreateEntity;
+import mudgame.server.rules.ActionRule;
 
 @RequiredArgsConstructor
 public class PlayerCanCreateEntity implements ActionRule {

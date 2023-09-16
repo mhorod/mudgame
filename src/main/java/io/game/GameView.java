@@ -2,7 +2,7 @@ package io.game;
 
 import ai.Bot;
 import ai.RandomWalker;
-import core.event.Event;
+import mudgame.controls.events.Event;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
