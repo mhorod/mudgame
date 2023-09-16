@@ -6,21 +6,15 @@ import org.mockito.ArgumentCaptor;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.Duration;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static middleware.server.MockSockets.*;
+import static middleware.utils.MockSockets.*;
+import static middleware.utils.Wait.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class RemoteServerTest {
-    private static final Duration VERIFY_WAIT = Duration.ofMillis(100);
-
-    void verify_wait() throws Throwable {
-        Thread.sleep(VERIFY_WAIT.toMillis());
-    }
-
     @Test
     void stop_cancels_timer_and_socket() throws Throwable {
         // given
@@ -59,7 +53,7 @@ class RemoteServerTest {
         // given
         Timer mockedTimer = mock(Timer.class);
         ServerSocketWithController mockedServerSocket = serverSocket();
-        Socket userSocket = socket();
+        Socket userSocket = empty_socket();
 
         RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
         mockedServerSocket.controller().accept(userSocket);
@@ -80,7 +74,7 @@ class RemoteServerTest {
         // given
         Timer mockedTimer = mock(Timer.class);
         ServerSocketWithController mockedServerSocket = serverSocket();
-        Socket userSocket = socket();
+        Socket userSocket = empty_socket();
 
         RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
         mockedServerSocket.controller().accept(userSocket);
@@ -101,7 +95,7 @@ class RemoteServerTest {
         Timer mockedTimer = mock(Timer.class);
         ArgumentCaptor<TimerTask> captor = ArgumentCaptor.forClass(TimerTask.class);
 
-        Socket userSocket = socket();
+        Socket userSocket = empty_socket();
         ServerSocketWithController mockedServerSocket = serverSocket();
         RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
         mockedServerSocket.controller().accept(userSocket);

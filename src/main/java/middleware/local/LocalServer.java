@@ -36,7 +36,6 @@ public final class LocalServer {
         return clients.size();
     }
 
-
     public ServerGameState state() {
         return core.state();
     }

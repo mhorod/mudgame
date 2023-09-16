@@ -1,9 +1,9 @@
 package middleware.messages_to_server;
 
-import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import lombok.AllArgsConstructor;
 import middleware.model.RoomID;
+import mudgame.controls.actions.Action;
 import mudgame.server.ServerGameState;
 
 import java.util.function.Consumer;

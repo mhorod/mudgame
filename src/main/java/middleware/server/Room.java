@@ -8,6 +8,7 @@ import mudgame.controls.actions.Action;
 import mudgame.server.EventOccurrence;
 import mudgame.server.MudServerCore;
 import mudgame.server.ServerGameState;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -56,7 +57,7 @@ public final class Room {
     public void sendGameState(User user) {
         if (!isRunning)
             return;
-        ClientGameState state = core.clientState(user.getPlayerID());
+        ClientGameState state = core.clientState(user.getPlayerID().orElseThrow());
         user.setGameState(state);
     }
 
@@ -89,7 +90,7 @@ public final class Room {
     }
 
     public void leaveRoom(User user) {
-        PlayerID playerID = user.getPlayerID();
+        PlayerID playerID = user.getPlayerID().orElseThrow();
 
         user.clearRoom();
         toUserMap.put(playerID, Optional.empty());
@@ -156,12 +157,12 @@ public final class Room {
     public void downloadState(User user) {
         if (sendErrorIfNotOwner(user))
             return;
-        user.setDownloadedState(core.state());
+        user.setDownloadedState(SerializationUtils.clone(core.state()));
     }
 
     public void processAction(Action action, User actor) {
         if (sendErrorIfNotStarted(actor))
             return;
-        core.process(action, actor.getPlayerID());
+        core.process(action, actor.getPlayerID().orElseThrow());
     }
 }

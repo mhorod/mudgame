@@ -1,15 +1,18 @@
 package middleware.clients;
 
-import middleware.remote.NetworkStatus;
-
 import java.util.Optional;
 
-public interface NetworkClient<SELF extends NetworkClient<SELF>> {
+import static middleware.clients.NetworkDevice.NetworkConnectionBuilder;
+import static middleware.clients.NetworkDevice.NetworkDeviceBuilder;
+
+public interface NetworkClient {
     NetworkStatus getNetworkStatus();
 
     void disconnect();
 
-    void connect(Connection<SELF> connection);
+    void connect(NetworkDeviceBuilder builder);
+
+    void connect(NetworkConnectionBuilder builder);
 
     Optional<ServerClient> getServerClient();
 

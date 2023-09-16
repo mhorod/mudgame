@@ -1,33 +1,34 @@
 package middleware.remote;
 
-import mudgame.controls.actions.Action;
-import mudgame.controls.events.Event;
 import core.model.PlayerID;
+import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
+import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
 import mudgame.client.ClientGameState;
+import mudgame.controls.actions.Action;
+import mudgame.controls.events.Event;
 import mudgame.server.ServerGameState;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 public final class RemoteServerClient implements ServerClient {
     private final RemoteNetworkClient client;
 
     private List<RoomInfo> roomList = List.of();
     private Optional<RoomInfo> currentRoom = Optional.empty();
-    ;
     private String name = UserID.DEFAULT_NAME;
 
     private Optional<ServerGameState> downloadedState = Optional.empty();
+    private Optional<RemoteGameClient> currentGameClient = Optional.empty();
     private boolean coreChanged = false;
-    private RemoteGameClient currentGameClient;
 
     public RemoteServerClient(RemoteNetworkClient client) {
         this.client = client;
@@ -44,13 +45,15 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     private MessageToServerHandler getServerHandler() {
-        if (!isActive())
-            throw new RuntimeException("Attempting to send message using inactive ServerClient");
-        return client.getSender();
+        if (!isActive()) {
+            log.warn("Attempting to send message using inactive ServerClient");
+            return new MessageToServerFactory(message -> { });
+        }
+        return client.getServerHandler();
     }
 
     public void setGameState(ClientGameState state) {
-        currentGameClient = new RemoteGameClient(state, this);
+        currentGameClient = Optional.of(new RemoteGameClient(state, this));
         coreChanged = true;
     }
 
@@ -59,12 +62,12 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     public void registerEvent(Event event) {
-        Objects.requireNonNull(currentGameClient).registerEvent(event);
+        currentGameClient.orElseThrow().registerEvent(event);
     }
 
     @Override
     public Optional<GameClient> getGameClient() {
-        return Optional.ofNullable(currentGameClient);
+        return currentGameClient.map(GameClient.class::cast);
     }
 
     @Override
@@ -112,13 +115,13 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     @Override
-    public void setName(String name) {
-        getServerHandler().setName(name);
+    public String getName() {
+        return name;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public void setName(String name) {
+        getServerHandler().setName(name);
     }
 
     public void changeName(String nameFromServer) {
