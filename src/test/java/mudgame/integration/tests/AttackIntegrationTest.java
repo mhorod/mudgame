@@ -7,6 +7,7 @@ import mudgame.controls.events.AttackEntityEvent;
 import mudgame.controls.events.AttackPosition;
 import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.KillEntity;
+import mudgame.controls.events.ProduceResources;
 import mudgame.integration.utils.RectangleTerrain;
 import mudgame.integration.utils.Scenario;
 import mudgame.integration.utils.ScenarioResult;
@@ -128,7 +129,9 @@ class AttackIntegrationTest extends IntegrationTestBase {
         // then
         assertIntegrity(result);
         assertThatClient(result, PLAYER_0)
-                .receivedEventTypes(AttackEntityEvent.class, KillEntity.class);
+                .receivedEventTypes(AttackEntityEvent.class,
+                                    KillEntity.class,
+                                    ProduceResources.class);
         assertThatClient(result, PLAYER_1)
                 .receivedEventTypes(AttackEntityEvent.class, KillEntity.class);
     }
@@ -152,7 +155,11 @@ class AttackIntegrationTest extends IntegrationTestBase {
         // then
         assertIntegrity(result);
         assertThatClient(result, PLAYER_0)
-                .receivedEventTypes(AttackEntityEvent.class, KillEntity.class);
+                .receivedEventTypes(
+                        AttackEntityEvent.class,
+                        KillEntity.class,
+                        ProduceResources.class
+                );
         assertThatClient(result, PLAYER_1)
                 .receivedEventTypes(AttackEntityEvent.class, KillEntity.class);
     }

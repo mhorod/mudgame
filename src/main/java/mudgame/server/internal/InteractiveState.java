@@ -75,4 +75,8 @@ public class InteractiveState extends InteractiveStateView {
         resources.forEach(r -> state.resourceManager().add(player, r));
         return resources.stream().reduce(Resources.empty(), Resources::merge);
     }
+
+    public void addResources(PlayerID player, Resources resources) {
+        state.resourceManager().add(player, resources);
+    }
 }

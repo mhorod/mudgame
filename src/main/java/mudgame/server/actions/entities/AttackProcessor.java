@@ -3,18 +3,24 @@ package mudgame.server.actions.entities;
 import core.entities.model.Entity;
 import core.entities.model.components.visitors.GetAttack;
 import core.entities.model.components.visitors.GetHealth;
-import mudgame.controls.events.Event;
 import core.model.PlayerID;
 import core.model.Position;
+import core.resources.Resources;
 import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.events.AttackEntityEvent;
 import mudgame.controls.events.AttackPosition;
 import mudgame.controls.events.DamageEntity;
+import mudgame.controls.events.Event;
 import mudgame.controls.events.KillEntity;
+import mudgame.controls.events.ProduceResources;
 import mudgame.controls.events.VisibilityChange;
 import mudgame.server.actions.EventSender;
 import mudgame.server.internal.InteractiveState;
 import mudgame.server.internal.RemovedEntity;
+
+import java.util.Map;
+
+import static core.resources.ResourceType.MUD;
 
 class AttackProcessor {
     private final InteractiveState state;
@@ -44,8 +50,25 @@ class AttackProcessor {
         int damage = getAttack.getAttack(attacker).damage();
         int healthLeft = attacked.damage(damage).orElse(0);
         sendAttack(attacker, attacked, damage);
-        if (healthLeft <= 0)
+        if (healthLeft <= 0) {
             kill(attacked);
+            sendKillReward(attacker.owner(), attacked);
+        }
+    }
+
+    private void sendKillReward(PlayerID owner, Entity attacked) {
+        int mud = switch (attacked.type()) {
+            case PAWN -> 1;
+            case MARSH_WIGGLE -> 2;
+            case WARRIOR -> 3;
+            case TOWER -> 5;
+            case BASE -> 20;
+        };
+
+        Resources resources = Resources.of(Map.of(MUD, mud));
+        state.addResources(owner, resources);
+        Event event = new ProduceResources(resources);
+        sender.send(event, owner);
     }
 
     private boolean canAttack(Entity attacker, Entity attacked) {
