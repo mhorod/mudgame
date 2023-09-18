@@ -32,7 +32,6 @@ public final class LocalServer {
         return clients.size();
     }
 
-
     public ServerState state() {
         return core.state();
     }

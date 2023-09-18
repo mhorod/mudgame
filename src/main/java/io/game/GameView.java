@@ -20,9 +20,9 @@ import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
+import middleware.communication.SocketDevice.SocketConnectionBuilder;
 import middleware.local.LocalServer;
 import middleware.remote.RemoteNetworkClient;
-import middleware.remote.SocketConnection;
 import mudgame.controls.events.Event;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
@@ -64,7 +64,8 @@ public class GameView extends SimpleView {
             // --------------------------------------------------
             // if this causes many merge conflicts remove it
             try {
-                RemoteNetworkClient.GLOBAL_CLIENT.connect(new SocketConnection("localhost", 6789));
+                RemoteNetworkClient.GLOBAL_CLIENT.connect(
+                        new SocketConnectionBuilder("localhost", 6789));
 
                 while (RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().isEmpty())
                     RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();

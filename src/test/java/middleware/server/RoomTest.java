@@ -3,6 +3,7 @@ package middleware.server;
 import core.model.PlayerID;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
+import middleware.utils.TestUser;
 import mudgame.controls.actions.CompleteTurn;
 import mudgame.server.state.ClassicServerStateSupplier;
 import mudgame.server.state.ServerStateSupplier;
@@ -389,7 +390,7 @@ class RoomTest {
                     put(new PlayerID(0), null);
                     put(new PlayerID(1), "user1");
                 }}));
-        assertThat(user2.sent).anyMatch(message -> message instanceof ErrorMessage);
+        assertThat(user2.sent).anyMatch(ErrorMessage.class::isInstance);
     }
 
     @Test
@@ -413,9 +414,9 @@ class RoomTest {
                     put(new PlayerID(0), null);
                     put(new PlayerID(1), "user1");
                 }}));
-        assertThat(user2.sent).anyMatch(message -> message instanceof ErrorMessage);
-        assertThat(user2.user.getRoom()).isNull();
-        assertThat(user2.user.getPlayerID()).isNull();
+        assertThat(user2.sent).anyMatch(ErrorMessage.class::isInstance);
+        assertThat(user2.user.getRoom()).isEmpty();
+        assertThat(user2.user.getPlayerID()).isEmpty();
     }
 
     @Test
@@ -427,7 +428,7 @@ class RoomTest {
         user1.receive().createRoom(new PlayerID(0), 2);
 
         TestUser user2 = new TestUser(server);
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         user1.sent.clear();
         user2.sent.clear();
@@ -449,7 +450,7 @@ class RoomTest {
         user1.receive().createRoom(new PlayerID(0), 2);
 
         TestUser user2 = new TestUser(server);
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         user1.receive().startGame();
 
@@ -460,12 +461,8 @@ class RoomTest {
         user1.receive().makeAction(new CompleteTurn());
 
         // then
-        assertThat(user1.sent).isNotEmpty().allMatch(
-                message -> message instanceof RegisterEventMessage
-        );
-        assertThat(user2.sent).isNotEmpty().allMatch(
-                message -> message instanceof RegisterEventMessage
-        );
+        assertThat(user1.sent).isNotEmpty().allMatch(RegisterEventMessage.class::isInstance);
+        assertThat(user2.sent).isNotEmpty().allMatch(RegisterEventMessage.class::isInstance);
     }
 
     @Test
@@ -477,7 +474,7 @@ class RoomTest {
         user1.receive().createRoom(new PlayerID(0), 2);
 
         TestUser user2 = new TestUser(server);
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         user1.receive().startGame();
 
@@ -500,7 +497,7 @@ class RoomTest {
         user1.receive().createRoom(new PlayerID(0), 3);
 
         TestUser user2 = new TestUser(server);
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         user1.sent.clear();
         user2.sent.clear();
@@ -510,11 +507,11 @@ class RoomTest {
 
         // then
         assertThat(user1.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage)
-                .anyMatch(message -> message instanceof SetGameStateMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance)
+                .anyMatch(SetGameStateMessage.class::isInstance);
         assertThat(user2.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage)
-                .anyMatch(message -> message instanceof SetGameStateMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance)
+                .anyMatch(SetGameStateMessage.class::isInstance);
     }
 
     @Test
@@ -532,12 +529,12 @@ class RoomTest {
         user2.sent.clear();
 
         // when
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         // then
         assertThat(user2.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage)
-                .anyMatch(message -> message instanceof SetGameStateMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance)
+                .anyMatch(SetGameStateMessage.class::isInstance);
     }
 
     @Test
@@ -555,12 +552,12 @@ class RoomTest {
         user2.sent.clear();
 
         // when
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         // then
         assertThat(user1.sent).hasSize(1);
         SetCurrentRoomMessage message = (SetCurrentRoomMessage) user1.sent.get(0);
-        assertThat(message.roomInfo()).isEqualTo(user1.user.getRoom().getRoomInfo());
+        assertThat(message.roomInfo()).isEqualTo(user1.user.getRoom().orElseThrow().getRoomInfo());
     }
 
     @Test
@@ -575,7 +572,7 @@ class RoomTest {
         TestUser user2 = new TestUser(server, "user2");
 
         // when
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         // then
         assertThat(server.getRoomList()).hasSize(1).first()
@@ -589,6 +586,27 @@ class RoomTest {
     }
 
     @Test
+    void client_game_state_is_deeply_copied() {
+        // given
+        GameServer server = new GameServer();
+
+        TestUser user = new TestUser(server);
+        user.receive().createRoom(new PlayerID(0), 2);
+
+        // when
+        user.receive().startGame();
+        user.receive().makeAction(new CompleteTurn());
+
+        // then
+        List<SetGameStateMessage> setGameStateMessages = user.sent.stream()
+                .filter(SetGameStateMessage.class::isInstance)
+                .map(SetGameStateMessage.class::cast).toList();
+        assertThat(setGameStateMessages).hasSize(1).first().matches(
+                m -> m.state().turnManager().isMyTurn()
+        );
+    }
+
+    @Test
     void room_info_after_username_change_is_correct() {
         // given
         GameServer server = new GameServer();
@@ -596,7 +614,7 @@ class RoomTest {
         TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(0), 2);
         TestUser user2 = new TestUser(server, "user2");
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         // when
         user1.receive().setName("new_name");
@@ -620,7 +638,7 @@ class RoomTest {
         TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(0), 2);
         TestUser user2 = new TestUser(server, "user2");
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         user1.sent.clear();
         user2.sent.clear();
@@ -630,9 +648,9 @@ class RoomTest {
 
         // then
         assertThat(user1.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance);
         assertThat(user2.sent)
-                .anyMatch(message -> message instanceof SetCurrentRoomMessage);
+                .anyMatch(SetCurrentRoomMessage.class::isInstance);
     }
 
     @Test
@@ -643,17 +661,17 @@ class RoomTest {
         TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(0), 2);
         TestUser user2 = new TestUser(server, "user2");
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         // when
         user1.receive().downloadState();
 
         // then
         assertThat(user1.sent)
-                .anyMatch(message -> message instanceof SetDownloadedStateMessage)
-                .noneMatch(message -> message instanceof ErrorMessage);
+                .anyMatch(SetDownloadedStateMessage.class::isInstance)
+                .noneMatch(ErrorMessage.class::isInstance);
         assertThat(user2.sent)
-                .noneMatch(message -> message instanceof SetDownloadedStateMessage);
+                .noneMatch(SetDownloadedStateMessage.class::isInstance);
     }
 
     @Test
@@ -664,16 +682,40 @@ class RoomTest {
         TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(0), 2);
         TestUser user2 = new TestUser(server, "user2");
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().getRoomID());
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         // when
         user2.receive().downloadState();
 
         // then
         assertThat(user1.sent)
-                .noneMatch(message -> message instanceof SetDownloadedStateMessage);
+                .noneMatch(SetDownloadedStateMessage.class::isInstance);
         assertThat(user2.sent)
-                .noneMatch(message -> message instanceof SetDownloadedStateMessage)
-                .anyMatch(message -> message instanceof ErrorMessage);
+                .noneMatch(SetDownloadedStateMessage.class::isInstance)
+                .anyMatch(ErrorMessage.class::isInstance);
+    }
+
+    @Test
+    void downloaded_server_state_is_deeply_copied() {
+        // given
+        GameServer server = new GameServer();
+
+        TestUser user = new TestUser(server);
+        user.receive().createRoom(new PlayerID(0), 2);
+        user.receive().startGame();
+
+        user.sent.clear();
+        user.receive().downloadState();
+        SetDownloadedStateMessage message1 = (SetDownloadedStateMessage) user.sent.get(0);
+
+        // when
+        user.receive().makeAction(new CompleteTurn());
+        user.sent.clear();
+        user.receive().downloadState();
+        SetDownloadedStateMessage message2 = (SetDownloadedStateMessage) user.sent.get(0);
+
+        // then
+        assertThat(message1.state().turnManager().currentPlayer()).isNotEqualTo(
+                message2.state().turnManager().currentPlayer());
     }
 }

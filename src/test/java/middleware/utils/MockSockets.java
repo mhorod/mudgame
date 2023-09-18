@@ -1,4 +1,4 @@
-package middleware.server;
+package middleware.utils;
 
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 @UtilityClass
 public class MockSockets {
     @SneakyThrows
-    public static Socket socket() {
+    public static Socket empty_socket() {
         Socket socket = mock(Socket.class);
         AtomicBoolean closed = new AtomicBoolean();
 
@@ -30,11 +30,11 @@ public class MockSockets {
         }).when(socket).close();
 
         doAnswer(invocation ->
-                closed.get()
+                         closed.get()
         ).when(socket).isClosed();
 
         doAnswer(invocation ->
-                new InetSocketAddress("localhost", 0).getAddress()
+                         new InetSocketAddress("localhost", 0).getAddress()
         ).when(socket).getInetAddress();
 
         doAnswer(invocation -> new OutputStream() {
@@ -69,7 +69,7 @@ public class MockSockets {
         }).when(socket).close();
 
         doAnswer(invocation ->
-                closed.get()
+                         closed.get()
         ).when(socket).isClosed();
 
         doAnswer(invocation -> {

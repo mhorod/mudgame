@@ -1,9 +1,9 @@
 package middleware.clients;
 
-import mudgame.controls.events.Event;
 import core.model.PlayerID;
 import mudgame.client.MudClientCoreView;
 import mudgame.controls.Controls;
+import mudgame.controls.events.Event;
 
 import java.util.Optional;
 

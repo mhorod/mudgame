@@ -1,10 +1,7 @@
 package middleware.server;
 
 import lombok.extern.slf4j.Slf4j;
-import middleware.communication.SocketReceiver;
-import middleware.communication.SocketSender;
-import middleware.messages_to_client.MessageToClient;
-import middleware.messages_to_server.MessageToServer;
+import middleware.communication.SocketDevice.SocketDeviceBuilder;
 import mudgame.server.state.ServerStateSupplier;
 
 import java.io.IOException;
@@ -57,20 +54,7 @@ public final class RemoteServer {
 
     private void receiveConnection(Socket socket) {
         synchronized (server) {
-            SocketSender<MessageToClient> sender = new SocketSender<>(socket);
-
-            User user = new User(
-                    serverStateSupplier, sender::sendMessage,
-                    sender.getClosingDevice(),
-                    server
-            );
-
-            new SocketReceiver<>(
-                    user::processMessage,
-                    socket,
-                    MessageToServer.class
-            );
-
+            User user = new User(serverStateSupplier, new SocketDeviceBuilder(socket), server);
             log.info("New connection from {} got {}", socket.getInetAddress(), user.getUserID());
         }
     }

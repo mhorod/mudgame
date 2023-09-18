@@ -1,9 +1,9 @@
 package middleware.messages_to_client;
 
-import mudgame.controls.events.Event;
 import lombok.AllArgsConstructor;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
+import mudgame.controls.events.Event;
 import mudgame.server.state.ServerState;
 
 import java.util.List;
