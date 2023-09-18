@@ -1,12 +1,12 @@
 package core.fogofwar;
 
-import core.entities.model.components.Vision;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
+import core.entities.model.components.Vision;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import static core.entities.model.EntityType.PAWN;
 import static org.mockito.Mockito.mock;
 
 class PlayerFogOfWarTest {
-    @RequiredArgsConstructor
+    @AllArgsConstructor
     private static class PlayerFogOfWarAssert {
         private final PlayerFogOfWar actual;
 

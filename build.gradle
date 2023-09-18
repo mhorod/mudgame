@@ -52,7 +52,7 @@ test {
 mainClassName = 'Program'
 
 task mudServer(type: Jar) {
-    archiveName = 'mudServer.jar'
+    archiveFileName = 'mudServer.jar'
     manifest { attributes('Main-Class': 'Server') }
     from {
         configurations.runtimeClasspath
@@ -65,7 +65,7 @@ task mudServer(type: Jar) {
 }
 
 task mudClient(type: Jar) {
-    archiveName = 'mudClient.jar'
+    archiveFileName = 'mudClient.jar'
     manifest { attributes('Main-Class': mainClassName) }
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
