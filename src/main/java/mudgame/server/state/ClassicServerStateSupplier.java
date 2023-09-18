@@ -10,7 +10,7 @@ import core.terrain.model.StartingTerrain;
 import core.terrain.placers.PlayerPlacer;
 import core.terrain.placers.RandomPlayerPlacer;
 import lombok.RequiredArgsConstructor;
-import mudgame.server.gameover.OwnsThreeEntities;
+import mudgame.server.gameover.OnlyOnePlayerLeft;
 import mudgame.server.rules.DefaultRules;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class ClassicServerStateSupplier implements ServerStateSupplier {
         ServerState state = ServerState.of(
                 playerCount,
                 generatedTerrain.terrain(),
-                OwnsThreeEntities::new,
+                OnlyOnePlayerLeft::new,
                 new DefaultRules()
         );
         placePlayerBases(state, generatedTerrain.startingPositions());
