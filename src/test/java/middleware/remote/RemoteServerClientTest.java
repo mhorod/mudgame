@@ -16,8 +16,9 @@ import middleware.model.RoomInfo;
 import middleware.model.UserID;
 import middleware.utils.TestServerClient;
 import mudgame.client.ClientGameState;
-import mudgame.server.MudServerCore;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ClassicServerStateSupplier;
+import mudgame.server.state.ServerState;
+import mudgame.server.state.ServerStateSupplier;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RemoteServerClientTest {
+    private final ServerStateSupplier serverStateSupplier = new ClassicServerStateSupplier();
     private static final RoomInfo ROOM_INFO = new RoomInfo(
             new RoomID(2),
             Map.of(new PlayerID(2), "2",
@@ -92,7 +94,7 @@ class RemoteServerClientTest {
         serverClient.refreshRoomList();
         serverClient.joinRoom(new RoomID(2), new PlayerID(3));
         serverClient.createRoom(new PlayerID(4), 5);
-        ServerGameState state = MudServerCore.newState(6);
+        ServerState state = serverStateSupplier.get(2);
         serverClient.createRoom(new PlayerID(7), state);
         serverClient.startGame();
         serverClient.setName("8");
@@ -126,7 +128,7 @@ class RemoteServerClientTest {
         serverClient.refreshRoomList();
         serverClient.joinRoom(new RoomID(2), new PlayerID(3));
         serverClient.createRoom(new PlayerID(4), 5);
-        ServerGameState state = MudServerCore.newState(6);
+        ServerState state = serverStateSupplier.get(6);
         serverClient.createRoom(new PlayerID(7), state);
         serverClient.startGame();
         serverClient.setName("8");
@@ -159,13 +161,13 @@ class RemoteServerClientTest {
         ServerClient serverClient = testClient.serverClient;
 
         // when
-        ServerGameState state = MudServerCore.newState(2);
+        ServerState state = serverStateSupplier.get(2);
         testClient.receive().setDownloadedState(state);
         networkClient.processAllMessages();
 
         // then
         assertThat(serverClient.getDownloadedState().orElseThrow()).isEqualTo(state);
-        assertThat(serverClient.getDownloadedState().isPresent()).isFalse();
+        assertThat(serverClient.getDownloadedState()).isEmpty();
     }
 
     @Test
@@ -176,7 +178,7 @@ class RemoteServerClientTest {
         ServerClient serverClient = testClient.serverClient;
 
         // when
-        ClientGameState state = MudServerCore.newState(2).toClientGameState(new PlayerID(0));
+        ClientGameState state = serverStateSupplier.get(2).toClientGameState(new PlayerID(0));
         testClient.receive().setGameState(state);
         networkClient.processAllMessages();
 

@@ -12,7 +12,7 @@ import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
 import mudgame.controls.events.Event;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -90,7 +90,7 @@ public final class RemoteNetworkClient implements NetworkClient {
         }
 
         @Override
-        public void setDownloadedState(ServerGameState state) {
+        public void setDownloadedState(ServerState state) {
             Objects.requireNonNull(currentServerClient).setDownloadedState(state);
         }
     };

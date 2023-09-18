@@ -5,10 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mudgame.controls.actions.Action;
 import mudgame.controls.actions.CompleteTurn;
-import mudgame.controls.events.Event;
 import mudgame.controls.events.NextTurn;
 import mudgame.controls.events.ProduceResources;
-import mudgame.server.EventOccurrence;
 import mudgame.server.internal.InteractiveState;
 
 @Slf4j
@@ -25,7 +23,7 @@ final class CompleteTurnProcessor {
     private void completeTurn() {
         state.completeTurn();
         NextTurn event = new NextTurn(state.currentPlayer());
-        sender.send(seenByEveryone(event));
+        sender.sendToEveryone(event);
 
         Resources resources = state.produceResources(state.currentPlayer());
         log.debug("Produced resources for player: {}, {}", state.currentPlayer(), resources);
@@ -33,8 +31,5 @@ final class CompleteTurnProcessor {
             sender.send(new ProduceResources(resources), state.currentPlayer());
     }
 
-    private EventOccurrence seenByEveryone(Event event) {
-        return new EventOccurrence(event, state.players());
-    }
 
 }

@@ -11,7 +11,7 @@ public class Wait {
     public static final Duration EPS = Duration.ofMillis(3);
 
     @SneakyThrows
-    public void verify_wait() {
+    public static void verify_wait() {
         Thread.sleep(VERIFY_WAIT.toMillis());
     }
 }

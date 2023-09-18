@@ -1,9 +1,10 @@
 package mudgame.client.events;
 
-import mudgame.controls.events.Event;
 import mudgame.client.ClientGameState;
 import mudgame.controls.events.AttackEntityEvent;
 import mudgame.controls.events.ChargeResources;
+import mudgame.controls.events.Event;
+import mudgame.controls.events.GameOver;
 import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.NextTurn;
@@ -34,6 +35,8 @@ public final class EventProcessor {
             entityEventProcessor.moveEntityAlongPath(e);
         else if (event instanceof NextTurn e)
             nextTurn(e);
+        else if (event instanceof GameOver e)
+            gameOver(e);
         else if (event instanceof AttackEntityEvent e)
             entityEventProcessor.attackEntity(e);
         else if (event instanceof KillEntity e)
@@ -46,5 +49,9 @@ public final class EventProcessor {
 
     private void nextTurn(NextTurn e) {
         state.turnManager().nextTurn(e.currentPlayer());
+    }
+
+    private void gameOver(GameOver e) {
+        state.gameOverCondition().gameOver(e.winners());
     }
 }

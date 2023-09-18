@@ -9,6 +9,7 @@ import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
 import middleware.server.GameServer;
 import middleware.server.User;
+import mudgame.server.state.ClassicServerStateSupplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public final class TestUser {
     private boolean allowKick = false;
 
     public TestUser(GameServer server) {
-        user = new User(new DummyNetworkDeviceBuilder(), server);
+        user = new User(new ClassicServerStateSupplier(), new DummyNetworkDeviceBuilder(), server);
     }
 
     public TestUser(GameServer server, String name) {

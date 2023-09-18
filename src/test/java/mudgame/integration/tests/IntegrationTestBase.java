@@ -1,10 +1,10 @@
 package mudgame.integration.tests;
 
 import core.entities.model.Entity;
-import mudgame.controls.actions.Action;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import mudgame.controls.actions.Action;
 import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.actions.CompleteTurn;
 import mudgame.controls.actions.CreateEntity;
@@ -29,7 +29,13 @@ abstract class IntegrationTestBase {
             assertEntityBoardIntegrity(result, player);
             assertClaimedAreaIntegrity(result, player);
             assertResourcesIntegrity(result, player);
+            assertGameOverIntegrity(result, player);
         }
+    }
+
+    private void assertGameOverIntegrity(ScenarioResult result, PlayerID player) {
+        assertThat(result.clientIsGameOver(player)).isEqualTo(result.serverIsGameOver());
+        assertThat(result.clientWinners(player)).isEqualTo(result.serverWinners());
     }
 
     private void assertResourcesIntegrity(ScenarioResult result, PlayerID player) {

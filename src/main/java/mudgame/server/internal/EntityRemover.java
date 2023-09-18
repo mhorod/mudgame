@@ -6,13 +6,13 @@ import core.model.EntityID;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.events.VisibilityChange;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.Set;
 
 @RequiredArgsConstructor
 class EntityRemover {
-    private final ServerGameState state;
+    private final ServerState state;
     private final Visibility visibility;
 
     public RemovedEntity removeEntity(EntityID entityID) {

@@ -7,13 +7,13 @@ import core.model.EntityID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.events.VisibilityChange;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.Set;
 
 @RequiredArgsConstructor
 class EntityMover {
-    private final ServerGameState state;
+    private final ServerState state;
     private final Visibility visibility;
 
     public MovedEntity moveEntity(EntityID entityID, Position position) {

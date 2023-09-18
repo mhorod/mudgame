@@ -7,13 +7,13 @@ import core.model.PlayerID;
 import core.model.Position;
 import core.resources.Resources;
 import lombok.extern.slf4j.Slf4j;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Functional facade for the {@link ServerGameState}.
+ * Functional facade for the {@link ServerState}.
  * <p>
  * This is meant for internal use to simplify access and modifications on the game state.
  * <p>
@@ -23,12 +23,12 @@ import java.util.Optional;
  */
 @Slf4j
 public class InteractiveState extends InteractiveStateView {
-    private final ServerGameState state;
+    private final ServerState state;
     private final EntityCreator entityCreator;
     private final EntityMover entityMover;
     private final EntityRemover entityRemover;
 
-    public InteractiveState(ServerGameState state) {
+    public InteractiveState(ServerState state) {
         super(state);
         this.state = state;
         Visibility visibility = new Visibility(

@@ -7,7 +7,7 @@ import mudgame.client.ClientGameState;
 import mudgame.controls.actions.Action;
 import mudgame.server.EventOccurrence;
 import mudgame.server.MudServerCore;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.LinkedHashMap;
@@ -31,7 +31,7 @@ public final class Room {
     private Optional<User> owner = Optional.empty();
     private boolean isRunning = false;
 
-    public Room(ServerGameState state, GameServer server) {
+    public Room(ServerState state, GameServer server) {
         this.server = server;
         this.roomID = new RoomID(nextRoomID++);
         this.core = new MudServerCore(state, this::eventObserver);

@@ -6,7 +6,8 @@ import middleware.clients.NetworkClient;
 import middleware.clients.ServerClient;
 import middleware.utils.TestServerClient;
 import mudgame.controls.events.Event;
-import mudgame.server.MudServerCore;
+import mudgame.server.state.ClassicServerStateSupplier;
+import mudgame.server.state.ServerState;
 import org.junit.jupiter.api.Test;
 
 import static middleware.messages_to_server.MessageToServer.MakeActionMessage;
@@ -23,7 +24,7 @@ class RemoteGameClientTest {
 
         // when
         testClient.receive()
-                .setGameState(MudServerCore.newState(2).toClientGameState(new PlayerID(0)));
+                .setGameState(newState(2).toClientGameState(new PlayerID(0)));
         networkClient.processAllMessages();
 
         // then
@@ -38,7 +39,7 @@ class RemoteGameClientTest {
         ServerClient serverClient = testClient.serverClient;
 
         testClient.receive()
-                .setGameState(MudServerCore.newState(2).toClientGameState(new PlayerID(0)));
+                .setGameState(newState(2).toClientGameState(new PlayerID(0)));
         networkClient.processAllMessages();
 
         GameClient gameClient = serverClient.getGameClient().orElseThrow();
@@ -58,12 +59,12 @@ class RemoteGameClientTest {
         ServerClient serverClient = testClient.serverClient;
 
         testClient.receive()
-                .setGameState(MudServerCore.newState(2).toClientGameState(new PlayerID(0)));
+                .setGameState(newState(2).toClientGameState(new PlayerID(0)));
         networkClient.processAllMessages();
 
         GameClient gameClient = serverClient.getGameClient().orElseThrow();
         testClient.receive()
-                .setGameState(MudServerCore.newState(2).toClientGameState(new PlayerID(0)));
+                .setGameState(newState(2).toClientGameState(new PlayerID(0)));
         networkClient.processAllMessages();
 
         // when
@@ -81,7 +82,7 @@ class RemoteGameClientTest {
         ServerClient serverClient = testClient.serverClient;
 
         testClient.receive()
-                .setGameState(MudServerCore.newState(2).toClientGameState(new PlayerID(0)));
+                .setGameState(newState(2).toClientGameState(new PlayerID(0)));
         networkClient.processAllMessages();
 
         GameClient gameClient = serverClient.getGameClient().orElseThrow();
@@ -102,12 +103,12 @@ class RemoteGameClientTest {
         ServerClient serverClient = testClient.serverClient;
 
         testClient.receive()
-                .setGameState(MudServerCore.newState(2).toClientGameState(new PlayerID(0)));
+                .setGameState(newState(2).toClientGameState(new PlayerID(0)));
         networkClient.processAllMessages();
 
         GameClient gameClient = serverClient.getGameClient().orElseThrow();
         testClient.receive()
-                .setGameState(MudServerCore.newState(2).toClientGameState(new PlayerID(0)));
+                .setGameState(newState(2).toClientGameState(new PlayerID(0)));
         networkClient.processAllMessages();
 
         // when
@@ -116,5 +117,9 @@ class RemoteGameClientTest {
 
         // then
         assertThat(gameClient.hasEvent()).isFalse();
+    }
+
+    private static ServerState newState(int players) {
+        return new ClassicServerStateSupplier().get(players);
     }
 }

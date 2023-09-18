@@ -13,8 +13,8 @@ import middleware.model.UserID;
 import mudgame.client.ClientGameState;
 import mudgame.controls.actions.Action;
 import mudgame.controls.events.Event;
-import mudgame.server.MudServerCore;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
+import mudgame.server.state.ServerStateSupplier;
 
 import java.util.Optional;
 
@@ -22,6 +22,7 @@ import java.util.Optional;
 public final class User {
     private static long nextUserID = 0;
 
+    private final ServerStateSupplier serverStateSupplier;
     private final NetworkDevice networkDevice;
     private final GameServer server;
     private final UserID userID;
@@ -40,11 +41,11 @@ public final class User {
                 sendError("playerCount must be positive");
                 return;
             }
-            loadGame(myPlayerID, MudServerCore.newState(playerCount));
+            loadGame(myPlayerID, serverStateSupplier.get(playerCount));
         }
 
         @Override
-        public void loadGame(PlayerID myPlayerID, ServerGameState state) {
+        public void loadGame(PlayerID myPlayerID, ServerState state) {
             if (sendErrorIfInRoom())
                 return;
             if (!state.turnManager().players().contains(myPlayerID)) {
@@ -129,9 +130,14 @@ public final class User {
     private int sinceLastCheck = 0;
     private boolean last0 = false;
 
-    public User(NetworkDeviceBuilder builder, GameServer server) {
+    public User(
+            ServerStateSupplier serverStateSupplier,
+            NetworkDeviceBuilder builder,
+            GameServer server
+    ) {
         this.networkDevice = builder.build(this::processMessage, MessageToServer.class)
                 .orElseThrow();
+        this.serverStateSupplier = serverStateSupplier;
         this.server = server;
         this.userID = new UserID(nextUserID++);
 
@@ -208,7 +214,7 @@ public final class User {
         getClientHandler().setGameState(state);
     }
 
-    public void setDownloadedState(ServerGameState state) {
+    public void setDownloadedState(ServerState state) {
         getClientHandler().setDownloadedState(state);
     }
 

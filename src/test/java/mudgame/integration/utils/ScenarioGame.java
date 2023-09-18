@@ -8,7 +8,7 @@ import mudgame.controls.events.Event;
 import mudgame.server.EventOccurrence;
 import mudgame.server.EventOccurrenceObserver;
 import mudgame.server.MudServerCore;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class ScenarioGame {
     private final Map<PlayerID, MudClientCore> clientCores;
     Map<PlayerID, List<Event>> receivedEvents;
 
-    public ScenarioGame(ServerGameState initialState) {
+    public ScenarioGame(ServerState initialState) {
         EventSender sender = new EventSender();
         serverCore = new MudServerCore(initialState, sender);
         clientCores = initialState.turnManager()

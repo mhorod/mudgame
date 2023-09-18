@@ -2,15 +2,19 @@ package middleware.local;
 
 import core.model.PlayerID;
 import middleware.clients.GameClient;
+import mudgame.server.state.ClassicServerStateSupplier;
+import mudgame.server.state.ServerStateSupplier;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LocalTest {
+    private static final ServerStateSupplier serverStateSupplier = new ClassicServerStateSupplier();
+
     @Test
     void local_clients_are_in_correct_order() {
         // given
-        LocalServer server = new LocalServer(2);
+        LocalServer server = new LocalServer(serverStateSupplier.get(2));
 
         // when
         GameClient client0 = server.getClient(0);
@@ -26,7 +30,7 @@ class LocalTest {
     @Test
     void restarting_game_works() {
         // given
-        LocalServer server0 = new LocalServer(2);
+        LocalServer server0 = new LocalServer(serverStateSupplier.get(2));
         server0.getClient(0).getControls().completeTurn();
         PlayerID player0 = server0.getClient(0).myPlayerID();
         PlayerID player1 = server0.getClient(1).myPlayerID();
@@ -43,7 +47,7 @@ class LocalTest {
     @Test
     void events_are_registered_automatically() {
         // given
-        LocalServer server = new LocalServer(2);
+        LocalServer server = new LocalServer(serverStateSupplier.get(2));
 
         GameClient client0 = server.getClient(0);
         GameClient client1 = server.getClient(1);
@@ -59,7 +63,7 @@ class LocalTest {
     @Test
     void processing_events_works() {
         // given
-        LocalServer server = new LocalServer(2);
+        LocalServer server = new LocalServer(serverStateSupplier.get(2));
 
         GameClient client0 = server.getClient(0);
         GameClient client1 = server.getClient(1);
