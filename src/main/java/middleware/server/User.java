@@ -1,7 +1,5 @@
 package middleware.server;
 
-import mudgame.controls.actions.Action;
-import mudgame.controls.events.Event;
 import core.model.PlayerID;
 import lombok.extern.slf4j.Slf4j;
 import middleware.communication.NetworkDevice;
@@ -13,8 +11,10 @@ import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomID;
 import middleware.model.UserID;
 import mudgame.client.ClientGameState;
-import mudgame.server.MudServerCore;
+import mudgame.controls.actions.Action;
+import mudgame.controls.events.Event;
 import mudgame.server.state.ServerState;
+import mudgame.server.state.ServerStateSupplier;
 
 import java.util.function.Consumer;
 
@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 public final class User {
     private static long nextUserID = 0;
 
+    private final ServerStateSupplier serverStateSupplier;
     private final MessageToClientHandler sender;
     private final NetworkDevice networkDevice;
     private final GameServer server;
@@ -41,7 +42,7 @@ public final class User {
                 sendError("playerCount must be positive");
                 return;
             }
-            loadGame(myPlayerID, MudServerCore.newState(playerCount));
+            loadGame(myPlayerID, serverStateSupplier.get(playerCount));
         }
 
         @Override
@@ -131,7 +132,11 @@ public final class User {
     private int sinceLastCheck = 0;
     private boolean last0 = false;
 
-    public User(Consumer<MessageToClient> sender, NetworkDevice networkDevice, GameServer server) {
+    public User(
+            ServerStateSupplier serverStateSupplier,
+            Consumer<MessageToClient> sender, NetworkDevice networkDevice, GameServer server
+    ) {
+        this.serverStateSupplier = serverStateSupplier;
         this.networkDevice = networkDevice;
         this.server = server;
         this.userID = new UserID(nextUserID++);

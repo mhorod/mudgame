@@ -4,6 +4,7 @@ import core.entities.EntityBoardView;
 import core.gameover.GameOverCondition;
 import core.model.PlayerID;
 import lombok.RequiredArgsConstructor;
+import mudgame.server.state.ServerGameState;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,11 @@ import java.util.Optional;
 public class OwnsThreeEntities implements GameOverCondition {
     private final List<PlayerID> players;
     private final EntityBoardView entityBoard;
+
+    public OwnsThreeEntities(ServerGameState gameState) {
+        players = gameState.turnManager().players();
+        entityBoard = gameState.entityBoard();
+    }
 
     @Override
     public boolean isGameOver() {
@@ -24,4 +30,5 @@ public class OwnsThreeEntities implements GameOverCondition {
     public Optional<List<PlayerID>> winners() {
         return Optional.empty();
     }
+
 }

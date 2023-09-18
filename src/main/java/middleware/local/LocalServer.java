@@ -28,10 +28,6 @@ public final class LocalServer {
         core = new MudServerCore(state, this::sendEvent);
     }
 
-    public LocalServer(int playerCount) {
-        this(MudServerCore.newState(playerCount));
-    }
-
     public int playerCount() {
         return clients.size();
     }

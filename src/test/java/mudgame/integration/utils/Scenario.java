@@ -14,6 +14,8 @@ import core.terrain.model.Terrain;
 import core.terrain.model.TerrainType;
 import core.turns.TurnManager;
 import mudgame.controls.actions.Action;
+import mudgame.server.rules.DefaultRules;
+import mudgame.server.rules.RuleProvider;
 import mudgame.server.state.ServerGameState;
 import mudgame.server.state.ServerState;
 

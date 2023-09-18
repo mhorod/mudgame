@@ -4,6 +4,7 @@ import middleware.communication.NetworkDevice;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
+import mudgame.server.state.ClassicServerStateSupplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ public final class TestUser {
 
     TestUser(GameServer server) {
         user = new User(
+                new ClassicServerStateSupplier(),
                 sent::add,
                 device,
                 server

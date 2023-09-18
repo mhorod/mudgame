@@ -13,7 +13,9 @@ import core.turns.PlayerTurnManager;
 import core.turns.TurnManager;
 import mudgame.client.ClientGameOverCondition;
 import mudgame.client.ClientGameState;
+import mudgame.server.gameover.GameOverConditionProvider;
 import mudgame.server.rules.ActionRule;
+import mudgame.server.rules.RuleProvider;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -24,6 +26,23 @@ public record ServerState(
         GameOverCondition gameOverCondition,
         List<ActionRule> rules
 ) implements Serializable {
+
+    public static ServerState of(
+            int playerCount,
+            Terrain terrain,
+            GameOverConditionProvider gameOverConditionProvider,
+            RuleProvider ruleProvider
+    ) {
+        ServerGameState gameState = ServerGameState.of(playerCount, terrain);
+        GameOverCondition gameOverCondition = gameOverConditionProvider.get(gameState);
+        return new ServerState(
+                gameState,
+                gameOverCondition,
+                ruleProvider.rules(gameState, gameOverCondition)
+        );
+    }
+
+
     public ClientGameState toClientGameState(PlayerID playerID) {
         PlayerTurnManager newTurnManager = new PlayerTurnManager(
                 playerID,

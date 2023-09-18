@@ -4,7 +4,8 @@ import core.model.PlayerID;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import mudgame.controls.actions.CompleteTurn;
-import mudgame.server.MudServerCore;
+import mudgame.server.state.ClassicServerStateSupplier;
+import mudgame.server.state.ServerStateSupplier;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,9 @@ import java.util.List;
 import static middleware.messages_to_client.MessageToClient.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RoomTest {
+class RoomTest {
+    private final static ServerStateSupplier serverStateSupplier = new ClassicServerStateSupplier();
+
     @Test
     void users_receive_correct_room_info_on_joining_server() {
         // given
@@ -57,7 +60,7 @@ public class RoomTest {
         user.sent.clear();
 
         // when
-        user.receive().loadGame(new PlayerID(0), MudServerCore.newState(2));
+        user.receive().loadGame(new PlayerID(0), serverStateSupplier.get(2));
 
         // then
         SetCurrentRoomMessage message = (SetCurrentRoomMessage) user.sent.get(0);
@@ -110,7 +113,7 @@ public class RoomTest {
         TestUser user = new TestUser(server, "user");
 
         // when
-        user.receive().loadGame(new PlayerID(1), MudServerCore.newState(2));
+        user.receive().loadGame(new PlayerID(1), serverStateSupplier.get(2));
 
         // then
         assertThat(server.getRoomList()).hasSize(1).first()

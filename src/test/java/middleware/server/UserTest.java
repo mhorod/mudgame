@@ -3,7 +3,8 @@ package middleware.server;
 import core.model.PlayerID;
 import middleware.model.UserID;
 import mudgame.controls.actions.CompleteTurn;
-import mudgame.server.MudServerCore;
+import mudgame.server.state.ClassicServerStateSupplier;
+import mudgame.server.state.ServerStateSupplier;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -13,6 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class UserTest {
+    private static final ServerStateSupplier serverStateSupplier = new ClassicServerStateSupplier();
+
     @Test
     void user_receives_id_and_room_list() {
         // given
@@ -147,7 +150,7 @@ public class UserTest {
         user.sent.clear();
 
         // when
-        user.receive().loadGame(new PlayerID(2), MudServerCore.newState(2));
+        user.receive().loadGame(new PlayerID(2), serverStateSupplier.get(2));
 
         // then
         assertThat(user.user.getRoom()).isNull();
@@ -165,7 +168,7 @@ public class UserTest {
         user.sent.clear();
 
         // when
-        user.receive().loadGame(new PlayerID(0), MudServerCore.newState(2));
+        user.receive().loadGame(new PlayerID(0), serverStateSupplier.get(2));
 
         // then
         assertThat(user.user.getRoom()).isEqualTo(room);

@@ -5,6 +5,7 @@ import middleware.communication.SocketReceiver;
 import middleware.communication.SocketSender;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_server.MessageToServer;
+import mudgame.server.state.ServerStateSupplier;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -17,11 +18,16 @@ import java.util.TimerTask;
 public final class RemoteServer {
     private static final Duration SCAN_CLOSED_CONNECTIONS_DELAY = Duration.ofSeconds(15);
 
+    private final ServerStateSupplier serverStateSupplier;
     private final GameServer server = new GameServer();
     private final ServerSocket serverSocket;
     private final Timer timer;
 
-    public RemoteServer(ServerSocket serverSocket, Timer timer) {
+    public RemoteServer(
+            ServerStateSupplier serverStateSupplier,
+            ServerSocket serverSocket, Timer timer
+    ) {
+        this.serverStateSupplier = serverStateSupplier;
         this.serverSocket = serverSocket;
         this.timer = timer;
         new Thread(this::workReceiveConnections).start();
@@ -54,7 +60,7 @@ public final class RemoteServer {
             SocketSender<MessageToClient> sender = new SocketSender<>(socket);
 
             User user = new User(
-                    sender::sendMessage,
+                    serverStateSupplier, sender::sendMessage,
                     sender.getClosingDevice(),
                     server
             );
