@@ -4,7 +4,7 @@ import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import lombok.AllArgsConstructor;
 import middleware.model.RoomID;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.function.Consumer;
 
@@ -20,7 +20,7 @@ public final class MessageToServerFactory implements MessageToServerHandler {
     }
 
     @Override
-    public void loadGame(PlayerID myPlayerID, ServerGameState state) {
+    public void loadGame(PlayerID myPlayerID, ServerState state) {
         consumer.accept(new LoadGameMessage(myPlayerID, state));
     }
 

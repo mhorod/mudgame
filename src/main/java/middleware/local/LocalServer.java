@@ -5,7 +5,7 @@ import middleware.clients.GameClient;
 import mudgame.controls.actions.Action;
 import mudgame.server.EventOccurrence;
 import mudgame.server.MudServerCore;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +18,7 @@ public final class LocalServer {
     private final List<GameClient> clients = new ArrayList<>();
     private final Map<PlayerID, LocalClient> clientMap = new HashMap<>();
 
-    public LocalServer(ServerGameState state) {
+    public LocalServer(ServerState state) {
         for (PlayerID playerID : state.turnManager().players()) {
             LocalClient client = new LocalClient(state.toClientGameState(playerID), this);
             clients.add(client);
@@ -37,7 +37,7 @@ public final class LocalServer {
     }
 
 
-    public ServerGameState state() {
+    public ServerState state() {
         return core.state();
     }
 

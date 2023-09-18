@@ -3,9 +3,9 @@ package mudgame.integration.utils;
 import core.claiming.ClaimedArea;
 import core.entities.EntityBoard;
 import core.entities.model.Entity;
-import mudgame.controls.actions.Action;
 import core.fogofwar.FogOfWar;
 import core.fogofwar.FogOfWarView;
+import core.gameover.GameOverCondition;
 import core.model.PlayerID;
 import core.model.Position;
 import core.resources.ResourceManager;
@@ -13,7 +13,9 @@ import core.resources.ResourceType;
 import core.terrain.model.Terrain;
 import core.terrain.model.TerrainType;
 import core.turns.TurnManager;
-import mudgame.server.ServerGameState;
+import mudgame.controls.actions.Action;
+import mudgame.server.state.ServerGameState;
+import mudgame.server.state.ServerState;
 
 @SuppressWarnings("unchecked")
 public class Scenario<T extends Scenario<T>> {
@@ -25,33 +27,29 @@ public class Scenario<T extends Scenario<T>> {
     private ClaimedArea claimedArea;
     private ResourceManager resourceManager;
     private RuleProvider ruleProvider;
-
+    private GameOverConditionProvider gameOverConditionProvider;
 
     public ScenarioGame act(PlayerID playerID, Action... actions) {
-        ServerGameState state = serverState();
+        ServerState state = serverState();
         return new ScenarioGame(state).act(playerID, actions);
     }
 
-    private ServerGameState serverState() {
-        return new ServerGameState(
+    private ServerState serverState() {
+        ServerGameState gameState = new ServerGameState(
                 turnManager,
                 entityBoard,
                 fow,
                 terrain,
                 claimedArea,
-                resourceManager,
-                ruleProvider.rules(turnManager,
-                                   entityBoard,
-                                   fow,
-                                   resourceManager,
-                                   terrain,
-                                   claimedArea
-                )
+                resourceManager
         );
-    }
-
-    public ScenarioResult finish() {
-        return new ScenarioGame(serverState()).finish();
+        GameOverCondition gameOverCondition = gameOverConditionProvider.gameOverCondition(
+                gameState);
+        return new ServerState(
+                gameState,
+                gameOverCondition,
+                ruleProvider.rules(gameState, gameOverCondition)
+        );
     }
 
     public Scenario(int playerCount) {
@@ -61,6 +59,7 @@ public class Scenario<T extends Scenario<T>> {
         claimedArea = new ClaimedArea();
         ruleProvider = new DefaultRules();
         resourceManager = new ResourceManager(turnManager.players());
+        gameOverConditionProvider = gameState -> new GameIsEndless();
     }
 
 
@@ -92,4 +91,10 @@ public class Scenario<T extends Scenario<T>> {
         resourceManager.set(player, mud, amount);
         return (T) this;
     }
+
+    public T with(GameOverConditionProvider gameOverConditionProvider) {
+        this.gameOverConditionProvider = gameOverConditionProvider;
+        return (T) this;
+    }
+
 }

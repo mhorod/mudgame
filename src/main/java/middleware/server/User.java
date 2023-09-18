@@ -14,7 +14,7 @@ import middleware.model.RoomID;
 import middleware.model.UserID;
 import mudgame.client.ClientGameState;
 import mudgame.server.MudServerCore;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.function.Consumer;
 
@@ -45,7 +45,7 @@ public final class User {
         }
 
         @Override
-        public void loadGame(PlayerID myPlayerID, ServerGameState state) {
+        public void loadGame(PlayerID myPlayerID, ServerState state) {
             if (sendErrorIfInRoom())
                 return;
             if (!state.turnManager().players().contains(myPlayerID)) {
@@ -207,7 +207,7 @@ public final class User {
         sender.setGameState(state);
     }
 
-    public void setDownloadedState(ServerGameState state) {
+    public void setDownloadedState(ServerState state) {
         sender.setDownloadedState(state);
     }
 

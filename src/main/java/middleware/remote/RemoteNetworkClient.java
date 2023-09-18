@@ -15,7 +15,7 @@ import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.net.Socket;
 import java.time.Duration;
@@ -196,7 +196,7 @@ public final class RemoteNetworkClient implements NetworkClient<RemoteNetworkCli
         }
 
         @Override
-        public void setDownloadedState(ServerGameState state) {
+        public void setDownloadedState(ServerState state) {
             Objects.requireNonNull(currentServerClient).setDownloadedState(state);
         }
     };

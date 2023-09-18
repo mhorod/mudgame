@@ -3,7 +3,7 @@ package middleware.messages_to_client;
 import mudgame.controls.events.Event;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.List;
 
@@ -26,5 +26,5 @@ public interface MessageToClientHandler {
 
     void changeName(String name);
 
-    void setDownloadedState(ServerGameState state);
+    void setDownloadedState(ServerState state);
 }

@@ -8,13 +8,13 @@ import core.model.PlayerID;
 import core.model.Position;
 import lombok.RequiredArgsConstructor;
 import mudgame.controls.events.VisibilityChange;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.Set;
 
 @RequiredArgsConstructor
 class EntityCreator {
-    private final ServerGameState state;
+    private final ServerState state;
     private final Visibility visibility;
 
     public CreatedEntity createEntity(EntityType type, PlayerID owner, Position position) {

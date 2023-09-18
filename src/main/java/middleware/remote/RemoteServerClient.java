@@ -10,7 +10,7 @@ import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
 import mudgame.client.ClientGameState;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +25,7 @@ public final class RemoteServerClient implements ServerClient {
     ;
     private String name = UserID.DEFAULT_NAME;
 
-    private Optional<ServerGameState> downloadedState = Optional.empty();
+    private Optional<ServerState> downloadedState = Optional.empty();
     private boolean coreChanged = false;
     private RemoteGameClient currentGameClient;
 
@@ -102,7 +102,7 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     @Override
-    public void createRoom(PlayerID myPlayerID, ServerGameState state) {
+    public void createRoom(PlayerID myPlayerID, ServerState state) {
         getServerHandler().loadGame(myPlayerID, state);
     }
 
@@ -131,13 +131,13 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     @Override
-    public Optional<ServerGameState> getDownloadedState() {
-        Optional<ServerGameState> state = downloadedState;
+    public Optional<ServerState> getDownloadedState() {
+        Optional<ServerState> state = downloadedState;
         downloadedState = Optional.empty();
         return state;
     }
 
-    public void setDownloadedState(ServerGameState state) {
+    public void setDownloadedState(ServerState state) {
         downloadedState = Optional.of(state);
     }
 

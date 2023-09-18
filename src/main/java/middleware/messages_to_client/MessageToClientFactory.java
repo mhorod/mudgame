@@ -4,7 +4,7 @@ import mudgame.controls.events.Event;
 import lombok.AllArgsConstructor;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -61,7 +61,7 @@ public final class MessageToClientFactory implements MessageToClientHandler {
     }
 
     @Override
-    public void setDownloadedState(ServerGameState state) {
+    public void setDownloadedState(ServerState state) {
         consumer.accept(new SetDownloadedStateMessage(state));
     }
 }

@@ -9,7 +9,7 @@ import core.pathfinder.EntityPathfinder;
 import core.pathfinder.Pathfinder;
 import core.terrain.model.TerrainType;
 import lombok.RequiredArgsConstructor;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor
 public class InteractiveStateView {
-    private final ServerGameState state;
+    private final ServerState state;
 
     // turns
     public List<PlayerID> players() {
@@ -91,4 +91,15 @@ public class InteractiveStateView {
         );
     }
 
+    public boolean isGameOver() {
+        return state.gameOverCondition().isGameOver();
+    }
+
+    public Optional<List<PlayerID>> winners() {
+        return state.gameOverCondition().winners();
+    }
+
+    public List<Entity> playerEntities(PlayerID player) {
+        return state.entityBoard().playerEntities(player);
+    }
 }

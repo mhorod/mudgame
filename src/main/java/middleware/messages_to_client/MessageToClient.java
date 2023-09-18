@@ -3,7 +3,7 @@ package middleware.messages_to_client;
 import mudgame.controls.events.Event;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.io.Serializable;
 import java.util.List;
@@ -72,7 +72,7 @@ public interface MessageToClient extends Serializable {
         }
     }
 
-    record SetDownloadedStateMessage(ServerGameState state) implements MessageToClient {
+    record SetDownloadedStateMessage(ServerState state) implements MessageToClient {
         public void execute(MessageToClientHandler handler) {
             handler.setDownloadedState(state);
         }

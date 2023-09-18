@@ -13,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public final class EventSender {
     private final EventOccurrenceObserver eventOccurrenceObserver;
+    private final List<PlayerID> players;
 
     public void send(List<EventOccurrence> eventOccurrences) {
         log.debug("Sending event occurrences {}", eventOccurrences);
@@ -27,5 +28,9 @@ public final class EventSender {
     public void send(Event event, PlayerID player) {
         log.debug("Sending event {} to player {}", event, player);
         eventOccurrenceObserver.receive(event, player);
+    }
+
+    public void sendToEveryone(Event event) {
+        send(new EventOccurrence(event, players));
     }
 }

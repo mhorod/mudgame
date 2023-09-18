@@ -20,6 +20,7 @@ public record ClientGameState(
         Terrain terrain,
         PlayerClaimedArea claimedArea,
         PlayerResourceManager resourceManager,
+        ClientGameOverCondition gameOverCondition,
         List<ActionRule> rules
 )
         implements Serializable {

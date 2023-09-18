@@ -3,12 +3,12 @@ package middleware.messages_to_server;
 import mudgame.controls.actions.Action;
 import core.model.PlayerID;
 import middleware.model.RoomID;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 public interface MessageToServerHandler {
     void createRoom(PlayerID myPlayerID, int playerCount);
 
-    void loadGame(PlayerID myPlayerID, ServerGameState state);
+    void loadGame(PlayerID myPlayerID, ServerState state);
 
     void getRoomList();
 
