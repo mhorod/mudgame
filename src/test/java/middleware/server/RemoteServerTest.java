@@ -58,7 +58,7 @@ class RemoteServerTest {
         // given
         Timer mockedTimer = mock(Timer.class);
         ServerSocketWithController mockedServerSocket = serverSocket();
-        Socket userSocket = empty_socket();
+        Socket userSocket = emptySocket();
 
         RemoteServer server = new RemoteServer(serverStateSupplier, mockedServerSocket.socket(),
                                                mockedTimer);
@@ -80,7 +80,7 @@ class RemoteServerTest {
         // given
         Timer mockedTimer = mock(Timer.class);
         ServerSocketWithController mockedServerSocket = serverSocket();
-        Socket userSocket = empty_socket();
+        Socket userSocket = emptySocket();
 
         RemoteServer server = new RemoteServer(serverStateSupplier, mockedServerSocket.socket(),
                                                mockedTimer);
@@ -102,7 +102,7 @@ class RemoteServerTest {
         Timer mockedTimer = mock(Timer.class);
         ArgumentCaptor<TimerTask> captor = ArgumentCaptor.forClass(TimerTask.class);
 
-        Socket userSocket = empty_socket();
+        Socket userSocket = emptySocket();
         ServerSocketWithController mockedServerSocket = serverSocket();
         RemoteServer server = new RemoteServer(serverStateSupplier, mockedServerSocket.socket(),
                                                mockedTimer);

@@ -1,9 +1,10 @@
 package middleware.clients;
 
-import java.util.Optional;
+import middleware.communication.NetworkConnectionBuilder;
+import middleware.communication.NetworkDeviceBuilder;
+import middleware.communication.NetworkStatus;
 
-import static middleware.clients.NetworkDevice.NetworkConnectionBuilder;
-import static middleware.clients.NetworkDevice.NetworkDeviceBuilder;
+import java.util.Optional;
 
 public interface NetworkClient {
     NetworkStatus getNetworkStatus();

@@ -2,8 +2,8 @@ package middleware.server;
 
 import core.model.PlayerID;
 import lombok.extern.slf4j.Slf4j;
-import middleware.clients.NetworkDevice;
-import middleware.clients.NetworkDevice.NetworkDeviceBuilder;
+import middleware.communication.NetworkDevice;
+import middleware.communication.NetworkDeviceBuilder;
 import middleware.messages_to_client.MessageToClientFactory;
 import middleware.messages_to_client.MessageToClientHandler;
 import middleware.messages_to_server.MessageToServer;
@@ -14,15 +14,11 @@ import mudgame.client.ClientGameState;
 import mudgame.controls.actions.Action;
 import mudgame.controls.events.Event;
 import mudgame.server.state.ServerState;
-import mudgame.server.state.ServerStateSupplier;
 
 import java.util.Optional;
 
 @Slf4j
 public final class User {
-    private static long nextUserID = 0;
-
-    private final ServerStateSupplier serverStateSupplier;
     private final NetworkDevice networkDevice;
     private final GameServer server;
     private final UserID userID;
@@ -41,7 +37,7 @@ public final class User {
                 sendError("playerCount must be positive");
                 return;
             }
-            loadGame(myPlayerID, serverStateSupplier.get(playerCount));
+            loadGame(myPlayerID, server.getStateSupplier().get(playerCount));
         }
 
         @Override
@@ -52,7 +48,7 @@ public final class User {
                 sendError("Invalid PlayerID");
                 return;
             }
-            Room room = new Room(state, server);
+            Room room = server.createRoom(state);
             room.joinRoom(myPlayerID, User.this);
             room.checkRemoval();
         }
@@ -66,13 +62,13 @@ public final class User {
         public void joinRoom(PlayerID myPlayerID, RoomID roomID) {
             if (sendErrorIfInRoom())
                 return;
-            Room room = server.getRoom(roomID);
-            if (room == null) {
+            Optional<Room> room = server.getRoom(roomID);
+            if (room.isEmpty()) {
                 sendError("This room does not exist");
                 sendRoomList();
                 return;
             }
-            room.joinRoom(myPlayerID, User.this);
+            room.orElseThrow().joinRoom(myPlayerID, User.this);
         }
 
         @Override
@@ -130,18 +126,12 @@ public final class User {
     private int sinceLastCheck = 0;
     private boolean last0 = false;
 
-    public User(
-            ServerStateSupplier serverStateSupplier,
-            NetworkDeviceBuilder builder,
-            GameServer server
-    ) {
+    public User(NetworkDeviceBuilder builder, UserID userID, GameServer server) {
         this.networkDevice = builder.build(this::processMessage, MessageToServer.class)
                 .orElseThrow();
-        this.serverStateSupplier = serverStateSupplier;
+        this.userID = userID;
         this.server = server;
-        this.userID = new UserID(nextUserID++);
 
-        this.server.putUser(this);
         sendRoomList();
     }
 
@@ -261,6 +251,6 @@ public final class User {
     }
 
     public void sendRoomList() {
-        getClientHandler().setRoomList(server.getRoomList());
+        getClientHandler().setRoomList(server.getRoomInfoList());
     }
 }
