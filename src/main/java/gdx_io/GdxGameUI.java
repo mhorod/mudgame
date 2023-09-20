@@ -50,7 +50,7 @@ public class GdxGameUI implements ApplicationListener, Canvas {
 
     @Override
     public void render() {
-        view.update(inputParser.getInput(), textureBank);
+        view.update(inputParser.getInput(), textureBank, this);
         ScreenUtils.clear(Color.WHITE);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -125,7 +125,7 @@ public class GdxGameUI implements ApplicationListener, Canvas {
     @Override
     public float getTextAspectRatio(String text) {
         glyphLayout.setText(font, text);
-        return glyphLayout.width / glyphLayout.height;
+        return (glyphLayout.width - 12) / glyphLayout.height;
     }
 
     @Override

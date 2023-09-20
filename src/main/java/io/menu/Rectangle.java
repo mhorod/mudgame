@@ -29,4 +29,11 @@ public class Rectangle {
         );
     }
 
+    public boolean contains(ScreenPosition position) {
+        return position.x() > this.position.x()
+                && position.y() > this.position.y()
+                && position.y() < this.position.y() + height
+                && position.x() < this.position.x() + height / aspectRatio;
+    }
+
 }

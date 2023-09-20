@@ -4,6 +4,7 @@ import io.menu.Rectangle;
 import io.menu.UIComponent;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
+import io.model.engine.TextManager;
 
 public class ScrollBox implements UIComponent {
     private final UIComponent contents;
@@ -23,7 +24,7 @@ public class ScrollBox implements UIComponent {
     }
 
     @Override
-    public void fitInto(Rectangle rectangle) {
+    public void fitInto(Rectangle rectangle, TextManager mgr) {
         var contentWidth = rectangle.width() * 0.9f;
         var contentHeight = contents.getAspectRatio() * contentWidth;
         maxScroll = Math.max((contentHeight - rectangle.height) / contentWidth, 0);
@@ -46,7 +47,7 @@ public class ScrollBox implements UIComponent {
                 rectangle.position.x() + rectangle.width() * 0.91f,
                 rectangle.position.y() + scrollBack.height - scrollFront.height - scrollAmount * contentWidth / contentHeight * scrollBack.height
         );
-        contents.fitInto(contentBounds);
+        contents.fitInto(contentBounds, mgr);
     }
 
     public void setScroll(float scroll) {

@@ -13,6 +13,7 @@ import io.game.world.MapObserver;
 import io.game.world.controller.Controls;
 import io.game.world.controller.WorldController;
 import io.model.engine.Canvas;
+import io.model.engine.TextManager;
 import io.model.engine.TextureBank;
 import io.model.input.Input;
 import io.model.input.events.Click;
@@ -140,7 +141,7 @@ public class GameView extends SimpleView {
     }
 
     @Override
-    public void update(Input input, TextureBank bank) {
+    public void update(Input input, TextureBank bank, TextManager mgr) {
         for (Bot bot : bots)
             bot.update();
         RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();

@@ -5,6 +5,7 @@ import io.game.GameView;
 import io.menu.scroll.ScrollBox;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
+import io.model.engine.TextManager;
 import io.model.engine.TextureBank;
 import io.model.input.Input;
 import io.model.input.events.Click;
@@ -16,28 +17,33 @@ import io.views.SimpleView;
 import java.util.List;
 
 public class RoomSelect extends SimpleView implements EventHandler {
-    ButtonBlock buttons = new ButtonBlock(0.1f,
-            List.of(
-                    "BAGNO",
-                    "MOCZARY",
-                    "BLOTO"
-            ),
-            List.of(
-                    () -> changeView(new GameView()),
-                    () -> changeView(new GameView()),
-                    () -> changeView(new GameView())
-            ));
+    ButtonBlock buttons;
+    ScrollBox scrollBox;
 
-    ScrollBox scrollBox = new ScrollBox(buttons);
-
-    Easer scrollEaser = new Easer(0) {
-        @Override
-        public void onUpdate(float value) {
-            scrollBox.setScroll(value);
-        }
-    };
+    Easer scrollEaser;
 
     Rectangle logo = new Rectangle(Texture.LOGO.aspectRatio());
+
+    public RoomSelect() {
+        buttons = new ButtonBlock(0.1f,
+                List.of(
+                        "BAGNO",
+                        "MOCZARY",
+                        "BLOTO"
+                ),
+                List.of(
+                        () -> changeView(new GameView()),
+                        () -> changeView(new GameView()),
+                        () -> changeView(new GameView())
+                ));
+        scrollBox = new ScrollBox(buttons);
+        scrollEaser = new Easer(0) {
+            @Override
+            public void onUpdate(float value) {
+                scrollBox.setScroll(value);
+            }
+        };
+    }
 
     @Override
     public void draw(Canvas canvas) {
@@ -45,7 +51,7 @@ public class RoomSelect extends SimpleView implements EventHandler {
     }
 
     @Override
-    public void update(Input input, TextureBank bank) {
+    public void update(Input input, TextureBank bank, TextManager mgr) {
         var window = new Rectangle(input.window().height() / input.window().width());
         window.position = new ScreenPosition(0, 0);
         window.height = input.window().height() / input.window().width();
@@ -58,7 +64,7 @@ public class RoomSelect extends SimpleView implements EventHandler {
         );
 
         scrollEaser.update(input.deltaTime());
-        scrollBox.fitInto(scene);
+        scrollBox.fitInto(scene, mgr);
         buttons.update(input.mouse().position(), input.mouse().leftPressed());
         logo.fitInto(new Rectangle(scene.position.x() + scene.width() / 2, scene.position.y(), scene.width() / 2, scene.height));
         input.events().forEach(event -> event.accept(this));

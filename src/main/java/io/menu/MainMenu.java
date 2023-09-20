@@ -3,6 +3,7 @@ package io.menu;
 import io.game.GameView;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
+import io.model.engine.TextManager;
 import io.model.engine.TextureBank;
 import io.model.input.Input;
 import io.model.input.events.Click;
@@ -15,19 +16,22 @@ import io.views.SimpleView;
 import java.util.List;
 
 public class MainMenu extends SimpleView implements EventHandler {
-    ButtonBlock buttons = new ButtonBlock(0.1f,
-            List.of(
-                    "PLAY",
-                    "SETTINGS",
-                    "EXIT"
-            ),
-            List.of(
-                    () -> changeView(new RoomSelect()),
-                    () -> changeView(new GameView()),
-                    () -> changeView(new GameView())
-            ));
-
+    ButtonBlock buttons;
     Rectangle logo = new Rectangle(Texture.LOGO.aspectRatio());
+
+    public MainMenu() {
+        buttons = new ButtonBlock(0.1f,
+                List.of(
+                        "PLAY",
+                        "SETTINGS",
+                        "EXIT"
+                ),
+                List.of(
+                        () -> changeView(new RoomSelect()),
+                        () -> changeView(new GameView()),
+                        () -> changeView(new GameView())
+                ));
+    }
 
     @Override
     public void draw(Canvas canvas) {
@@ -40,7 +44,7 @@ public class MainMenu extends SimpleView implements EventHandler {
     }
 
     @Override
-    public void update(Input input, TextureBank bank) {
+    public void update(Input input, TextureBank bank, TextManager mgr) {
         var window = new Rectangle(input.window().height() / input.window().width());
         window.position = new ScreenPosition(0, 0);
         window.height = input.window().height() / input.window().width();
@@ -49,7 +53,7 @@ public class MainMenu extends SimpleView implements EventHandler {
         scene.fitInto(window);
 
         input.events().forEach(event -> event.accept(this));
-        buttons.fitInto(new Rectangle(scene.position.x(), scene.position.y(), scene.width() / 2, scene.height));
+        buttons.fitInto(new Rectangle(scene.position.x(), scene.position.y(), scene.width() / 2, scene.height), mgr);
         buttons.update(input.mouse().position(), input.mouse().leftPressed());
         logo.fitInto(new Rectangle(scene.position.x() + scene.width() / 2, scene.position.y(), scene.width() / 2, scene.height));
     }
