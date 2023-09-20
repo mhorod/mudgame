@@ -4,7 +4,7 @@ import io.menu.UIComponent;
 import io.model.textures.Texture;
 
 public class ButtonBig extends Button {
-    public ButtonBig(UIComponent content, Runnable onClick) {
-        super(content, onClick, Texture.BUTTON_BIG, Texture.BUTTON_BIG, Texture.BUTTON_BIG_PRESSED);
+    public ButtonBig(UIComponent content) {
+        super(content, Texture.BUTTON_BIG, Texture.BUTTON_BIG, Texture.BUTTON_BIG_PRESSED);
     }
 }

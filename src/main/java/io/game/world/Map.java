@@ -50,7 +50,10 @@ public class Map implements Animation {
     }
 
     public void setHighlightedTiles(List<Position> positions) {
-        highlightedTiles = new HashSet<>(positions);
+        if (positions == null)
+            highlightedTiles = null;
+        else
+            highlightedTiles = new HashSet<>(positions);
     }
 
     public AnimatedEntity entityFromID(EntityID id) {

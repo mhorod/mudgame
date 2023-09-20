@@ -10,6 +10,7 @@ public enum Texture {
     FOG_RIGHT(282.f / 325.f),
     PAWN(152f / 80f),
     WARRIOR(137f / 106f),
+    MARSH_WIGGLE(180f / 130f),
     BASE(255f / 208f),
     TOWER(241f / 158f),
     SHADOW(149.f / 256.f),

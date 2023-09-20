@@ -11,14 +11,16 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class ButtonBlock implements UIComponent {
-    List<? extends Button> buttons;
+    private final List<? extends Button> buttons;
+    private final List<Runnable> handlers;
 
     private final UIComponent content;
 
     public ButtonBlock(float gap, List<String> text, List<Runnable> handlers) {
         buttons = IntStream.rangeClosed(1, text.size())
-                .mapToObj(i -> new ButtonMedium(new Label(text.get(text.size() - i)), handlers.get(handlers.size() - i)))
+                .mapToObj(i -> new ButtonMedium(new Label(text.get(text.size() - i))))
                 .toList();
+        this.handlers = handlers;
         content = new VBox(gap, buttons);
     }
 
@@ -27,7 +29,9 @@ public class ButtonBlock implements UIComponent {
     }
 
     public void click(ScreenPosition pos) {
-        buttons.forEach(button -> button.click(pos));
+        for (int i = 0; i < buttons.size(); i++)
+            if (buttons.get(i).contains(pos))
+                handlers.get(i).run();
     }
 
     @Override

@@ -8,9 +8,9 @@ import core.model.Position;
 import io.animation.Animation;
 import io.animation.AnimationController;
 import io.animation.Finishable;
+import io.game.ui.HUD;
 import io.game.world.Map;
 import io.game.world.MapObserver;
-import io.game.world.controller.Controls;
 import io.game.world.controller.WorldController;
 import io.model.engine.Canvas;
 import io.model.engine.TextManager;
@@ -39,6 +39,7 @@ public class GameView extends SimpleView {
     private final Map map;
     private MapView mapView;
     private final Camera camera = new Camera();
+    private final HUD hud = new HUD();
     private final CameraController cameraController = new CameraController(camera);
     private final DragDetector dragDetector = new DragDetector() {
         @Override
@@ -90,38 +91,29 @@ public class GameView extends SimpleView {
         animations.addAnimation(map);
         worldController = new WorldController(
                 map,
+                hud,
                 me.getCore().entityBoard(),
                 me.getCore().terrain(),
                 me.getCore().pathfinder(),
                 me.getCore().spawnManager(),
-                new Controls() {
-                    @Override
-                    public void moveEntity(EntityID id, Position destination) {
-                        me.getControls().moveEntity(id, destination);
-                        me.getControls().completeTurn();
-                    }
-
-                    @Override
-                    public void createEntity(Position position) {
-                        me.getControls().createEntity(position);
-                    }
-                });
+                me.getControls()
+        );
     }
 
     private void processEvent(Event event) {
         log.debug("Processing event: {}", event);
         if (event instanceof MoveEntityAlongPath e) {
+            eventAnimation = map.animate(e);
             worldController.onMoveEntityAlongPath(e);
-            eventAnimation = map.animate(e);
         } else if (event instanceof VisibilityChange e) {
+            eventAnimation = map.animate(e);
             worldController.onVisibilityChange(e);
-            eventAnimation = map.animate(e);
         } else if (event instanceof SpawnEntity e) {
+            eventAnimation = map.animate(e);
             worldController.onSpawnEntity(e);
-            eventAnimation = map.animate(e);
         } else if (event instanceof RemoveEntity e) {
-            worldController.onRemoveEntity(e);
             eventAnimation = map.animate(e);
+            worldController.onRemoveEntity(e);
         }
         me.processEvent();
     }
@@ -138,6 +130,7 @@ public class GameView extends SimpleView {
     public void draw(Canvas canvas) {
         if (mapView != null)
             mapView.draw(canvas);
+        hud.draw(canvas);
     }
 
     @Override
@@ -152,17 +145,18 @@ public class GameView extends SimpleView {
             input.events().forEach(event -> event.accept(new EventHandler() {
                 @Override
                 public void onClick(Click click) {
-                    mapView.objectAt(click.position(), new MapObserver() {
-                        @Override
-                        public void onEntity(EntityID id) {
-                            worldController.onEntityClick(id);
-                        }
+                    if (!hud.click(click.position(), worldController))
+                        mapView.objectAt(click.position(), new MapObserver() {
+                            @Override
+                            public void onEntity(EntityID id) {
+                                worldController.onEntityClick(id);
+                            }
 
-                        @Override
-                        public void onTile(Position position) {
-                            worldController.onTileClick(position);
-                        }
-                    });
+                            @Override
+                            public void onTile(Position position) {
+                                worldController.onTileClick(position);
+                            }
+                        });
                 }
 
                 @Override
@@ -182,6 +176,7 @@ public class GameView extends SimpleView {
                 }
             });
         }
+        hud.update(input.mouse().position(), input.mouse().leftPressed(), mgr);
         dragDetector.update(input.mouse(), input.deltaTime());
         animations.update(input.deltaTime());
         camera.setAspectRatio(input.window().height() / input.window().width());

@@ -1,5 +1,6 @@
 package io.game.world.controller.states;
 
+import core.entities.model.EntityType;
 import core.model.EntityID;
 import core.model.Position;
 import io.game.world.controller.CommonState;
@@ -11,19 +12,17 @@ import mudgame.controls.events.VisibilityChange;
 
 import java.util.List;
 
-import static core.entities.model.EntityType.PAWN;
-
 public class Normal extends WorldState {
 
     public Normal(CommonState state) {
         super(state);
         state.map().setPath(List.of());
-        state.map().setHighlightedTiles(state.spawnManager().allowedSpawnPositions(PAWN));
+        state.map().setHighlightedTiles(null);
+        state.hud().clear();
     }
 
     @Override
     public void onTileClick(Position position) {
-        state.controls().createEntity(position);
     }
 
     @Override
@@ -60,5 +59,10 @@ public class Normal extends WorldState {
     @Override
     public void onRemoveEntity(RemoveEntity event) {
 
+    }
+
+    @Override
+    public void onEntityTypeSelected(EntityType type) {
+        change(new EntityTypeSelected(state, type));
     }
 }

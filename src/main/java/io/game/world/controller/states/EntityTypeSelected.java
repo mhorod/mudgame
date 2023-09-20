@@ -10,36 +10,30 @@ import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
 
-public class UnitSelected extends WorldState {
-    private final EntityID selectedUnit;
+import java.util.List;
 
-    public UnitSelected(CommonState state, EntityID unit) {
+public class EntityTypeSelected extends WorldState {
+    private final EntityType type;
+
+    public EntityTypeSelected(CommonState state, EntityType type) {
         super(state);
-        this.selectedUnit = unit;
-        state.map()
-                .setHighlightedTiles(state.pathfinder()
-                        .reachablePositions(selectedUnit)
-                        .getPositions()
-                        .stream()
-                        .toList());
+        this.type = type;
+        state.map().setPath(List.of());
+        state.map().setHighlightedTiles(state.spawnManager().allowedSpawnPositions(type));
         state.hud().clear();
+        state.hud().setPressed(type);
     }
 
     @Override
     public void onTileClick(Position position) {
-        state.controls().moveEntity(selectedUnit, position);
-        state.map().putDown(selectedUnit);
+        if (state.spawnManager().allowedSpawnPositions(type).contains(position))
+            state.controls().createEntity(type, position);
         change(new Normal(state));
     }
 
     @Override
     public void onEntityClick(EntityID entity) {
-        if (entityAnimated(entity))
-            return;
-        state.map().putDown(selectedUnit);
-        if (entity.equals(selectedUnit)) {
-            change(new Normal(state));
-        } else {
+        if (!entityAnimated(entity)) {
             state.map().pickUp(entity);
             change(new UnitSelected(state, entity));
         }
@@ -47,9 +41,7 @@ public class UnitSelected extends WorldState {
 
     @Override
     public void onTileHover(Position position) {
-        if (!state.pathfinder().isReachable(selectedUnit, position))
-            return;
-        state.map().setPath(state.pathfinder().findPath(selectedUnit, position));
+
     }
 
     @Override
@@ -59,8 +51,6 @@ public class UnitSelected extends WorldState {
 
     @Override
     public void onMoveEntityAlongPath(MoveEntityAlongPath event) {
-        if (event.entityID().equals(selectedUnit))
-            change(new Normal(state));
     }
 
     @Override
@@ -69,16 +59,19 @@ public class UnitSelected extends WorldState {
 
     @Override
     public void onSpawnEntity(SpawnEntity event) {
+
     }
 
     @Override
     public void onRemoveEntity(RemoveEntity event) {
-        if (event.entityID().equals(selectedUnit))
-            change(new Normal(state));
+
     }
 
     @Override
     public void onEntityTypeSelected(EntityType type) {
-        change(new EntityTypeSelected(state, type));
+        if (type == this.type)
+            change(new Normal(state));
+        else
+            change(new EntityTypeSelected(state, type));
     }
 }

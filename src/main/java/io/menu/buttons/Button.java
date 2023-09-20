@@ -10,7 +10,6 @@ import io.model.textures.TextureDrawData;
 
 public class Button implements UIComponent {
     private final Rectangle bounds;
-    private final Runnable onClick;
     private final UIComponent content;
 
     private final Texture normal, hover, pressed;
@@ -23,14 +22,18 @@ public class Button implements UIComponent {
     }
 
     private ButtonState state = ButtonState.NORMAL;
+    boolean forcePress = false;
 
-    public Button(UIComponent content, Runnable onClick, Texture normal, Texture hover, Texture pressed) {
+    public Button(UIComponent content, Texture normal, Texture hover, Texture pressed) {
         this.content = content;
-        this.onClick = onClick;
         this.bounds = new Rectangle(normal.aspectRatio());
         this.normal = normal;
         this.hover = hover;
         this.pressed = pressed;
+    }
+
+    public void setPressed(boolean pressed) {
+        forcePress = pressed;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class Button implements UIComponent {
         content.fitInto(contentBounds, mgr);
     }
 
-    private boolean contains(ScreenPosition position) {
+    public boolean contains(ScreenPosition position) {
         return bounds.contains(position);
     }
 
@@ -62,13 +65,11 @@ public class Button implements UIComponent {
         else state = ButtonState.NORMAL;
     }
 
-    public void click(ScreenPosition pos) {
-        if (contains(pos))
-            onClick.run();
-    }
 
     public void draw(Canvas canvas) {
-        switch (state) {
+        if (forcePress)
+            canvas.draw(new TextureDrawData(pressed, bounds.position, bounds.height));
+        else switch (state) {
             case NORMAL -> canvas.draw(new TextureDrawData(normal, bounds.position, bounds.height));
             case HOVER -> canvas.draw(new TextureDrawData(hover, bounds.position, bounds.height));
             case PRESSED -> canvas.draw(new TextureDrawData(pressed, bounds.position, bounds.height));

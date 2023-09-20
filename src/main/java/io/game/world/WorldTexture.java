@@ -37,6 +37,7 @@ public enum WorldTexture {
     BASE(Texture.BASE, new Center(0.5f, 0.23f), 0.8f),
     TOWER(Texture.TOWER, new Center(0.5f, 0.187f), 0.8f),
     WARRIOR(Texture.WARRIOR, new Center(0.5f, 0.23f), 0.5f),
+    MARSH_WIGGLE(Texture.MARSH_WIGGLE, new Center(0.5f, 0.15f), 0.6f),
     PAWN(Texture.PAWN, new Center(0.5f, 0.15f), 0.38f);
     private final Texture texture;
     private final Center center;
@@ -55,7 +56,7 @@ public enum WorldTexture {
                 new ScreenPosition(
                         centerPosition.x() - width * center.x() * camera.getTileWidth(),
                         centerPosition.y() -
-                        width * center.y() * camera.getTileWidth() * texture.aspectRatio()
+                                width * center.y() * camera.getTileWidth() * texture.aspectRatio()
                 ),
                 camera.getTileWidth() * width * texture.aspectRatio()
         );
@@ -73,7 +74,8 @@ public enum WorldTexture {
 
     public static WorldTexture from(EntityType type) {
         return switch (type) {
-            case MARSH_WIGGLE, PAWN -> PAWN;
+            case PAWN -> PAWN;
+            case MARSH_WIGGLE -> MARSH_WIGGLE;
             case BASE -> BASE;
             case WARRIOR -> WARRIOR;
             case TOWER -> TOWER;
