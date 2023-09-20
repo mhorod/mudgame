@@ -12,8 +12,8 @@ public class MoveAlong extends AnimationChain {
 
     private static List<EntityAnimation> fromPath(List<Position> path) {
         return Arrow.fromPositions(path).stream()
-                .map(arrow -> (EntityAnimation) new Move(arrow.position(), arrow.kind().from(),
-                                                         arrow.kind().to()))
+                .map(arrow -> (EntityAnimation) new Move(arrow.getGamePosition(), arrow.getKind().from(),
+                        arrow.getKind().to()))
                 .toList();
     }
 }

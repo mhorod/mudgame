@@ -5,6 +5,8 @@ import core.model.Position;
 import io.game.world.controller.CommonState;
 import io.game.world.controller.WorldState;
 import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.RemoveEntity;
+import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
 
 public class UnitSelected extends WorldState {
@@ -57,13 +59,19 @@ public class UnitSelected extends WorldState {
     public void onMoveEntityAlongPath(MoveEntityAlongPath event) {
         if (event.entityID().equals(selectedUnit))
             change(new Normal(state));
-        moveEntity(event);
-        nextEvent();
     }
 
     @Override
     public void onVisibilityChange(VisibilityChange event) {
-        changeVisibility(event);
-        nextEvent();
+    }
+
+    @Override
+    public void onSpawnEntity(SpawnEntity event) {
+    }
+
+    @Override
+    public void onRemoveEntity(RemoveEntity event) {
+        if (event.entityID().equals(selectedUnit))
+            change(new Normal(state));
     }
 }

@@ -11,8 +11,8 @@ import java.util.EnumMap;
 public class TextureBank implements io.model.engine.TextureBank {
     private final EnumMap<io.model.textures.Texture, TextureRegion> textures
             = new EnumMap<>(io.model.textures.Texture.class);
-    private final Pixmap unitPixmap;
-    private final Texture units;
+    private final Pixmap unitPixmap, tilePixmap;
+    private final Texture units, tiles;
 
     private static TextureRegion cutOut(
             Texture tex, int x, int y, float tile_width, float tile_height
@@ -22,12 +22,14 @@ public class TextureBank implements io.model.engine.TextureBank {
     }
 
     public TextureBank() {
-        Texture tiles = new Texture("tiles.png");
+        tiles = new Texture("tiles.png");
         units = new Texture("unit.png");
         Texture arrows = new Texture("arrows.png");
         Texture ui = new Texture("ui.png");
         units.getTextureData().prepare();
+        tiles.getTextureData().prepare();
         unitPixmap = units.getTextureData().consumePixmap();
+        tilePixmap = tiles.getTextureData().consumePixmap();
         float width = 256f;
         float height = 148f;
         textures.put(io.model.textures.Texture.BUTTON_SMALL, new TextureRegion(ui, 0, 0, 450, 181));
@@ -79,14 +81,18 @@ public class TextureBank implements io.model.engine.TextureBank {
     @Override
     public boolean contains(TextureDrawData texture, ScreenPosition pos) {
         var tex = getTexture(texture.texture());
-        if (tex.getTexture() != units) return false;
+        if (tex.getTexture() != units && tex.getTexture() != tiles) return false;
         int x = (int) ((pos.x() - texture.position().x()) / texture.height() *
                 tex.getRegionHeight());
         int y = (int) ((pos.y() - texture.position().y()) / texture.height() *
                 tex.getRegionHeight());
         if (x < 0 || x >= tex.getRegionWidth() || y < 0 || y >= tex.getRegionHeight())
             return false;
-        return (unitPixmap.getPixel(tex.getRegionX() + x,
+        if (tex.getTexture() == units)
+            return (unitPixmap.getPixel(tex.getRegionX() + x,
+                    tex.getRegionY() + tex.getRegionHeight() - y) & 0xff) != 0;
+
+        return (tilePixmap.getPixel(tex.getRegionX() + x,
                 tex.getRegionY() + tex.getRegionHeight() - y) & 0xff) != 0;
     }
 }

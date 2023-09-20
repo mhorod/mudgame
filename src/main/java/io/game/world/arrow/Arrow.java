@@ -1,18 +1,29 @@
 package io.game.world.arrow;
 
 import core.model.Position;
-import io.game.Camera;
 import io.game.WorldPosition;
-import io.model.engine.Canvas;
+import io.game.world.entity.WorldEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public record Arrow(Position position, ArrowKind kind) {
+public class Arrow extends WorldEntity {
+    private final Position gamePosition;
+    private final ArrowKind kind;
 
-    public void draw(Canvas canvas, Camera camera) {
-        kind().getTexture().draw(WorldPosition.from(position()), canvas, camera);
+    public Arrow(Position position, ArrowKind kind) {
+        super(WorldPosition.from(position), kind.getTexture(), 0);
+        this.gamePosition = position;
+        this.kind = kind;
+    }
+
+    public ArrowKind getKind() {
+        return kind;
+    }
+
+    public Position getGamePosition() {
+        return gamePosition;
     }
 
     public static List<Arrow> fromPositions(List<Position> positions) {
@@ -21,6 +32,7 @@ public record Arrow(Position position, ArrowKind kind) {
                 .mapToObj(i -> new Arrow(positions.get(i), kinds.get(i)))
                 .toList();
     }
+
 
     public static List<Position> pathBetween(Position a, Position b) {
         ArrayList<Position> result = new ArrayList<>();

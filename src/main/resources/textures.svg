@@ -26,8 +26,8 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="2.8284271"
-     inkscape:cx="205.94485"
-     inkscape:cy="306.88435"
+     inkscape:cx="293.62609"
+     inkscape:cy="311.48054"
      inkscape:window-width="1920"
      inkscape:window-height="1080"
      inkscape:window-x="0"
@@ -515,13 +515,13 @@
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.15;stroke-linecap:round;stroke-dasharray:none"
        d="m 38.066003,81.677266 -0.56815,0.328022"
        id="path1897" /><path
-       style="fill:#76d390;stroke-width:0.15;stroke-linecap:round;fill-opacity:1"
+       style="fill:#ececec;stroke-width:0.15;stroke-linecap:round;fill-opacity:1"
        d="m 53.974184,67.244335 -5.681493,3.280211 5.681493,3.280212 5.681493,-3.280212 z"
        id="path434" /><path
-       style="fill:#55a27f;stroke-width:0.15;stroke-linecap:round;fill-opacity:1"
+       style="fill:#b3b3b3;stroke-width:0.15;stroke-linecap:round;fill-opacity:1"
        d="m 48.292691,70.524546 v 3.280212 l 5.681493,3.280211 v -3.280211 z"
        id="path490" /><path
-       style="fill:#6cbe8b;stroke-width:0.15;stroke-linecap:round;fill-opacity:1"
+       style="fill:#f2f2f2;stroke-width:0.15;stroke-linecap:round;fill-opacity:1"
        d="M 53.974184,77.084971 59.655677,73.80476 V 70.524548 L 53.974184,73.80476 Z"
        id="path492" /><image
        width="15.908181"

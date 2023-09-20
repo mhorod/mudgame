@@ -5,6 +5,8 @@ import core.model.Position;
 import io.game.world.controller.CommonState;
 import io.game.world.controller.WorldState;
 import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.RemoveEntity;
+import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
 
 import java.util.List;
@@ -44,13 +46,19 @@ public class Normal extends WorldState {
 
     @Override
     public void onMoveEntityAlongPath(MoveEntityAlongPath event) {
-        moveEntity(event);
-        nextEvent();
     }
 
     @Override
     public void onVisibilityChange(VisibilityChange event) {
-        changeVisibility(event);
-        nextEvent();
+    }
+
+    @Override
+    public void onSpawnEntity(SpawnEntity event) {
+
+    }
+
+    @Override
+    public void onRemoveEntity(RemoveEntity event) {
+
     }
 }

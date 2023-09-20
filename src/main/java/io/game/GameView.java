@@ -5,7 +5,9 @@ import ai.RandomWalker;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import io.animation.Animation;
 import io.animation.AnimationController;
+import io.animation.Finishable;
 import io.game.world.Map;
 import io.game.world.MapObserver;
 import io.game.world.controller.Controls;
@@ -23,11 +25,7 @@ import middleware.clients.ServerClient;
 import middleware.communication.SocketDevice.SocketConnectionBuilder;
 import middleware.local.LocalServer;
 import middleware.remote.RemoteNetworkClient;
-import mudgame.controls.events.Event;
-import mudgame.controls.events.MoveEntityAlongPath;
-import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.SpawnEntity;
-import mudgame.controls.events.VisibilityChange;
+import mudgame.controls.events.*;
 import mudgame.server.state.ClassicServerStateSupplier;
 import mudgame.server.state.ServerState;
 
@@ -36,8 +34,9 @@ import java.util.List;
 
 @Slf4j
 public class GameView extends SimpleView {
-    private final AnimationController animations = new AnimationController();
+    private final AnimationController<Animation> animations = new AnimationController<>();
     private final Map map;
+    private MapView mapView;
     private final Camera camera = new Camera();
     private final CameraController cameraController = new CameraController(camera);
     private final DragDetector dragDetector = new DragDetector() {
@@ -49,7 +48,7 @@ public class GameView extends SimpleView {
     private final WorldController worldController;
 
     private final GameClient me;
-    private boolean eventObserved = false;
+    private Finishable eventAnimation;
     private final List<Bot> bots = new ArrayList<>();
 
     public GameView() {
@@ -105,48 +104,39 @@ public class GameView extends SimpleView {
                     public void createEntity(Position position) {
                         me.getControls().createEntity(position);
                     }
-
-                    @Override
-                    public void nextEvent() {
-                        do {
-                            me.processEvent();
-                        } while (canEatEvent());
-                        eventObserved = false;
-                        var maybeEvent = me.peekEvent();
-                        maybeEvent.ifPresent(GameView.this::processEvent);
-                    }
                 });
     }
 
     private void processEvent(Event event) {
         log.debug("Processing event: {}", event);
         if (event instanceof MoveEntityAlongPath e) {
-            eventObserved = true;
             worldController.onMoveEntityAlongPath(e);
+            eventAnimation = map.animate(e);
         } else if (event instanceof VisibilityChange e) {
-            eventObserved = true;
             worldController.onVisibilityChange(e);
+            eventAnimation = map.animate(e);
         } else if (event instanceof SpawnEntity e) {
-            eventObserved = true;
             worldController.onSpawnEntity(e);
+            eventAnimation = map.animate(e);
         } else if (event instanceof RemoveEntity e) {
-            eventObserved = true;
             worldController.onRemoveEntity(e);
+            eventAnimation = map.animate(e);
         }
+        me.processEvent();
     }
 
-    private boolean canEatEvent() {
-        return me.peekEvent().stream().anyMatch(
-                event -> !(event instanceof MoveEntityAlongPath)
-                         && !(event instanceof VisibilityChange)
-                         && !(event instanceof SpawnEntity)
-                         && !(event instanceof RemoveEntity)
-        );
+    private void processEvents() {
+        if (eventAnimation != null && eventAnimation.finished())
+            eventAnimation = null;
+        if (eventAnimation == null)
+            me.peekEvent().ifPresent(this::processEvent);
     }
+
 
     @Override
     public void draw(Canvas canvas) {
-        map.draw(canvas, camera);
+        if (mapView != null)
+            mapView.draw(canvas);
     }
 
     @Override
@@ -154,47 +144,47 @@ public class GameView extends SimpleView {
         for (Bot bot : bots)
             bot.update();
         RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
+        processEvents();
         worldController.update();
-        if (!eventObserved) {
-            while (canEatEvent())
-                me.processEvent();
-            me.peekEvent().ifPresent(this::processEvent);
+
+        if (mapView != null) {
+            input.events().forEach(event -> event.accept(new EventHandler() {
+                @Override
+                public void onClick(Click click) {
+                    mapView.objectAt(click.position(), new MapObserver() {
+                        @Override
+                        public void onEntity(EntityID id) {
+                            worldController.onEntityClick(id);
+                        }
+
+                        @Override
+                        public void onTile(Position position) {
+                            worldController.onTileClick(position);
+                        }
+                    });
+                }
+
+                @Override
+                public void onScroll(Scroll scroll) {
+                    cameraController.scroll(input.mouse().position(), scroll.amount());
+                }
+            }));
+            mapView.objectAt(input.mouse().position(), new MapObserver() {
+                @Override
+                public void onEntity(EntityID id) {
+                    worldController.onEntityHover(id);
+                }
+
+                @Override
+                public void onTile(Position position) {
+                    worldController.onTileHover(position);
+                }
+            });
         }
-
-        input.events().forEach(event -> event.accept(new EventHandler() {
-            @Override
-            public void onClick(Click click) {
-                map.objectAt(click.position(), bank, camera, new MapObserver() {
-                    @Override
-                    public void onEntity(EntityID id) {
-                        worldController.onEntityClick(id);
-                    }
-
-                    @Override
-                    public void onTile(Position position) {
-                        worldController.onTileClick(position);
-                    }
-                });
-            }
-
-            @Override
-            public void onScroll(Scroll scroll) {
-                cameraController.scroll(input.mouse().position(), scroll.amount());
-            }
-        }));
-        map.objectAt(input.mouse().position(), bank, camera, new MapObserver() {
-            @Override
-            public void onEntity(EntityID id) {
-                worldController.onEntityHover(id);
-            }
-
-            @Override
-            public void onTile(Position position) {
-                worldController.onTileHover(position);
-            }
-        });
         dragDetector.update(input.mouse(), input.deltaTime());
         animations.update(input.deltaTime());
+        camera.setAspectRatio(input.window().height() / input.window().width());
+        mapView = map.getView(bank, camera);
     }
 
 

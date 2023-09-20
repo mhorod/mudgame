@@ -12,12 +12,12 @@ public class WorldEntity {
     public WorldPosition position;
     public float alpha = 1;
     private final WorldTexture texture;
-    private final boolean hasShadow;
+    private final int layer;
 
-    public WorldEntity(WorldPosition position, WorldTexture texture, boolean hasShadow) {
+    public WorldEntity(WorldPosition position, WorldTexture texture, int layer) {
         this.position = position;
         this.texture = texture;
-        this.hasShadow = hasShadow;
+        this.layer = layer;
     }
 
     public boolean contains(ScreenPosition position, TextureBank bank, Camera camera) {
@@ -35,13 +35,12 @@ public class WorldEntity {
         texture.drawColored(getPosition(), canvas, camera, color, alpha);
     }
 
-    public void drawShadow(Canvas canvas, Camera camera) {
-        if (hasShadow)
-            WorldTexture.SHADOW.draw(new WorldPosition(position.x(), position.y(), 0), canvas, camera);
-    }
-
 
     public WorldPosition getPosition() {
         return position;
+    }
+
+    public int getLayer() {
+        return layer;
     }
 }
