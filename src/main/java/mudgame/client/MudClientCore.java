@@ -2,7 +2,6 @@ package mudgame.client;
 
 import core.claiming.ClaimedAreaView;
 import core.entities.EntityBoardView;
-import mudgame.controls.events.Event;
 import core.fogofwar.PlayerFogOfWarView;
 import core.model.PlayerID;
 import core.pathfinder.Pathfinder;
@@ -12,6 +11,7 @@ import core.terrain.TerrainView;
 import core.turns.PlayerTurnView;
 import lombok.extern.slf4j.Slf4j;
 import mudgame.client.events.EventProcessor;
+import mudgame.controls.events.Event;
 
 @Slf4j
 public class MudClientCore implements MudClientCoreView {
@@ -19,6 +19,7 @@ public class MudClientCore implements MudClientCoreView {
     private final EventProcessor eventProcessor;
     private final Pathfinder pathfinder;
     private final PlayerSpawnManager spawnManager;
+    private final PlayerAttackManager playerAttackManager;
 
     public MudClientCore(ClientGameState state) {
         this.state = state;
@@ -36,6 +37,10 @@ public class MudClientCore implements MudClientCoreView {
                 state.claimedArea(),
                 state().resourceManager(),
                 state.terrain()
+        );
+        playerAttackManager = new PlayerAttackManager(
+                state.playerID(),
+                state.entityBoard()
         );
     }
 
@@ -85,6 +90,11 @@ public class MudClientCore implements MudClientCoreView {
     @Override
     public PlayerTurnView turnView() {
         return state.turnManager();
+    }
+
+    @Override
+    public PlayerAttackManager playerAttackManager() {
+        return playerAttackManager;
     }
 
 }

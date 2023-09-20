@@ -18,4 +18,5 @@ public interface MudClientCoreView {
     EntityBoardView entityBoard();
     PlayerFogOfWarView fogOfWar();
     PlayerTurnView turnView();
+    PlayerAttackManager playerAttackManager();
 }

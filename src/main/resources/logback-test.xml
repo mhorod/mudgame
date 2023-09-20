@@ -1,8 +1,25 @@
 <configuration>
+    <property name="defaultPattern" value="%d{HH:mm:ss.SSS} [%.+4thread] %-5level %logger{36} -%kvp- %msg%n"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <!--            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%kvp- %msg%n</pattern>-->
-            <pattern>%d{HH:mm:ss.SSS} [%.+4thread] %-5level %logger{36} -%kvp- %msg%n</pattern>
+            <pattern>${defaultPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE_ACTIONS" class="ch.qos.logback.core.FileAppender">
+        <file>actions.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>${defaultPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE_EVENTS" class="ch.qos.logback.core.FileAppender">
+        <file>events.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>${defaultPattern}</pattern>
         </encoder>
     </appender>
 
@@ -14,6 +31,14 @@
     <!--    <logger name="core" level="OFF"/>-->
     <!--    <logger name="middleware" level="OFF"/>-->
 
-    <logger name="middleware.communication.SocketReceiver" level="INFO"/>
-    <logger name="middleware.communication.SocketSender" level="INFO"/>
+    <logger name="middleware.communication" level="INFO"/>
+
+    <logger name="mudgame.server.actions.ActionProcessor">
+        <appender-ref ref="FILE_ACTIONS"/>
+    </logger>
+    
+    <logger name="mudgame.server.actions.EventSender">
+        <appender-ref ref="FILE_EVENTS"/>
+    </logger>
+
 </configuration>

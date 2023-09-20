@@ -3,5 +3,6 @@
 build
 .classpath
 .project
+*.log
 .settings/
 bin/

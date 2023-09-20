@@ -1,19 +1,19 @@
 package core.entities.model.components.visitors;
 
-import core.entities.model.components.Attack;
 import core.entities.model.components.Component;
 import core.entities.model.components.ComponentVisitor;
+import core.entities.model.components.Movement;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class GetAttack implements ComponentVisitor<Optional<Attack>>, Serializable {
+public class GetMovement implements ComponentVisitor<Optional<Movement>>, Serializable {
     @Override
-    public Optional<Attack> visit(Attack a) { return Optional.of(a); }
+    public Optional<Movement> visit(Movement c) { return Optional.of(c); }
 
-    public Optional<Attack> getAttack(List<Component> components) {
+    public Optional<Movement> getMovement(List<Component> components) {
         return components
                 .stream()
                 .map(c -> c.accept(this))
