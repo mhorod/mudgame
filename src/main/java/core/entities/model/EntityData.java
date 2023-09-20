@@ -8,8 +8,10 @@ import core.entities.model.components.Health;
 import core.entities.model.components.Movement;
 import core.entities.model.components.Production;
 import core.entities.model.components.Vision;
+import core.entities.model.components.visitors.GetAttack;
 import core.entities.model.components.visitors.GetCost;
 import core.entities.model.components.visitors.GetHealth;
+import core.entities.model.components.visitors.GetMovement;
 import core.entities.model.components.visitors.GetProduction;
 
 import java.io.Serializable;
@@ -33,6 +35,14 @@ public record EntityData(
 
     public Optional<Production> getProduction() {
         return new GetProduction().getProduction(components());
+    }
+
+    public Optional<Attack> getAttack() {
+        return new GetAttack().getAttack(components());
+    }
+
+    public Optional<Movement> getMovement() {
+        return new GetMovement().getMovement(components());
     }
 
     public static EntityData ofType(EntityType type) {

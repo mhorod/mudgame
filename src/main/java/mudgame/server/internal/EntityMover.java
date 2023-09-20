@@ -19,13 +19,20 @@ class EntityMover {
     public MovedEntity moveEntity(EntityID entityID, Position position) {
         Entity entity = state.entityBoard().findEntityByID(entityID);
         state.entityBoard().moveEntity(entityID, position);
+        int movementCost = state.terrain().terrainAt(position).getMovementCost();
+        entity.getMovement().ifPresent(m -> m.move(movementCost));
+
         ClaimChange claimChange = state.claimedArea()
                 .moveEntity(entity, position)
                 .masked(state.terrain());
+
         Set<PositionVisibility> positions = state.fogOfWar()
                 .playerFogOfWar(entity.owner())
                 .moveEntity(entityID, position);
+
         VisibilityChange visibilityChange = visibility.get(positions);
+
+
         return new MovedEntity(entityID, visibilityChange, claimChange);
     }
 }

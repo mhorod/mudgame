@@ -17,6 +17,8 @@ public final class Health implements Component {
 
     public void damage(int amount) {
         currentHealth -= amount;
+        if (currentHealth < 0)
+            currentHealth = 0;
     }
 
     public void heal(int amount) {

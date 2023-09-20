@@ -28,8 +28,10 @@ final class EntityEventProcessor {
     public EntityEventProcessor(ClientGameState state) {
         this.state = state;
         this.entityManager = new EntityManager(
+                state.playerID(),
                 state.entityBoard(),
-                state.fogOfWar()
+                state.fogOfWar(),
+                state.terrain()
         );
         this.claimedArea = state.claimedArea();
     }
