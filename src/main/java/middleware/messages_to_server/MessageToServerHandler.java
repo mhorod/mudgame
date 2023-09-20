@@ -1,14 +1,14 @@
 package middleware.messages_to_server;
 
-import core.event.Action;
 import core.model.PlayerID;
 import middleware.model.RoomID;
-import mudgame.server.ServerGameState;
+import mudgame.controls.actions.Action;
+import mudgame.server.state.ServerState;
 
 public interface MessageToServerHandler {
     void createRoom(PlayerID myPlayerID, int playerCount);
 
-    void loadGame(PlayerID myPlayerID, ServerGameState state);
+    void loadGame(PlayerID myPlayerID, ServerState state);
 
     void getRoomList();
 
@@ -25,4 +25,8 @@ public interface MessageToServerHandler {
     void pongToServer();
 
     void disconnect();
+
+    void setName(String name);
+
+    void downloadState();
 }

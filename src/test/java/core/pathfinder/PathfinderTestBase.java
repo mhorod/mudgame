@@ -1,6 +1,6 @@
 package core.pathfinder;
 
-import core.entities.components.Movement;
+import core.entities.model.components.Movement;
 import core.entities.model.EntityData;
 import core.entities.model.EntityType;
 import core.model.Position;

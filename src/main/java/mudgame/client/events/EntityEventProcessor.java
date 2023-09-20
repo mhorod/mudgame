@@ -1,9 +1,12 @@
 package mudgame.client.events;
 
+import core.claiming.PlayerClaimedArea;
 import core.entities.model.Entity;
 import core.model.Position;
 import lombok.extern.slf4j.Slf4j;
 import mudgame.client.ClientGameState;
+import mudgame.controls.events.AttackEntityEvent;
+import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.MoveEntityAlongPath.SingleMove;
 import mudgame.controls.events.PlaceEntity;
@@ -20,16 +23,23 @@ import static core.terrain.model.TerrainType.UNKNOWN;
 final class EntityEventProcessor {
     private final ClientGameState state;
     private final EntityManager entityManager;
+    private final PlayerClaimedArea claimedArea;
 
     public EntityEventProcessor(ClientGameState state) {
         this.state = state;
-        this.entityManager = new EntityManager(state.entityBoard(), state.fogOfWar());
+        this.entityManager = new EntityManager(
+                state.entityBoard(),
+                state.fogOfWar()
+        );
+        this.claimedArea = state.claimedArea();
     }
 
     public void spawnEntity(SpawnEntity e) {
         entityManager.placeEntity(e.entity(), e.position());
         applyVisibilityChange(e.visibilityChange());
+        claimedArea.apply(e.claimChange());
     }
+
 
     private void applyVisibilityChange(VisibilityChange visibilityChange) {
         for (PositionVisibilityChange p : visibilityChange.positions())
@@ -46,11 +56,16 @@ final class EntityEventProcessor {
                 .map(Entity::id)
                 .forEach(entityManager::removeEntity);
         state.terrain().setTerrainAt(h.position(), UNKNOWN);
+        claimedArea.unclaim(h.position());
     }
 
     private void showPosition(ShowPosition s) {
         state.terrain().setTerrainAt(s.position(), s.terrain());
         s.entities().forEach(e -> entityManager.placeEntity(e, s.position()));
+        if (s.positionOwner() != null)
+            claimedArea.claim(s.positionOwner(), s.position());
+        else
+            claimedArea.unclaim(s.position());
     }
 
     public void moveEntityAlongPath(MoveEntityAlongPath e) {
@@ -59,6 +74,7 @@ final class EntityEventProcessor {
             if (destination != null)
                 entityManager.moveEntity(e.entityID(), destination);
             applyVisibilityChange(singleMove.visibilityChange());
+            claimedArea.apply(singleMove.claimChange());
         }
     }
 
@@ -68,5 +84,15 @@ final class EntityEventProcessor {
 
     public void removeEntity(RemoveEntity e) {
         entityManager.removeEntity(e.entityID());
+    }
+
+    public void attackEntity(AttackEntityEvent e) {
+        entityManager.damageEntity(e.attacked(), e.damage());
+    }
+
+    public void killEntity(KillEntity e) {
+        entityManager.removeEntity(e.entityID());
+        applyVisibilityChange(e.visibilityChange());
+        claimedArea.apply(e.claimChange());
     }
 }

@@ -1,10 +1,10 @@
 package core.pathfinder;
 
 import core.entities.EntityBoardView;
-import core.entities.components.ComponentVisitor;
-import core.entities.components.Movement;
 import core.entities.model.Entity;
-import core.fogofwar.FogOfWar;
+import core.entities.model.components.ComponentVisitor;
+import core.entities.model.components.Movement;
+import core.fogofwar.FogOfWarView;
 import core.model.EntityID;
 import core.model.Position;
 import core.terrain.TerrainView;
@@ -26,7 +26,7 @@ import static java.util.Comparator.comparing;
 public class EntityPathfinder implements Pathfinder, Serializable {
     private final TerrainView terrain;
     private final EntityBoardView entityBoard;
-    private final FogOfWar fow;
+    private final FogOfWarView fow;
 
     private record PositionOnPath(Position position, int movementLeft) { }
 
@@ -105,7 +105,7 @@ public class EntityPathfinder implements Pathfinder, Serializable {
             return false;
         else if (!entityBoard.entitiesAt(destination).isEmpty())
             return false;
-        else if (!fow.isVisible(destination, entity.owner()))
+        else if (!fow.playerSees(destination, entity.owner()))
             return false;
         else
             return true;

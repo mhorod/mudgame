@@ -1,17 +1,20 @@
 package mudgame.integration.utils;
 
+import core.claiming.PlayerClaimedArea;
 import core.entities.EntityBoard;
-import core.event.Event;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
+import core.resources.PlayerResourceManager;
 import mudgame.client.ClientGameState;
-import mudgame.server.ServerGameState;
+import mudgame.controls.events.Event;
+import mudgame.server.state.ServerState;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public record ScenarioResult(
-        ServerGameState serverState,
+        ServerState serverState,
         Map<PlayerID, ClientGameState> clientStates,
         Map<PlayerID, List<Event>> receivedEvents
 ) {
@@ -40,14 +43,46 @@ public record ScenarioResult(
     }
 
     public PlayerID serverTurn() {
-        return serverState.playerManager().getCurrentPlayer();
+        return serverState.turnManager().currentPlayer();
     }
 
     public PlayerID clientTurn(PlayerID player) {
-        return clientStates.get(player).playerManager().getCurrentPlayer();
+        return clientStates.get(player).turnManager().currentPlayer();
     }
 
     public ClientGameState clientState(PlayerID player) {
         return clientStates().get(player);
+    }
+
+    public PlayerClaimedArea clientClaimedArea(PlayerID player) {
+        return clientStates.get(player).claimedArea();
+    }
+
+    public PlayerClaimedArea serverClaimedArea(PlayerID player) {
+        return serverState.claimedArea().mask(serverFow(player), serverState.terrain());
+    }
+
+    public PlayerResourceManager clientResources(PlayerID player) {
+        return clientStates.get(player).resourceManager();
+    }
+
+    public PlayerResourceManager serverResources(PlayerID player) {
+        return serverState.resourceManager().playerResources(player);
+    }
+
+    public boolean clientIsGameOver(PlayerID player) {
+        return clientStates.get(player).gameOverCondition().isGameOver();
+    }
+
+    public boolean serverIsGameOver() {
+        return serverState.gameOverCondition().isGameOver();
+    }
+
+    public Optional<List<PlayerID>> clientWinners(PlayerID player) {
+        return clientStates.get(player).gameOverCondition().winners();
+    }
+
+    public Optional<List<PlayerID>> serverWinners() {
+        return serverState.gameOverCondition().winners();
     }
 }

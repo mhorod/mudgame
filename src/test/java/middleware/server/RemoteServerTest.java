@@ -1,33 +1,31 @@
 package middleware.server;
 
+import mudgame.server.state.ServerStateSupplier;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.Duration;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static middleware.server.MockSockets.*;
+import static middleware.utils.MockSockets.*;
+import static middleware.utils.Wait.verify_wait;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class RemoteServerTest {
-    private static final Duration VERIFY_WAIT = Duration.ofMillis(100);
-
-    void verify_wait() throws Throwable {
-        Thread.sleep(VERIFY_WAIT.toMillis());
-    }
+    private static final ServerStateSupplier serverStateSupplier = mock(ServerStateSupplier.class);
 
     @Test
-    void stop_cancels_timer_and_socket() throws Throwable {
+    void stop_cancels_timer_and_socket() {
         // given
         Timer mockedTimer = mock(Timer.class);
         ServerSocketWithController mockedServerSocket = serverSocket();
 
-        RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
+        RemoteServer server = new RemoteServer(serverStateSupplier, mockedServerSocket.socket(),
+                                               mockedTimer);
 
         // when
         server.stop();
@@ -44,7 +42,8 @@ class RemoteServerTest {
         Timer mockedTimer = mock(Timer.class);
         ServerSocketWithController mockedServerSocket = serverSocket();
 
-        RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
+        RemoteServer server = new RemoteServer(serverStateSupplier, mockedServerSocket.socket(),
+                                               mockedTimer);
 
         // when
         mockedServerSocket.socket().close();
@@ -59,9 +58,10 @@ class RemoteServerTest {
         // given
         Timer mockedTimer = mock(Timer.class);
         ServerSocketWithController mockedServerSocket = serverSocket();
-        Socket userSocket = socket();
+        Socket userSocket = empty_socket();
 
-        RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
+        RemoteServer server = new RemoteServer(serverStateSupplier, mockedServerSocket.socket(),
+                                               mockedTimer);
         mockedServerSocket.controller().accept(userSocket);
         verify_wait();
 
@@ -80,9 +80,10 @@ class RemoteServerTest {
         // given
         Timer mockedTimer = mock(Timer.class);
         ServerSocketWithController mockedServerSocket = serverSocket();
-        Socket userSocket = socket();
+        Socket userSocket = empty_socket();
 
-        RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
+        RemoteServer server = new RemoteServer(serverStateSupplier, mockedServerSocket.socket(),
+                                               mockedTimer);
         mockedServerSocket.controller().accept(userSocket);
         verify_wait();
 
@@ -101,9 +102,10 @@ class RemoteServerTest {
         Timer mockedTimer = mock(Timer.class);
         ArgumentCaptor<TimerTask> captor = ArgumentCaptor.forClass(TimerTask.class);
 
-        Socket userSocket = socket();
+        Socket userSocket = empty_socket();
         ServerSocketWithController mockedServerSocket = serverSocket();
-        RemoteServer server = new RemoteServer(mockedServerSocket.socket(), mockedTimer);
+        RemoteServer server = new RemoteServer(serverStateSupplier, mockedServerSocket.socket(),
+                                               mockedTimer);
         mockedServerSocket.controller().accept(userSocket);
         verify_wait();
 
@@ -128,7 +130,7 @@ class RemoteServerTest {
         doThrow(new IOException()).when(socket).close();
         doThrow(new IOException()).when(socket).accept();
 
-        RemoteServer server = new RemoteServer(socket, mockedTimer);
+        RemoteServer server = new RemoteServer(serverStateSupplier, socket, mockedTimer);
 
         // when
         server.stop();

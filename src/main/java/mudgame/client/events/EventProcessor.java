@@ -1,20 +1,27 @@
 package mudgame.client.events;
 
-import core.event.Event;
-import core.turns.CompleteTurn;
 import mudgame.client.ClientGameState;
+import mudgame.controls.events.AttackEntityEvent;
+import mudgame.controls.events.ChargeResources;
+import mudgame.controls.events.Event;
+import mudgame.controls.events.GameOver;
+import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.NextTurn;
 import mudgame.controls.events.PlaceEntity;
+import mudgame.controls.events.ProduceResources;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.controls.events.SpawnEntity;
 
 public final class EventProcessor {
     private final ClientGameState state;
     private final EntityEventProcessor entityEventProcessor;
+    private final ResourceEventProcessor resourceEventProcessor;
 
     public EventProcessor(ClientGameState state) {
         this.state = state;
         entityEventProcessor = new EntityEventProcessor(state);
+        resourceEventProcessor = new ResourceEventProcessor(state);
     }
 
     public void process(Event event) {
@@ -26,11 +33,25 @@ public final class EventProcessor {
             entityEventProcessor.removeEntity(e);
         else if (event instanceof MoveEntityAlongPath e)
             entityEventProcessor.moveEntityAlongPath(e);
-        else if (event instanceof CompleteTurn)
-            completeTurn();
+        else if (event instanceof NextTurn e)
+            nextTurn(e);
+        else if (event instanceof GameOver e)
+            gameOver(e);
+        else if (event instanceof AttackEntityEvent e)
+            entityEventProcessor.attackEntity(e);
+        else if (event instanceof KillEntity e)
+            entityEventProcessor.killEntity(e);
+        else if (event instanceof ProduceResources e)
+            resourceEventProcessor.produceResources(e);
+        else if (event instanceof ChargeResources e)
+            resourceEventProcessor.chargeResources(e);
     }
 
-    private void completeTurn() {
-        state.playerManager().completeTurn();
+    private void nextTurn(NextTurn e) {
+        state.turnManager().nextTurn(e.currentPlayer());
+    }
+
+    private void gameOver(GameOver e) {
+        state.gameOverCondition().gameOver(e.winners());
     }
 }

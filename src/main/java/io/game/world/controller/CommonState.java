@@ -1,18 +1,20 @@
 package io.game.world.controller;
 
-import core.entities.EntityBoard;
-import core.event.Event;
+import core.entities.EntityBoardView;
+import mudgame.controls.events.Event;
 import core.pathfinder.Pathfinder;
-import core.terrain.model.Terrain;
+import core.spawning.PlayerSpawnManager;
+import core.terrain.TerrainView;
 import io.game.world.Map;
 
 import java.util.HashSet;
 
 public record CommonState(
         Map map,
-        Terrain terrain,
-        EntityBoard entities,
+        TerrainView terrain,
+        EntityBoardView entities,
         Pathfinder pathfinder,
+        PlayerSpawnManager spawnManager,
         Controls controls,
         HashSet<Event> animatedEvents
 ) {

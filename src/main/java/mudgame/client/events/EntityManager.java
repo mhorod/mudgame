@@ -26,4 +26,8 @@ class EntityManager {
         entityBoard.moveEntity(entityID, destination);
         playerFogOfWar.moveEntity(entityID, destination);
     }
+
+    public void damageEntity(EntityID entityID, int damage) {
+        entityBoard.findEntityByID(entityID).damage(damage);
+    }
 }

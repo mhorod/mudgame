@@ -1,8 +1,11 @@
 package middleware.server;
 
 import core.model.PlayerID;
-import core.turns.CompleteTurn;
-import mudgame.server.MudServerCore;
+import middleware.model.UserID;
+import middleware.utils.TestUser;
+import mudgame.controls.actions.CompleteTurn;
+import mudgame.server.state.ClassicServerStateSupplier;
+import mudgame.server.state.ServerStateSupplier;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -12,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class UserTest {
+    private static final ServerStateSupplier serverStateSupplier = new ClassicServerStateSupplier();
+
     @Test
     void user_receives_id_and_room_list() {
         // given
@@ -21,9 +26,8 @@ public class UserTest {
         TestUser user = new TestUser(server);
 
         // then
-        assertThat(user.sent).hasSize(2);
-        assertThat(user.sent.get(0)).isInstanceOf(SetUserIDMessage.class);
-        assertThat(user.sent.get(1)).isInstanceOf(SetRoomListMessage.class);
+        assertThat(user.sent).hasSize(1);
+        assertThat(user.sent.get(0)).isInstanceOf(SetRoomListMessage.class);
     }
 
     @Test
@@ -45,23 +49,6 @@ public class UserTest {
     }
 
     @Test
-    void correct_user_ids_are_sent() {
-        // given
-        GameServer server = new GameServer();
-
-        // when
-        TestUser user1 = new TestUser(server);
-        TestUser user2 = new TestUser(server);
-
-        // then
-        SetUserIDMessage message1 = (SetUserIDMessage) user1.sent.get(0);
-        SetUserIDMessage message2 = (SetUserIDMessage) user2.sent.get(0);
-
-        assertThat(user1.user.getUserID()).isEqualTo(message1.userID());
-        assertThat(user2.user.getUserID()).isEqualTo(message2.userID());
-    }
-
-    @Test
     void clear_room_should_not_be_called_directly() {
         // given
         GameServer server = new GameServer();
@@ -77,13 +64,13 @@ public class UserTest {
         GameServer server = new GameServer();
         TestUser user = new TestUser(server);
         user.receive().createRoom(new PlayerID(0), 2);
-        Room room = user.user.getRoom();
+        Room room = user.user.getRoom().orElseThrow();
 
         // then
         assertThatThrownBy(
-                () -> user.user.setRoom(user.user.getRoom(), new PlayerID(0))
+                () -> user.user.setRoom(user.user.getRoom().orElseThrow(), new PlayerID(0))
         ).isInstanceOf(RuntimeException.class);
-        assertThat(user.user.getRoom()).isEqualTo(room);
+        assertThat(user.user.getRoom().orElseThrow()).isEqualTo(room);
     }
 
     @Test
@@ -97,7 +84,7 @@ public class UserTest {
         user.receive().createRoom(new PlayerID(0), -5);
 
         // then
-        assertThat(user.user.getRoom()).isNull();
+        assertThat(user.user.getRoom()).isEmpty();
         assertThat(server.getRoomList()).isEmpty();
         assertThat(user.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
     }
@@ -113,7 +100,7 @@ public class UserTest {
         user.receive().createRoom(new PlayerID(2), 2);
 
         // then
-        assertThat(user.user.getRoom()).isNull();
+        assertThat(user.user.getRoom()).isEmpty();
         assertThat(server.getRoomList()).isEmpty();
         assertThat(user.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
     }
@@ -124,18 +111,16 @@ public class UserTest {
         GameServer server = new GameServer();
         TestUser user = new TestUser(server);
         user.receive().createRoom(new PlayerID(0), 2);
-        Room room = user.user.getRoom();
+        Room room = user.user.getRoom().orElseThrow();
         user.sent.clear();
 
         // when
         user.receive().createRoom(new PlayerID(0), 2);
 
         // then
-        assertThat(user.user.getRoom()).isEqualTo(room);
+        assertThat(user.user.getRoom().orElseThrow()).isEqualTo(room);
         assertThat(server.getRoomList()).containsExactly(room.getRoomInfo());
-        assertThat(user.sent).anyMatch(
-                message -> message instanceof ErrorMessage
-        );
+        assertThat(user.sent).anyMatch(ErrorMessage.class::isInstance);
     }
 
     @Test
@@ -146,14 +131,13 @@ public class UserTest {
         user.sent.clear();
 
         // when
+        user.allowKick();
         user.receive().loadGame(new PlayerID(0), null);
 
         // then
-        assertThat(user.user.getRoom()).isNull();
+        assertThat(user.user.getRoom()).isEmpty();
         assertThat(server.getRoomList()).isEmpty();
-        assertThat(user.sent).anyMatch(
-                message -> message instanceof ErrorMessage
-        );
+        assertThat(user.sent).anyMatch(ErrorMessage.class::isInstance);
     }
 
     @Test
@@ -164,10 +148,10 @@ public class UserTest {
         user.sent.clear();
 
         // when
-        user.receive().loadGame(new PlayerID(2), MudServerCore.newState(2));
+        user.receive().loadGame(new PlayerID(2), serverStateSupplier.get(2));
 
         // then
-        assertThat(user.user.getRoom()).isNull();
+        assertThat(user.user.getRoom()).isEmpty();
         assertThat(server.getRoomList()).isEmpty();
         assertThat(user.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
     }
@@ -178,18 +162,16 @@ public class UserTest {
         GameServer server = new GameServer();
         TestUser user = new TestUser(server);
         user.receive().createRoom(new PlayerID(0), 2);
-        Room room = user.user.getRoom();
+        Room room = user.user.getRoom().orElseThrow();
         user.sent.clear();
 
         // when
-        user.receive().loadGame(new PlayerID(0), MudServerCore.newState(2));
+        user.receive().loadGame(new PlayerID(0), serverStateSupplier.get(2));
 
         // then
-        assertThat(user.user.getRoom()).isEqualTo(room);
+        assertThat(user.user.getRoom().orElseThrow()).isEqualTo(room);
         assertThat(server.getRoomList()).containsExactly(room.getRoomInfo());
-        assertThat(user.sent).anyMatch(
-                message -> message instanceof ErrorMessage
-        );
+        assertThat(user.sent).anyMatch(ErrorMessage.class::isInstance);
     }
 
     @Test
@@ -200,6 +182,7 @@ public class UserTest {
         user.device.close();
 
         // when
+        user.allowKick();
         user.receive().createRoom(new PlayerID(0), 2);
 
         // then
@@ -217,9 +200,7 @@ public class UserTest {
         user.receive().makeAction(new CompleteTurn());
 
         // then
-        assertThat(user.sent).anyMatch(
-                message -> message instanceof ErrorMessage
-        );
+        assertThat(user.sent).anyMatch(ErrorMessage.class::isInstance);
     }
 
     @Test
@@ -233,9 +214,7 @@ public class UserTest {
         user.receive().getRoomList();
 
         // then
-        assertThat(user.sent).anyMatch(
-                message -> message instanceof SetRoomListMessage
-        );
+        assertThat(user.sent).anyMatch(SetRoomListMessage.class::isInstance);
     }
 
     @Test
@@ -249,8 +228,72 @@ public class UserTest {
         user.receive().pingToServer();
 
         // then
-        assertThat(user.sent).anyMatch(
-                message -> message instanceof PongToClientMessage
-        );
+        assertThat(user.sent).anyMatch(PongToClientMessage.class::isInstance);
+    }
+
+    @Test
+    void default_name() {
+        // given
+        GameServer server = new GameServer();
+
+        // when
+        TestUser user = new TestUser(server);
+
+        // then
+        assertThat(user.user.getName()).isEqualTo(UserID.DEFAULT_NAME);
+    }
+
+    @Test
+    void users_can_change_name() {
+        // given
+        GameServer server = new GameServer();
+        TestUser user = new TestUser(server);
+        user.sent.clear();
+
+        // when
+        user.receive().setName("new_name");
+
+        // then
+        assertThat(user.sent)
+                .contains(new ChangeNameMessage("new_name"))
+                .noneMatch(ErrorMessage.class::isInstance);
+    }
+
+    @Test
+    void multiple_users_with_same_name_can_coexist() {
+        // given
+        GameServer server = new GameServer();
+        TestUser user1 = new TestUser(server);
+        TestUser user2 = new TestUser(server);
+        user1.sent.clear();
+        user2.sent.clear();
+
+        // when
+        user1.receive().setName("new_name");
+        user2.receive().setName("new_name");
+
+        // then
+        assertThat(user1.sent)
+                .contains(new ChangeNameMessage("new_name"))
+                .noneMatch(ErrorMessage.class::isInstance);
+        assertThat(user2.sent)
+                .contains(new ChangeNameMessage("new_name"))
+                .noneMatch(ErrorMessage.class::isInstance);
+
+    }
+
+    @Test
+    void cannot_download_state_while_not_in_room() {
+        // given
+        GameServer server = new GameServer();
+        TestUser user = new TestUser(server);
+
+        // when
+        user.receive().downloadState();
+
+        // then
+        assertThat(user.sent)
+                .noneMatch(SetDownloadedStateMessage.class::isInstance)
+                .anyMatch(ErrorMessage.class::isInstance);
     }
 }

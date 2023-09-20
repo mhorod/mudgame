@@ -1,10 +1,10 @@
 package middleware.messages_to_server;
 
-import core.event.Action;
 import core.model.PlayerID;
 import lombok.AllArgsConstructor;
 import middleware.model.RoomID;
-import mudgame.server.ServerGameState;
+import mudgame.controls.actions.Action;
+import mudgame.server.state.ServerState;
 
 import java.util.function.Consumer;
 
@@ -20,7 +20,7 @@ public final class MessageToServerFactory implements MessageToServerHandler {
     }
 
     @Override
-    public void loadGame(PlayerID myPlayerID, ServerGameState state) {
+    public void loadGame(PlayerID myPlayerID, ServerState state) {
         consumer.accept(new LoadGameMessage(myPlayerID, state));
     }
 
@@ -62,5 +62,15 @@ public final class MessageToServerFactory implements MessageToServerHandler {
     @Override
     public void disconnect() {
         consumer.accept(new DisconnectMessage());
+    }
+
+    @Override
+    public void setName(String name) {
+        consumer.accept(new SetNameMessage(name));
+    }
+
+    @Override
+    public void downloadState() {
+        consumer.accept(new DownloadStateMessage());
     }
 }

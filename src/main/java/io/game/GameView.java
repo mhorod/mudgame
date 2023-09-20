@@ -2,7 +2,6 @@ package io.game;
 
 import ai.Bot;
 import ai.RandomWalker;
-import core.event.Event;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -21,15 +20,16 @@ import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
+import middleware.communication.SocketDevice.SocketConnectionBuilder;
 import middleware.local.LocalServer;
 import middleware.remote.RemoteNetworkClient;
-import middleware.remote.SocketConnection;
-import mudgame.controls.events.HideEntity;
+import mudgame.controls.events.Event;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.ShowEntity;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
+import mudgame.server.state.ClassicServerStateSupplier;
+import mudgame.server.state.ServerState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,8 @@ public class GameView extends SimpleView {
     private final List<Bot> bots = new ArrayList<>();
 
     public GameView() {
-        var server = new LocalServer(4);
+        ServerState serverState = new ClassicServerStateSupplier().get(4);
+        var server = new LocalServer(serverState);
 
         if (true) {
             me = server.getClients().get(0);
@@ -63,7 +64,8 @@ public class GameView extends SimpleView {
             // --------------------------------------------------
             // if this causes many merge conflicts remove it
             try {
-                RemoteNetworkClient.GLOBAL_CLIENT.connect(new SocketConnection("localhost", 6789));
+                RemoteNetworkClient.GLOBAL_CLIENT.connect(
+                        new SocketConnectionBuilder("localhost", 6789));
 
                 while (RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().isEmpty())
                     RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
@@ -83,20 +85,20 @@ public class GameView extends SimpleView {
             // --------------------------------------------------
         }
 
-        map = new Map(me.getCore().state().terrain(), me.getCore().state().entityBoard());
+        map = new Map(me.getCore().terrain(), me.getCore().entityBoard());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
         worldController = new WorldController(
                 map,
-                me.getCore().state().entityBoard(),
-                me.getCore().state().terrain(),
+                me.getCore().entityBoard(),
+                me.getCore().terrain(),
                 me.getCore().pathfinder(),
+                me.getCore().spawnManager(),
                 new Controls() {
                     @Override
                     public void moveEntity(EntityID id, Position destination) {
                         me.getControls().moveEntity(id, destination);
                         me.getControls().completeTurn();
-                        ;
                     }
 
                     @Override
@@ -130,12 +132,6 @@ public class GameView extends SimpleView {
         } else if (event instanceof RemoveEntity e) {
             eventObserved = true;
             worldController.onRemoveEntity(e);
-        } else if (event instanceof ShowEntity e) {
-            eventObserved = true;
-            worldController.onShowEntity(e);
-        } else if (event instanceof HideEntity e) {
-            eventObserved = true;
-            worldController.onHideEntity(e);
         }
     }
 
@@ -145,8 +141,6 @@ public class GameView extends SimpleView {
                          && !(event instanceof VisibilityChange)
                          && !(event instanceof SpawnEntity)
                          && !(event instanceof RemoveEntity)
-                         && !(event instanceof ShowEntity)
-                         && !(event instanceof HideEntity)
         );
     }
 

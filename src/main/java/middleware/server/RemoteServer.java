@@ -1,10 +1,8 @@
 package middleware.server;
 
 import lombok.extern.slf4j.Slf4j;
-import middleware.communication.SocketReceiver;
-import middleware.communication.SocketSender;
-import middleware.messages_to_client.MessageToClient;
-import middleware.messages_to_server.MessageToServer;
+import middleware.communication.SocketDevice.SocketDeviceBuilder;
+import mudgame.server.state.ServerStateSupplier;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -17,11 +15,16 @@ import java.util.TimerTask;
 public final class RemoteServer {
     private static final Duration SCAN_CLOSED_CONNECTIONS_DELAY = Duration.ofSeconds(15);
 
+    private final ServerStateSupplier serverStateSupplier;
     private final GameServer server = new GameServer();
     private final ServerSocket serverSocket;
     private final Timer timer;
 
-    public RemoteServer(ServerSocket serverSocket, Timer timer) {
+    public RemoteServer(
+            ServerStateSupplier serverStateSupplier,
+            ServerSocket serverSocket, Timer timer
+    ) {
+        this.serverStateSupplier = serverStateSupplier;
         this.serverSocket = serverSocket;
         this.timer = timer;
         new Thread(this::workReceiveConnections).start();
@@ -51,29 +54,13 @@ public final class RemoteServer {
 
     private void receiveConnection(Socket socket) {
         synchronized (server) {
-            SocketSender<MessageToClient> sender = new SocketSender<>(socket);
-
-            User user = new User(
-                    sender::sendMessage,
-                    sender.getClosingDevice(),
-                    server
-            );
-
-            new SocketReceiver<>(
-                    user::processMessage,
-                    socket,
-                    MessageToServer.class
-            );
-
-            log.info("New connection from %s got %s".formatted(
-                    socket.getInetAddress().toString(),
-                    user.getUserID().toString()
-            ));
+            User user = new User(serverStateSupplier, new SocketDeviceBuilder(socket), server);
+            log.info("New connection from {} got {}", socket.getInetAddress(), user.getUserID());
         }
     }
 
     private void workReceiveConnections() {
-        log.info("Started listening on port " + serverSocket.getLocalPort());
+        log.info("Started listening on port {}", serverSocket.getLocalPort());
 
         try {
             while (!serverSocket.isClosed()) {

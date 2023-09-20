@@ -1,16 +1,16 @@
 package middleware.messages_to_server;
 
-import core.event.Action;
 import core.model.PlayerID;
 import middleware.model.RoomID;
-import mudgame.server.ServerGameState;
+import mudgame.controls.actions.Action;
+import mudgame.server.state.ServerState;
 
 import java.io.Serializable;
 
 public interface MessageToServer extends Serializable {
     void execute(MessageToServerHandler handler);
 
-    record LoadGameMessage(PlayerID myPlayerID, ServerGameState state) implements MessageToServer {
+    record LoadGameMessage(PlayerID myPlayerID, ServerState state) implements MessageToServer {
         @Override
         public void execute(MessageToServerHandler handler) {
             handler.loadGame(myPlayerID, state);
@@ -77,6 +77,20 @@ public interface MessageToServer extends Serializable {
         @Override
         public void execute(MessageToServerHandler handler) {
             handler.startGame();
+        }
+    }
+
+    record SetNameMessage(String name) implements MessageToServer {
+        @Override
+        public void execute(MessageToServerHandler handler) {
+            handler.setName(name);
+        }
+    }
+
+    record DownloadStateMessage() implements MessageToServer {
+        @Override
+        public void execute(MessageToServerHandler handler) {
+            handler.downloadState();
         }
     }
 }

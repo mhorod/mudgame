@@ -1,9 +1,9 @@
 package middleware.messages_to_client;
 
-import core.event.Event;
 import middleware.model.RoomInfo;
-import middleware.model.UserID;
 import mudgame.client.ClientGameState;
+import mudgame.controls.events.Event;
+import mudgame.server.state.ServerState;
 
 import java.util.List;
 
@@ -22,7 +22,9 @@ public interface MessageToClientHandler {
 
     void setRoomList(List<RoomInfo> roomList);
 
-    void setUserID(UserID userID);
-
     void kick();
+
+    void changeName(String name);
+
+    void setDownloadedState(ServerState state);
 }

@@ -1,14 +1,14 @@
 package mudgame.integration.utils;
 
-import core.event.Action;
-import core.event.Event;
-import core.event.EventOccurrence;
 import core.model.PlayerID;
 import mudgame.client.ClientGameState;
 import mudgame.client.MudClientCore;
-import mudgame.events.EventOccurrenceObserver;
+import mudgame.controls.actions.Action;
+import mudgame.controls.events.Event;
+import mudgame.server.EventOccurrence;
+import mudgame.server.EventOccurrenceObserver;
 import mudgame.server.MudServerCore;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,18 +33,18 @@ public class ScenarioGame {
     private final Map<PlayerID, MudClientCore> clientCores;
     Map<PlayerID, List<Event>> receivedEvents;
 
-    public ScenarioGame(ServerGameState initialState) {
+    public ScenarioGame(ServerState initialState) {
         EventSender sender = new EventSender();
         serverCore = new MudServerCore(initialState, sender);
-        clientCores = initialState.playerManager()
-                .getPlayerIDs()
+        clientCores = initialState.turnManager()
+                .players()
                 .stream()
                 .collect(toMap(
                         p -> p,
                         p -> new MudClientCore(initialState.toClientGameState(p))
                 ));
-        receivedEvents = initialState.playerManager()
-                .getPlayerIDs()
+        receivedEvents = initialState.turnManager()
+                .players()
                 .stream()
                 .collect(toMap(
                         p -> p,

@@ -1,9 +1,9 @@
 package middleware.messages_to_client;
 
-import core.event.Event;
 import middleware.model.RoomInfo;
-import middleware.model.UserID;
 import mudgame.client.ClientGameState;
+import mudgame.controls.events.Event;
+import mudgame.server.state.ServerState;
 
 import java.io.Serializable;
 import java.util.List;
@@ -60,16 +60,21 @@ public interface MessageToClient extends Serializable {
         }
     }
 
-    record SetUserIDMessage(UserID userID) implements MessageToClient {
-        @Override
-        public void execute(MessageToClientHandler handler) {
-            handler.setUserID(userID);
-        }
-    }
-
     record KickMessage() implements MessageToClient {
         public void execute(MessageToClientHandler handler) {
             handler.kick();
+        }
+    }
+
+    record ChangeNameMessage(String name) implements MessageToClient {
+        public void execute(MessageToClientHandler handler) {
+            handler.changeName(name);
+        }
+    }
+
+    record SetDownloadedStateMessage(ServerState state) implements MessageToClient {
+        public void execute(MessageToClientHandler handler) {
+            handler.setDownloadedState(state);
         }
     }
 }

@@ -1,34 +1,36 @@
 package middleware.remote;
 
-import core.event.Action;
-import core.event.Event;
 import core.model.PlayerID;
+import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
+import middleware.messages_to_server.MessageToServerFactory;
 import middleware.messages_to_server.MessageToServerHandler;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
 import middleware.model.UserID;
 import mudgame.client.ClientGameState;
-import mudgame.server.ServerGameState;
+import mudgame.controls.actions.Action;
+import mudgame.controls.events.Event;
+import mudgame.server.state.ServerState;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 public final class RemoteServerClient implements ServerClient {
-    private final UserID myUserID;
     private final RemoteNetworkClient client;
 
     private List<RoomInfo> roomList = List.of();
-    private RoomInfo currentRoom;
+    private Optional<RoomInfo> currentRoom = Optional.empty();
+    private String name = UserID.DEFAULT_NAME;
 
+    private Optional<ServerState> downloadedState = Optional.empty();
+    private Optional<RemoteGameClient> currentGameClient = Optional.empty();
     private boolean coreChanged = false;
-    private RemoteGameClient currentGameClient;
 
-    public RemoteServerClient(UserID myUserID, RemoteNetworkClient client) {
-        this.myUserID = myUserID;
+    public RemoteServerClient(RemoteNetworkClient client) {
         this.client = client;
     }
 
@@ -43,27 +45,29 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     private MessageToServerHandler getServerHandler() {
-        if (!isActive())
-            throw new RuntimeException("Attempting to send message using inactive ServerClient");
-        return client.getSender();
+        if (!isActive()) {
+            log.warn("Attempting to send message using inactive ServerClient");
+            return new MessageToServerFactory(message -> { });
+        }
+        return client.getServerHandler();
     }
 
     public void setGameState(ClientGameState state) {
-        currentGameClient = new RemoteGameClient(state, this);
+        currentGameClient = Optional.of(new RemoteGameClient(state, this));
         coreChanged = true;
     }
 
     public void setCurrentRoom(RoomInfo roomInfo) {
-        currentRoom = roomInfo;
+        currentRoom = Optional.ofNullable(roomInfo);
     }
 
     public void registerEvent(Event event) {
-        Objects.requireNonNull(currentGameClient).registerEvent(event);
+        currentGameClient.orElseThrow().registerEvent(event);
     }
 
     @Override
     public Optional<GameClient> getGameClient() {
-        return Optional.ofNullable(currentGameClient);
+        return currentGameClient.map(GameClient.class::cast);
     }
 
     @Override
@@ -77,12 +81,7 @@ public final class RemoteServerClient implements ServerClient {
 
     @Override
     public Optional<RoomInfo> currentRoom() {
-        return Optional.ofNullable(currentRoom);
-    }
-
-    @Override
-    public UserID myUsedID() {
-        return myUserID;
+        return currentRoom;
     }
 
     @Override
@@ -106,13 +105,43 @@ public final class RemoteServerClient implements ServerClient {
     }
 
     @Override
-    public void createRoom(PlayerID myPlayerID, ServerGameState state) {
+    public void createRoom(PlayerID myPlayerID, ServerState state) {
         getServerHandler().loadGame(myPlayerID, state);
     }
 
     @Override
     public void startGame() {
         getServerHandler().startGame();
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        getServerHandler().setName(name);
+    }
+
+    public void changeName(String nameFromServer) {
+        name = nameFromServer;
+    }
+
+    @Override
+    public void downloadState() {
+        getServerHandler().downloadState();
+    }
+
+    @Override
+    public Optional<ServerState> getDownloadedState() {
+        Optional<ServerState> state = downloadedState;
+        downloadedState = Optional.empty();
+        return state;
+    }
+
+    public void setDownloadedState(ServerState state) {
+        downloadedState = Optional.of(state);
     }
 
     public void makeAction(Action action) {

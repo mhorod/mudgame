@@ -1,16 +1,20 @@
 package middleware.server;
 
-import core.event.Action;
-import core.event.EventOccurrence;
 import core.model.PlayerID;
 import middleware.model.RoomID;
 import middleware.model.RoomInfo;
-import middleware.model.UserID;
 import mudgame.client.ClientGameState;
+import mudgame.controls.actions.Action;
+import mudgame.server.EventOccurrence;
 import mudgame.server.MudServerCore;
-import mudgame.server.ServerGameState;
+import mudgame.server.state.ServerState;
+import org.apache.commons.lang3.SerializationUtils;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public final class Room {
     private static long nextRoomID = 0;
@@ -19,22 +23,22 @@ public final class Room {
     private final RoomID roomID;
     private final MudServerCore core;
 
-    private final Map<PlayerID, User> toUserMap = new LinkedHashMap<>();
+    private final Map<PlayerID, Optional<User>> toUserMap = new LinkedHashMap<>();
     private final Set<PlayerID> validPlayerIDs = toUserMap.keySet();
 
     private final Set<User> connectedUsers = new LinkedHashSet<>();
 
-    private User owner;
+    private Optional<User> owner = Optional.empty();
     private boolean isRunning = false;
 
-    public Room(ServerGameState state, GameServer server) {
+    public Room(ServerState state, GameServer server) {
         this.server = server;
         this.roomID = new RoomID(nextRoomID++);
         this.core = new MudServerCore(state, this::eventObserver);
 
         server.putRoom(this);
-        for (PlayerID playerID : state.playerManager().getPlayerIDs())
-            toUserMap.put(playerID, null);
+        for (PlayerID playerID : state.turnManager().players())
+            toUserMap.put(playerID, Optional.empty());
     }
 
     private void eventObserver(EventOccurrence eventOccurrence) {
@@ -42,18 +46,18 @@ public final class Room {
                 .recipients()
                 .stream()
                 .map(toUserMap::get)
-                .filter(Objects::nonNull)
+                .flatMap(Optional::stream)
                 .forEach(user -> user.registerEvent(eventOccurrence.event()));
     }
 
-    private void sendUpdatedInfo() {
+    public void sendUpdatedInfo() {
         connectedUsers.forEach(User::sendCurrentRoom);
     }
 
     public void sendGameState(User user) {
         if (!isRunning)
             return;
-        ClientGameState state = core.state().toClientGameState(user.getPlayerID());
+        ClientGameState state = core.clientState(user.getPlayerID().orElseThrow());
         user.setGameState(state);
     }
 
@@ -62,16 +66,16 @@ public final class Room {
             user.sendError("This PlayedID is not valid");
             return false;
         }
-        if (toUserMap.get(asPlayerID) != null) {
+        if (toUserMap.get(asPlayerID).isPresent()) {
             user.sendError("This PlayedID is already taken");
             return false;
         }
 
-        if (owner == null)
-            owner = user;
+        if (owner.isEmpty())
+            owner = Optional.of(user);
 
         user.setRoom(this, asPlayerID);
-        toUserMap.put(asPlayerID, user);
+        toUserMap.put(asPlayerID, Optional.of(user));
         connectedUsers.add(user);
 
         sendUpdatedInfo();
@@ -86,21 +90,17 @@ public final class Room {
     }
 
     public void leaveRoom(User user) {
-        PlayerID playerID = user.getPlayerID();
+        PlayerID playerID = user.getPlayerID().orElseThrow();
 
         user.clearRoom();
-        toUserMap.put(playerID, null);
+        toUserMap.put(playerID, Optional.empty());
         connectedUsers.remove(user);
 
-        if (user.equals(owner) && !connectedUsers.isEmpty())
-            owner = connectedUsers.iterator().next();
+        if (user.equals(owner.orElse(null)))
+            owner = connectedUsers.stream().findFirst();
 
         sendUpdatedInfo();
         checkRemoval();
-    }
-
-    public UserID getOwnerID() {
-        return owner == null ? null : owner.getUserID();
     }
 
     public RoomID getRoomID() {
@@ -108,13 +108,14 @@ public final class Room {
     }
 
     public RoomInfo getRoomInfo() {
-        Map<PlayerID, UserID> toUserIDMap = new LinkedHashMap<>();
+        Map<PlayerID, String> toUserIDMap = new LinkedHashMap<>();
         for (var entry : toUserMap.entrySet()) {
             PlayerID playerID = entry.getKey();
-            User user = entry.getValue();
-            toUserIDMap.put(playerID, user == null ? null : user.getUserID());
+            String username = entry.getValue().map(User::getName).orElse(null);
+            toUserIDMap.put(playerID, username);
         }
-        return new RoomInfo(roomID, toUserIDMap, getOwnerID(), isRunning);
+
+        return new RoomInfo(roomID, toUserIDMap, owner.map(User::getName).orElse(null), isRunning);
     }
 
     public void start(User actor) {
@@ -130,7 +131,7 @@ public final class Room {
     }
 
     private boolean sendErrorIfNotOwner(User user) {
-        if (!user.equals(owner)) {
+        if (!user.equals(owner.orElse(null))) {
             user.sendError("You are not owner of this room");
             return true;
         }
@@ -153,9 +154,15 @@ public final class Room {
         return false;
     }
 
+    public void downloadState(User user) {
+        if (sendErrorIfNotOwner(user))
+            return;
+        user.setDownloadedState(SerializationUtils.clone(core.state()));
+    }
+
     public void processAction(Action action, User actor) {
         if (sendErrorIfNotStarted(actor))
             return;
-        core.process(action, actor.getPlayerID());
+        core.process(action, actor.getPlayerID().orElseThrow());
     }
 }
