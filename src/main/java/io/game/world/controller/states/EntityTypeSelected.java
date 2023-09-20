@@ -31,8 +31,12 @@ public class EntityTypeSelected extends WorldState {
     @Override
     public void onEntityClick(EntityID entity) {
         if (!entityAnimated(entity)) {
-            state.map().pickUp(entity);
-            change(new UnitSelected(state, entity));
+            if (state.pathfinder().reachablePositions(entity).getPositions().isEmpty())
+                state.map().refuse(entity);
+            else {
+                state.map().pickUp(entity);
+                change(new UnitSelected(state, entity));
+            }
         }
     }
 

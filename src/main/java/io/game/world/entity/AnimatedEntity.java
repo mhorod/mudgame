@@ -36,6 +36,11 @@ public class AnimatedEntity implements Animation {
         raised = true;
     }
 
+    public void refuse() {
+        if (raised || falling) return;
+        setAnimation(new Refuse());
+    }
+
     public Finishable putDown() {
         if (!raised && falling)
             return animation;

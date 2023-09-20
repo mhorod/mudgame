@@ -24,7 +24,11 @@ public class Normal extends WorldState {
 
     @Override
     public void onEntityClick(EntityID entity) {
-        if (!entityAnimated(entity)) {
+        if (entityAnimated(entity))
+            return;
+        if (state.pathfinder().reachablePositions(entity).getPositions().isEmpty())
+            state.map().refuse(entity);
+        else {
             state.map().pickUp(entity);
             change(new UnitSelected(state, entity));
         }

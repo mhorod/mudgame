@@ -129,6 +129,10 @@ public class Map implements Animation {
         entityFromID(entity).pickUp();
     }
 
+    public void refuse(EntityID entity) {
+        entityFromID(entity).refuse();
+    }
+
     public void putDown(EntityID entity) {
         entityFromID(entity).putDown();
     }

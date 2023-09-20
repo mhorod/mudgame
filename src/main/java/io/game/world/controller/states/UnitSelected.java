@@ -37,8 +37,12 @@ public class UnitSelected extends WorldState {
         if (entity.equals(selectedUnit)) {
             change(new Normal(state));
         } else {
-            state.map().pickUp(entity);
-            change(new UnitSelected(state, entity));
+            if (state.pathfinder().reachablePositions(entity).getPositions().isEmpty())
+                state.map().refuse(entity);
+            else {
+                state.map().pickUp(entity);
+                change(new UnitSelected(state, entity));
+            }
         }
     }
 
