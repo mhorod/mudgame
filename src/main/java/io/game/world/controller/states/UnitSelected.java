@@ -5,10 +5,7 @@ import core.model.EntityID;
 import core.model.Position;
 import io.game.world.controller.CommonState;
 import io.game.world.controller.WorldState;
-import mudgame.controls.events.MoveEntityAlongPath;
-import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.SpawnEntity;
-import mudgame.controls.events.VisibilityChange;
+import mudgame.controls.events.*;
 
 public class UnitSelected extends WorldState {
     private final EntityID selectedUnit;
@@ -64,6 +61,12 @@ public class UnitSelected extends WorldState {
     }
 
     @Override
+    public void onNextTurn(NextTurn e) {
+        if (state.myID().equals(e.currentPlayer()))
+            state.hud().setEndTurnEnabled(true);
+    }
+
+    @Override
     public void onVisibilityChange(VisibilityChange event) {
     }
 
@@ -80,5 +83,13 @@ public class UnitSelected extends WorldState {
     @Override
     public void onEntityTypeSelected(EntityType type) {
         change(new EntityTypeSelected(state, type));
+    }
+
+    @Override
+    public void onEndTurn() {
+        state.controls().completeTurn();
+        state.hud().setEndTurnEnabled(false);
+        state.map().putDown(selectedUnit);
+        change(new Normal(state));
     }
 }

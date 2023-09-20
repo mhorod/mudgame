@@ -5,10 +5,7 @@ import core.model.EntityID;
 import core.model.Position;
 import io.game.world.controller.CommonState;
 import io.game.world.controller.WorldState;
-import mudgame.controls.events.MoveEntityAlongPath;
-import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.SpawnEntity;
-import mudgame.controls.events.VisibilityChange;
+import mudgame.controls.events.*;
 
 import java.util.List;
 
@@ -54,6 +51,12 @@ public class EntityTypeSelected extends WorldState {
     }
 
     @Override
+    public void onNextTurn(NextTurn e) {
+        if (state.myID().equals(e.currentPlayer()))
+            state.hud().setEndTurnEnabled(true);
+    }
+
+    @Override
     public void onVisibilityChange(VisibilityChange event) {
     }
 
@@ -73,5 +76,12 @@ public class EntityTypeSelected extends WorldState {
             change(new Normal(state));
         else
             change(new EntityTypeSelected(state, type));
+    }
+
+    @Override
+    public void onEndTurn() {
+        state.hud().setEndTurnEnabled(false);
+        state.controls().completeTurn();
+        change(new Normal(state));
     }
 }

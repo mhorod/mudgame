@@ -39,7 +39,7 @@ public class GameView extends SimpleView {
     private final Map map;
     private MapView mapView;
     private final Camera camera = new Camera();
-    private final HUD hud = new HUD();
+    private final HUD hud;
     private final CameraController cameraController = new CameraController(camera);
     private final DragDetector dragDetector = new DragDetector() {
         @Override
@@ -87,11 +87,13 @@ public class GameView extends SimpleView {
         }
 
         map = new Map(me.getCore().terrain(), me.getCore().entityBoard());
+        hud = new HUD(me.getCore().turnView());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
         worldController = new WorldController(
                 map,
                 hud,
+                me.getCore().myPlayerID(),
                 me.getCore().entityBoard(),
                 me.getCore().terrain(),
                 me.getCore().pathfinder(),
@@ -114,6 +116,8 @@ public class GameView extends SimpleView {
         } else if (event instanceof RemoveEntity e) {
             eventAnimation = map.animate(e);
             worldController.onRemoveEntity(e);
+        } else if (event instanceof NextTurn e) {
+            worldController.onNextTurn(e);
         }
         me.processEvent();
     }

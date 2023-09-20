@@ -3,6 +3,7 @@ package io.game.world.controller;
 import core.entities.EntityBoardView;
 import core.entities.model.EntityType;
 import core.model.EntityID;
+import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.Pathfinder;
 import core.spawning.PlayerSpawnManager;
@@ -13,10 +14,7 @@ import io.game.ui.HUD;
 import io.game.world.Map;
 import io.game.world.controller.states.Normal;
 import mudgame.controls.Controls;
-import mudgame.controls.events.MoveEntityAlongPath;
-import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.SpawnEntity;
-import mudgame.controls.events.VisibilityChange;
+import mudgame.controls.events.*;
 
 import java.util.HashSet;
 
@@ -27,6 +25,7 @@ public class WorldController implements WorldBehavior {
     public WorldController(
             Map map,
             HUD hud,
+            PlayerID myID,
             EntityBoardView entities,
             TerrainView terrain,
             Pathfinder pathfinder,
@@ -34,7 +33,7 @@ public class WorldController implements WorldBehavior {
             Controls controls
     ) {
         state = new Normal(
-                new CommonState(map, hud, terrain, entities, pathfinder, spawnManager, controls,
+                new CommonState(map, hud, myID, terrain, entities, pathfinder, spawnManager, controls,
                         new HashSet<>()));
         state.init(this);
     }
@@ -94,7 +93,17 @@ public class WorldController implements WorldBehavior {
     }
 
     @Override
+    public void onNextTurn(NextTurn e) {
+        state.onNextTurn(e);
+    }
+
+    @Override
     public void onEntityTypeSelected(EntityType type) {
         state.onEntityTypeSelected(type);
+    }
+
+    @Override
+    public void onEndTurn() {
+        state.onEndTurn();
     }
 }

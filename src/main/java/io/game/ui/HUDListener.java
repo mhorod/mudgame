@@ -4,4 +4,6 @@ import core.entities.model.EntityType;
 
 public interface HUDListener {
     void onEntityTypeSelected(EntityType type);
+
+    void onEndTurn();
 }

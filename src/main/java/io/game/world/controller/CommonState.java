@@ -1,6 +1,7 @@
 package io.game.world.controller;
 
 import core.entities.EntityBoardView;
+import core.model.PlayerID;
 import core.pathfinder.Pathfinder;
 import core.spawning.PlayerSpawnManager;
 import core.terrain.TerrainView;
@@ -14,6 +15,7 @@ import java.util.HashSet;
 public record CommonState(
         Map map,
         HUD hud,
+        PlayerID myID,
         TerrainView terrain,
         EntityBoardView entities,
         Pathfinder pathfinder,
