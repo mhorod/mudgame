@@ -1,6 +1,7 @@
 package mudgame.server.actions;
 
 import core.model.PlayerID;
+import lombok.extern.slf4j.Slf4j;
 import mudgame.controls.actions.Action;
 import mudgame.server.EventOccurrenceObserver;
 import mudgame.server.GameOverProcessor;
@@ -8,6 +9,7 @@ import mudgame.server.state.ServerState;
 import mudgame.server.actions.entities.EntityActionProcessor;
 import mudgame.server.internal.InteractiveState;
 
+@Slf4j
 public final class ActionProcessor {
     private final RuleChecker ruleChecker;
     private final EntityActionProcessor entityActionProcessor;
@@ -29,6 +31,8 @@ public final class ActionProcessor {
     public void process(Action action, PlayerID actor) {
         if (!ruleChecker.satisfiesRules(action, actor))
             return;
+
+        log.info("{} from {} satisfies rules", action, actor);
 
         entityActionProcessor.process(action);
         completeTurnProcessor.process(action);
