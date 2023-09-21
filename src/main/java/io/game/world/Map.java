@@ -14,18 +14,12 @@ import io.game.world.arrow.Arrow;
 import io.game.world.entity.AnimatedEntity;
 import io.game.world.entity.Entity;
 import io.game.world.entity.EntityAnimation;
-import io.game.world.entity.WorldEntity;
-import io.game.world.event_animations.MoveEntityAlongPathAnimation;
-import io.game.world.event_animations.RemoveEntityAnimation;
-import io.game.world.event_animations.SpawnEntityAnimation;
-import io.game.world.event_animations.VisibilityChangeAnimation;
+import io.game.world.event_animations.*;
 import io.game.world.tile.AnimatedTile;
+import io.game.world.tile.AttackMarker;
 import io.game.world.tile.Fog;
 import io.model.engine.TextureBank;
-import mudgame.controls.events.MoveEntityAlongPath;
-import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.SpawnEntity;
-import mudgame.controls.events.VisibilityChange;
+import mudgame.controls.events.*;
 
 import java.util.*;
 
@@ -36,6 +30,7 @@ public class Map implements Animation {
     private final EntityBoardView entities;
     private final ArrayList<Position> path = new ArrayList<>();
     private Set<Position> highlightedTiles = null;
+    private Set<Position> attackMarkers = null;
     HashMap<Position, AnimatedTile> tmpTiles = new HashMap<>();
     private Animation mapAnimation;
 
@@ -54,6 +49,15 @@ public class Map implements Animation {
             highlightedTiles = null;
         else
             highlightedTiles = new HashSet<>(positions);
+    }
+
+    public void setAttackMarkers(List<Position> positions) {
+        if (positions == null)
+            attackMarkers = null;
+        else
+            attackMarkers = new HashSet<>(positions);
+
+        System.out.println(attackMarkers);
     }
 
     public AnimatedEntity entityFromID(EntityID id) {
@@ -83,6 +87,8 @@ public class Map implements Animation {
         camera.forAllVisibleTiles(
                 pos -> entities.addAll(tileFromPosition(pos).getEntities(getAnimatedEntities(), highlightedTiles, this::fog))
         );
+        if (attackMarkers != null)
+            entities.addAll(attackMarkers.stream().map(AttackMarker::new).toList());
         entities.addAll(Arrow.fromPositions(path));
         entities.addAll(entityAnimations.values().stream().flatMap(
                 animation -> animation.getEntity().withShadow().stream()
@@ -153,6 +159,13 @@ public class Map implements Animation {
 
     public Finishable animate(SpawnEntity event) {
         return mapAnimation = new SpawnEntityAnimation(this, event);
+    }
+
+    public Finishable animate(AttackEntityEvent event) {
+        return mapAnimation = new AttackEntityAnimation(this, event,
+                entities.entityPosition(event.attacker()),
+                entities.entityPosition(event.attacked())
+        );
     }
 
     @Override

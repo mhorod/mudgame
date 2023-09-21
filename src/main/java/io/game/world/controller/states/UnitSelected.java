@@ -19,6 +19,9 @@ public class UnitSelected extends WorldState {
                         .getPositions()
                         .stream()
                         .toList());
+        state.map().setAttackMarkers(state.attackManager().attackableEntities(selectedUnit).stream().map(
+                entity -> state.entities().entityPosition(entity)
+        ).toList());
         state.hud().clear();
     }
 
@@ -34,15 +37,18 @@ public class UnitSelected extends WorldState {
         if (entityAnimated(entity))
             return;
         state.map().putDown(selectedUnit);
+        if (state.attackManager().attackableEntities(selectedUnit).contains(entity)) {
+            state.controls().attackEntity(selectedUnit, entity);
+            change(new Normal(state));
+            return;
+        }
         if (entity.equals(selectedUnit)) {
             change(new Normal(state));
         } else {
-            if (state.pathfinder().reachablePositions(entity).getPositions().isEmpty())
-                state.map().refuse(entity);
-            else {
+            if (hasAnyMoves(entity)) {
                 state.map().pickUp(entity);
                 change(new UnitSelected(state, entity));
-            }
+            } else state.map().refuse(entity);
         }
     }
 
@@ -68,6 +74,11 @@ public class UnitSelected extends WorldState {
     public void onNextTurn(NextTurn e) {
         if (state.myID().equals(e.currentPlayer()))
             state.hud().setEndTurnEnabled(true);
+    }
+
+    @Override
+    public void onAttackEntity(AttackEntityEvent e) {
+
     }
 
     @Override

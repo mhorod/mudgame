@@ -1,8 +1,7 @@
-package io.game.world.entity;
+package io.game.world;
 
 import io.game.Camera;
 import io.game.WorldPosition;
-import io.game.world.WorldTexture;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.Color;

@@ -19,6 +19,11 @@ public abstract class WorldState implements WorldBehavior {
         this.controller.setState(state);
     }
 
+    protected boolean hasAnyMoves(EntityID entity) {
+        return !state.pathfinder().reachablePositions(entity).getPositions().isEmpty()
+                || !state.attackManager().attackableEntities(entity).isEmpty();
+    }
+
     protected boolean entityAnimated(EntityID entity) {
         return state.animatedEvents().stream().anyMatch(event -> {
             if (!(event instanceof MoveEntityAlongPath))

@@ -31,12 +31,10 @@ public class EntityTypeSelected extends WorldState {
     @Override
     public void onEntityClick(EntityID entity) {
         if (!entityAnimated(entity)) {
-            if (state.pathfinder().reachablePositions(entity).getPositions().isEmpty())
-                state.map().refuse(entity);
-            else {
+            if (hasAnyMoves(entity)) {
                 state.map().pickUp(entity);
                 change(new UnitSelected(state, entity));
-            }
+            } else state.map().refuse(entity);
         }
     }
 
@@ -58,6 +56,11 @@ public class EntityTypeSelected extends WorldState {
     public void onNextTurn(NextTurn e) {
         if (state.myID().equals(e.currentPlayer()))
             state.hud().setEndTurnEnabled(true);
+    }
+
+    @Override
+    public void onAttackEntity(AttackEntityEvent e) {
+
     }
 
     @Override

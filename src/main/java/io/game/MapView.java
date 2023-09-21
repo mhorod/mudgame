@@ -1,8 +1,8 @@
 package io.game;
 
 import io.game.world.MapObserver;
+import io.game.world.WorldEntity;
 import io.game.world.entity.Entity;
-import io.game.world.entity.WorldEntity;
 import io.game.world.tile.Tile;
 import io.model.Drawable;
 import io.model.ScreenPosition;

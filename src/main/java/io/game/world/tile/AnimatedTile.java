@@ -8,11 +8,11 @@ import io.animation.Animation;
 import io.animation.AnimationController;
 import io.animation.Finishable;
 import io.game.WorldPosition;
+import io.game.world.WorldEntity;
 import io.game.world.WorldTexture;
 import io.game.world.entity.Condense;
 import io.game.world.entity.Dissipate;
 import io.game.world.entity.EntityAnimation;
-import io.game.world.entity.WorldEntity;
 
 import java.util.ArrayList;
 import java.util.List;

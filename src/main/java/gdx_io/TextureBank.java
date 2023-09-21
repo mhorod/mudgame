@@ -54,6 +54,7 @@ public class TextureBank implements io.model.engine.TextureBank {
         textures.put(io.model.textures.Texture.TILE_HIGHLIGHT, new TextureRegion(tiles, 512, 0, 256, 148));
         textures.put(io.model.textures.Texture.PAWN, new TextureRegion(units, 88, 0, 80, 152));
         textures.put(io.model.textures.Texture.SHADOW, new TextureRegion(units, 0, 200, 256, 149));
+        textures.put(io.model.textures.Texture.ATTACK_MARKER, new TextureRegion(units, 269, 819, 230, 94));
         textures.put(io.model.textures.Texture.BASE, new TextureRegion(units, 24, 377, 208, 255));
         textures.put(io.model.textures.Texture.WARRIOR, new TextureRegion(units, 331, 22, 106, 137));
         textures.put(io.model.textures.Texture.MARSH_WIGGLE, new TextureRegion(units, 63, 711, 130, 180));

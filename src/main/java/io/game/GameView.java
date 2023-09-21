@@ -98,6 +98,7 @@ public class GameView extends SimpleView {
                 me.getCore().terrain(),
                 me.getCore().pathfinder(),
                 me.getCore().spawnManager(),
+                me.getCore().playerAttackManager(),
                 me.getControls()
         );
     }
@@ -116,6 +117,9 @@ public class GameView extends SimpleView {
         } else if (event instanceof RemoveEntity e) {
             eventAnimation = map.animate(e);
             worldController.onRemoveEntity(e);
+        } else if (event instanceof AttackEntityEvent e) {
+            eventAnimation = map.animate(e);
+            worldController.onAttackEntity(e);
         } else if (event instanceof NextTurn e) {
             worldController.onNextTurn(e);
         }

@@ -13,6 +13,7 @@ import io.animation.FutureExecutor;
 import io.game.ui.HUD;
 import io.game.world.Map;
 import io.game.world.controller.states.Normal;
+import mudgame.client.PlayerAttackManager;
 import mudgame.controls.Controls;
 import mudgame.controls.events.*;
 
@@ -30,10 +31,11 @@ public class WorldController implements WorldBehavior {
             TerrainView terrain,
             Pathfinder pathfinder,
             PlayerSpawnManager spawnManager,
+            PlayerAttackManager attackManager,
             Controls controls
     ) {
         state = new Normal(
-                new CommonState(map, hud, myID, terrain, entities, pathfinder, spawnManager, controls,
+                new CommonState(map, hud, myID, terrain, entities, pathfinder, spawnManager, attackManager, controls,
                         new HashSet<>()));
         state.init(this);
     }
@@ -95,6 +97,11 @@ public class WorldController implements WorldBehavior {
     @Override
     public void onNextTurn(NextTurn e) {
         state.onNextTurn(e);
+    }
+
+    @Override
+    public void onAttackEntity(AttackEntityEvent e) {
+        state.onAttackEntity(e);
     }
 
     @Override

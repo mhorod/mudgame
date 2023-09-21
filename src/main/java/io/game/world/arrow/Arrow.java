@@ -2,7 +2,7 @@ package io.game.world.arrow;
 
 import core.model.Position;
 import io.game.WorldPosition;
-import io.game.world.entity.WorldEntity;
+import io.game.world.WorldEntity;
 
 import java.util.ArrayList;
 import java.util.List;

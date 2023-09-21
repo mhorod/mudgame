@@ -2,8 +2,8 @@ package io.game.world.tile;
 
 import core.model.Position;
 import io.game.WorldPosition;
+import io.game.world.WorldEntity;
 import io.game.world.WorldTexture;
-import io.game.world.entity.WorldEntity;
 
 public class Fog extends WorldEntity {
     private final Position gamePosition;

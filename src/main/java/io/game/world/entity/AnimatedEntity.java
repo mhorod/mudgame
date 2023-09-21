@@ -38,7 +38,7 @@ public class AnimatedEntity implements Animation {
 
     public void refuse() {
         if (raised || falling) return;
-        setAnimation(new Refuse());
+        setAnimation(new Shake());
     }
 
     public Finishable putDown() {

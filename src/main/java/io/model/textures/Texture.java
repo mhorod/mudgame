@@ -14,6 +14,7 @@ public enum Texture {
     BASE(255f / 208f),
     TOWER(241f / 158f),
     SHADOW(149.f / 256.f),
+    ATTACK_MARKER(94.f / 230.f),
     ARROW_NONE(74.f / 128.f),
     ARROW_SW_NE(74.f / 128.f),
     ARROW_SE_NW(74.f / 128.f),

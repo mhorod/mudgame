@@ -15,6 +15,7 @@ public class Normal extends WorldState {
         super(state);
         state.map().setPath(List.of());
         state.map().setHighlightedTiles(null);
+        state.map().setAttackMarkers(null);
         state.hud().clear();
     }
 
@@ -26,12 +27,10 @@ public class Normal extends WorldState {
     public void onEntityClick(EntityID entity) {
         if (entityAnimated(entity))
             return;
-        if (state.pathfinder().reachablePositions(entity).getPositions().isEmpty())
-            state.map().refuse(entity);
-        else {
+        if (hasAnyMoves(entity)) {
             state.map().pickUp(entity);
             change(new UnitSelected(state, entity));
-        }
+        } else state.map().refuse(entity);
     }
 
     @Override
@@ -52,6 +51,11 @@ public class Normal extends WorldState {
     public void onNextTurn(NextTurn e) {
         if (state.myID().equals(e.currentPlayer()))
             state.hud().setEndTurnEnabled(true);
+    }
+
+    @Override
+    public void onAttackEntity(AttackEntityEvent e) {
+
     }
 
     @Override

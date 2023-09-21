@@ -23,4 +23,6 @@ public interface WorldBehavior extends HUDListener {
     void onMoveEntityAlongPath(MoveEntityAlongPath e);
 
     void onNextTurn(NextTurn e);
+
+    void onAttackEntity(AttackEntityEvent e);
 }

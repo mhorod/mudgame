@@ -2,7 +2,7 @@ package io.game.world.entity;
 
 import io.game.WorldPosition;
 
-public class Refuse extends EntityAnimation {
+public class Shake extends EntityAnimation {
     public static final float TIME = 0.3f;
     private WorldPosition pos;
     private float totalTime = 0;

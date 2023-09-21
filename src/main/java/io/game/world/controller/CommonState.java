@@ -7,6 +7,7 @@ import core.spawning.PlayerSpawnManager;
 import core.terrain.TerrainView;
 import io.game.ui.HUD;
 import io.game.world.Map;
+import mudgame.client.PlayerAttackManager;
 import mudgame.controls.Controls;
 import mudgame.controls.events.Event;
 
@@ -20,6 +21,7 @@ public record CommonState(
         EntityBoardView entities,
         Pathfinder pathfinder,
         PlayerSpawnManager spawnManager,
+        PlayerAttackManager attackManager,
         Controls controls,
         HashSet<Event> animatedEvents
 ) {

@@ -19,6 +19,7 @@ public enum WorldTexture {
     FOG_RIGHT(Texture.FOG_RIGHT, new Center(0.5f, 0.62f), 1.15f),
     FOG_TALL(Texture.FOG_TALL, new Center(0.5f, 0.62f), 1.15f),
     SHADOW(Texture.SHADOW, new Center(0.5f, 0.5f), 1.0f),
+    ATTACK_MARKER(Texture.ATTACK_MARKER, new Center(0.5f, 0.5f), 1.0f),
     ARROW_NONE(Texture.ARROW_NONE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SW_NE(Texture.ARROW_SW_NE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SE_NW(Texture.ARROW_SE_NW, new Center(0.5f, 0.5f), 1.0f),
