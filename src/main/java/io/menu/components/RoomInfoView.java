@@ -1,6 +1,5 @@
 package io.menu.components;
 
-import io.menu.Image;
 import io.menu.Rectangle;
 import io.menu.UIComponent;
 import io.menu.containers.HBox;
@@ -42,9 +41,9 @@ public class RoomInfoView implements UIComponent {
         ), mgr);
         fire.fitInto(new Rectangle(
                 rectangle.position.x() + rectangle.width() * 0.8f,
-                rectangle.position.y(),
+                rectangle.position.y() + rectangle.height * 0.1f,
                 rectangle.width() * 0.2f,
-                rectangle.height
+                rectangle.height * 0.8f
         ), mgr);
     }
 

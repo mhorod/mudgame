@@ -46,6 +46,7 @@ public enum Texture {
     BANNER_LEFT(246f / 386f),
     BANNER_TOP(247f / 524f),
     FIRE(307f / 180f),
+    MUD(127f / 349f),
     ;
     private final float ratio;
 

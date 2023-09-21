@@ -1,5 +1,7 @@
-package io.menu;
+package io.menu.components;
 
+import io.menu.Rectangle;
+import io.menu.UIComponent;
 import io.menu.buttons.Button;
 import io.menu.buttons.ButtonMedium;
 import io.menu.containers.VBox;

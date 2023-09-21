@@ -1,7 +1,7 @@
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import gdx_io.GdxGameUI;
-import io.menu.MainMenu;
+import io.menu.views.MainMenu;
 import io.views.CompositeView;
 
 public class Program {

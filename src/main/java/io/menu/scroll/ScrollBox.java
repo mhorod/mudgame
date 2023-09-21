@@ -7,7 +7,7 @@ import io.model.engine.Canvas;
 import io.model.engine.TextManager;
 
 public class ScrollBox implements UIComponent {
-    private final UIComponent contents;
+    private UIComponent contents;
     private final Scroller scrollBack = new Scroller(true);
     private final Scroller scrollFront = new Scroller(false);
 
@@ -56,6 +56,14 @@ public class ScrollBox implements UIComponent {
             scrollAmount = 0;
         if (scrollAmount > maxScroll)
             scrollAmount = maxScroll;
+    }
+
+    public void setContents(UIComponent contents) {
+        this.contents = contents;
+    }
+
+    public float getScroll() {
+        return scrollAmount;
     }
 
     public float getMaxScroll() {

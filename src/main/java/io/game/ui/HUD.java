@@ -3,12 +3,13 @@ package io.game.ui;
 import core.entities.model.Entity;
 import core.entities.model.EntityType;
 import core.resources.PlayerResourcesView;
+import core.resources.ResourceType;
 import core.turns.PlayerTurnView;
-import io.menu.Image;
 import io.menu.Rectangle;
 import io.menu.UIComponent;
 import io.menu.buttons.Button;
 import io.menu.buttons.ButtonSmall;
+import io.menu.components.Image;
 import io.menu.containers.HBox;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
@@ -33,7 +34,7 @@ public class HUD {
 
     UIComponent content = new HBox(0.1f, buttons);
 
-    Image bannerLeft = new Image(Texture.BANNER_LEFT);
+    ResourceInfo resourceInfo;
     EntityInfo entityInfo;
 
     private final PlayerTurnView turnView;
@@ -42,10 +43,13 @@ public class HUD {
     public HUD(PlayerTurnView turnView, PlayerResourcesView resourcesView) {
         this.turnView = turnView;
         this.resourcesView = resourcesView;
+        resourceInfo = new ResourceInfo(resourcesView.amount(ResourceType.MUD));
     }
 
 
     public void update(ScreenPosition mouse, float aspectRatio, boolean pressed, TextManager mgr) {
+        resourceInfo.setMudCount(resourcesView.amount(ResourceType.MUD));
+
         content.fitInto(new Rectangle(0, 0.01f, 1, 0.1f), mgr);
         buttons.forEach(button -> button.update(mouse, pressed));
 
@@ -53,7 +57,7 @@ public class HUD {
         nextTurn.setPressed(!nextTurnEnabled);
         nextTurn.fitInto(new Rectangle(0.84f, 0.01f, 0.15f, 0.15f), mgr);
         nextTurn.update(mouse, pressed);
-        bannerLeft.fitInto(new Rectangle(0, aspectRatio - 0.15f, 0.1f / bannerLeft.getAspectRatio(mgr), 0.1f), mgr);
+        resourceInfo.fitInto(new Rectangle(0, aspectRatio - 0.15f, 0.1f / resourceInfo.getAspectRatio(mgr), 0.1f), mgr);
         if (entityInfo != null)
             entityInfo.fitInto(new Rectangle(0, aspectRatio - 0.15f, 1, 0.15f), mgr);
     }
@@ -61,7 +65,7 @@ public class HUD {
     public void draw(Canvas canvas) {
         content.draw(canvas);
         nextTurn.draw(canvas);
-        bannerLeft.draw(canvas);
+        resourceInfo.draw(canvas);
         if (entityInfo != null)
             entityInfo.draw(canvas);
     }

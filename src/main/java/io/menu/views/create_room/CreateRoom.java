@@ -1,10 +1,11 @@
 package io.menu.views.create_room;
 
 import io.game.GameView;
-import io.menu.Label;
 import io.menu.Rectangle;
 import io.menu.buttons.Button;
 import io.menu.buttons.ButtonSmall;
+import io.menu.components.Label;
+import io.menu.views.RoomSelect;
 import io.menu.views.room_view.OwnerRoomView;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
@@ -16,7 +17,6 @@ import io.model.input.events.Click;
 import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.ServerClient;
 import mudgame.server.state.ServerState;
@@ -39,6 +39,7 @@ public class CreateRoom extends SimpleView implements EventHandler {
     ServerState loadedState;
 
     Label or = new Label("OR");
+    Button goBack = new ButtonSmall(new Label("BACK"));
 
     void loadState(ServerState state) {
         int playerCount = state.turnManager().playerCount();
@@ -69,6 +70,7 @@ public class CreateRoom extends SimpleView implements EventHandler {
         numberPicker.draw(canvas);
         colorPicker.draw(canvas);
         or.draw(canvas);
+        goBack.draw(canvas);
         loadButton.draw(canvas);
     }
 
@@ -124,6 +126,13 @@ public class CreateRoom extends SimpleView implements EventHandler {
                 scene.height * 0.1f
         ), mgr);
 
+        goBack.fitInto(new Rectangle(
+                window.position.x(),
+                window.position.y() + window.height - 0.1f * window.width(),
+                window.width() * 0.1f,
+                window.width() * 0.1f
+        ), mgr);
+
         numberPicker.update(input.deltaTime());
         input.events().forEach(event -> event.accept(this));
         colorPicker.fitInto(new Rectangle(
@@ -158,6 +167,8 @@ public class CreateRoom extends SimpleView implements EventHandler {
                     client.createRoom(playerID, loadedState);
             }
         });
+        if (goBack.contains(click.position()))
+            changeView(new RoomSelect(client));
         if (loadButton.contains(click.position())) {
             if (loadedState == null)
                 futureState = stateManager.loadState();

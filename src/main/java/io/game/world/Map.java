@@ -75,6 +75,10 @@ public class Map implements Animation {
         return entityAnimations.keySet();
     }
 
+    public Set<Position> getAnimatedTiles() {
+        return tmpTiles.keySet();
+    }
+
     public AnimatedTile tileFromPosition(Position pos) {
         if (tmpTiles.containsKey(pos))
             return tmpTiles.get(pos);

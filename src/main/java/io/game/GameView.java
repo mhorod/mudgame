@@ -1,6 +1,7 @@
 package io.game;
 
 import core.model.EntityID;
+import core.model.PlayerID;
 import core.model.Position;
 import io.animation.Animation;
 import io.animation.AnimationController;
@@ -9,6 +10,7 @@ import io.game.ui.HUD;
 import io.game.world.Map;
 import io.game.world.MapObserver;
 import io.game.world.controller.WorldController;
+import io.menu.views.GameOverView;
 import io.model.engine.Canvas;
 import io.model.engine.StateManager;
 import io.model.engine.TextManager;
@@ -21,6 +23,8 @@ import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import mudgame.controls.events.*;
+
+import java.util.HashMap;
 
 @Slf4j
 public class GameView extends SimpleView {
@@ -82,6 +86,11 @@ public class GameView extends SimpleView {
             worldController.onKillEntity(e);
         } else if (event instanceof NextTurn e) {
             worldController.onNextTurn(e);
+        } else if (event instanceof GameOver e) {
+            var winners = new HashMap<PlayerID, String>();
+            e.winners().forEach(w -> winners.put(w, null));
+            changeView(new GameOverView(winners));
+
         }
         me.processEvent();
     }

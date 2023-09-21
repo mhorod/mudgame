@@ -1,7 +1,13 @@
-package io.menu;
+package io.menu.views;
 
 import io.animation.Easer;
 import io.game.GameView;
+import io.menu.Rectangle;
+import io.menu.UIComponent;
+import io.menu.buttons.Button;
+import io.menu.buttons.ButtonSmall;
+import io.menu.components.ButtonBlock;
+import io.menu.components.Label;
 import io.menu.components.RoomInfoView;
 import io.menu.scroll.ScrollBox;
 import io.menu.views.create_room.CreateRoom;
@@ -15,7 +21,6 @@ import io.model.input.Input;
 import io.model.input.events.Click;
 import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
-import io.model.textures.Texture;
 import io.views.SimpleView;
 import middleware.clients.ServerClient;
 import middleware.model.RoomInfo;
@@ -29,12 +34,13 @@ public class RoomSelect extends SimpleView implements EventHandler {
     ButtonBlock buttons;
     ScrollBox scrollBox;
 
-    Easer scrollEaser;
+    Button goBack = new ButtonSmall(new Label("BACK"));
 
-    Rectangle logo = new Rectangle(Texture.LOGO.aspectRatio());
+    Easer scrollEaser;
 
     public RoomSelect(ServerClient client) {
         this.client = client;
+        this.scrollBox = new ScrollBox(new Label("loading"));
         scrollEaser = new Easer(0) {
             @Override
             public void onUpdate(float value) {
@@ -46,6 +52,7 @@ public class RoomSelect extends SimpleView implements EventHandler {
     @Override
     public void draw(Canvas canvas) {
         scrollBox.draw(canvas);
+        goBack.draw(canvas);
     }
 
     @Override
@@ -68,30 +75,39 @@ public class RoomSelect extends SimpleView implements EventHandler {
         }
 
         buttons = new ButtonBlock(0.01f, contents, handlers);
-        scrollBox = new ScrollBox(buttons);
+        scrollBox.setContents(buttons);
 
         var window = new Rectangle(input.window().height() / input.window().width());
         window.position = new ScreenPosition(0, 0);
         window.height = input.window().height() / input.window().width();
 
         var scene = new Rectangle(
+                0.2f,
                 0.025f,
-                0.025f,
-                window.width() - 0.025f,
+                window.width() - 0.225f,
                 window.height - 0.05f
         );
 
-        scrollEaser.update(input.deltaTime());
+        goBack.fitInto(new Rectangle(
+                window.position.x(),
+                window.position.y() + window.height - 0.1f * window.width(),
+                window.width() * 0.1f,
+                window.width() * 0.1f
+        ), mgr);
+
         scrollBox.fitInto(scene, mgr);
+        scrollEaser.update(input.deltaTime());
         buttons.update(input.mouse().position(), input.mouse().leftPressed());
-        logo.fitInto(new Rectangle(scene.position.x() + scene.width() / 2, scene.position.y(),
-                scene.width() / 2, scene.height));
+        goBack.update(input.mouse().position(), input.mouse().leftPressed());
         input.events().forEach(event -> event.accept(this));
     }
 
     @Override
     public void onClick(Click click) {
         buttons.click(click.position());
+        if (goBack.contains(click.position())) {
+            changeView(new MainMenu());
+        }
     }
 
     @Override

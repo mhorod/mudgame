@@ -1,5 +1,8 @@
-package io.menu;
+package io.menu.views;
 
+import io.menu.Rectangle;
+import io.menu.components.ButtonBlock;
+import io.menu.components.Label;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.StateManager;
@@ -28,6 +31,7 @@ public class MainMenu extends SimpleView implements EventHandler {
     Rectangle logo = new Rectangle(Texture.LOGO.aspectRatio());
 
     public MainMenu() {
+        client.disconnect();
         buttons = new ButtonBlock(
                 0.1f,
                 List.of(
