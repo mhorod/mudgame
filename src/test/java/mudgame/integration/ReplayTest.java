@@ -1,9 +1,11 @@
-package mudgame.integration.replays;
+package mudgame.integration;
 
 import core.entities.model.Entity;
+import core.entities.model.EntityType;
+import core.entities.model.components.Health;
+import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
-import core.resources.PlayerResourceManager;
 import core.resources.PlayerResourcesView;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -23,27 +25,37 @@ import java.util.Optional;
 import java.util.Scanner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 @Slf4j
-public class Replays {
+public class ReplayTest {
+    private record EntityData(EntityID entityID, EntityType type, PlayerID owner, Optional<Health> health) {
+        public EntityData(Entity entity) {
+            this(entity.id(), entity.type(), entity.owner(), entity.getHealth());
+        }
+    }
+
     void checkIntegrityOfClient(MudServerCore serverCore, MudClientCoreView clientCore) {
-        PlayerID myPlayer = clientCore.myPlayerID();
+        PlayerID myPlayerID = clientCore.myPlayerID();
+        log.info("player: {}", myPlayerID);
 
-        for (Position pos : clientCore.fogOfWar().visiblePositions()) {
-            if (!serverCore.state().terrain().contains(pos)) continue;
-            Optional<PlayerID> ownerByServer = serverCore.state().claimedArea().owner(pos);
-            Optional<PlayerID> ownerByClient = clientCore.claimedArea().owner(pos);
+        List<Position> serverVisible = serverCore.state().fogOfWar().playerFogOfWarView(myPlayerID).visiblePositions();
+        List<Position> clientVisible = clientCore.fogOfWar().visiblePositions();
 
-            PlayerResourcesView serverResources = serverCore.state().resourceManager().playerResources(myPlayer);
-            PlayerResourcesView clientResources = clientCore.playerResources();
+        PlayerResourcesView serverResources = serverCore.state().resourceManager().playerResources(myPlayerID);
+        PlayerResourcesView clientResources = clientCore.playerResources();
 
-            List<Entity> serverEntities = serverCore.state().entityBoard().entitiesAt(pos);
-            List<Entity> clientEntities = clientCore.entityBoard().entitiesAt(pos);
+        assertThat(clientVisible).containsExactlyInAnyOrderElementsOf(serverVisible);
+        assertThat(clientResources).isEqualTo(serverResources);
 
-            assertThat(ownerByClient).isEqualTo(ownerByServer);
-            assertThat(clientResources).isEqualTo(serverResources);
-            assertThat(clientEntities).isEqualTo(serverEntities);
+        for (Position pos : clientVisible) {
+            Optional<PlayerID> serverOwner = serverCore.state().claimedArea().owner(pos);
+            Optional<PlayerID> clientOwner = clientCore.claimedArea().owner(pos);
+
+            List<EntityData> serverEntities = serverCore.state().entityBoard().entitiesAt(pos).stream().map(EntityData::new).toList();
+            List<EntityData> clientEntities = clientCore.entityBoard().entitiesAt(pos).stream().map(EntityData::new).toList();
+
+            assertThat(clientOwner).isEqualTo(serverOwner);
+            assertThat(clientEntities).containsExactlyInAnyOrderElementsOf(serverEntities);
         }
     }
 
@@ -58,7 +70,6 @@ public class Replays {
 
     void runScenarioFromBase64(String base64) {
         ActionsAndState actionsAndState = ActionRecorder.fromBase64(base64);
-
         LocalServer server = new LocalServer(actionsAndState.state());
 
         for (ActionWithActor actionWithActor : actionsAndState.actions()) {
@@ -95,6 +106,11 @@ public class Replays {
 
     @Test
     void scenario3() {
+        runScenario();
+    }
+
+    @Test
+    void scenario4() {
         runScenario();
     }
 }
