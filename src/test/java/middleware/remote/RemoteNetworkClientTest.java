@@ -2,11 +2,12 @@ package middleware.remote;
 
 import lombok.SneakyThrows;
 import middleware.clients.NetworkClient;
-import middleware.clients.NetworkDevice.NetworkConnectionBuilder;
-import middleware.clients.NetworkDevice.NetworkDeviceBuilder;
-import middleware.clients.NetworkStatus;
+import middleware.communication.NetworkConnectionBuilder;
+import middleware.communication.NetworkDeviceBuilder;
+import middleware.communication.NetworkStatus;
+import middleware.remote_clients.RemoteNetworkClient;
 import middleware.utils.TestClient;
-import middleware.utils.TestClientNetworkConnection;
+import middleware.utils.TestConnection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentCaptor;
@@ -16,8 +17,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static middleware.messages_to_server.MessageToServer.DisconnectMessage;
-import static middleware.remote.RemoteNetworkClient.CONNECTION_TIMEOUT;
-import static middleware.utils.Wait.*;
+import static middleware.remote_clients.RemoteNetworkClient.CONNECTION_TIMEOUT;
+import static middleware.utils.Wait.verify_wait;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -29,7 +30,7 @@ class RemoteNetworkClientTest {
         NetworkClient client = testClient.client;
 
         // when
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         // then
@@ -42,7 +43,7 @@ class RemoteNetworkClientTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         // when
@@ -74,7 +75,7 @@ class RemoteNetworkClientTest {
         TestClient testClient = new TestClient();
         RemoteNetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         connection.close();
@@ -94,14 +95,14 @@ class RemoteNetworkClientTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         connection.close();
         client.processAllMessages();
 
         // when
-        connection.receive().pingToClient();
+        connection.receiveFromServer().pingToClient();
         client.processAllMessages();
 
         // then
@@ -159,7 +160,7 @@ class RemoteNetworkClientTest {
 
         // when
         NetworkConnectionBuilder builder = mock(NetworkConnectionBuilder.class);
-        doReturn(Optional.of(new TestClientNetworkConnection())).when(builder).connect(any());
+        doReturn(Optional.of(new TestConnection())).when(builder).connect(any());
 
         client.connect(builder);
         verify_wait();
@@ -175,7 +176,7 @@ class RemoteNetworkClientTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
         client.processAllMessages();
 
@@ -195,11 +196,11 @@ class RemoteNetworkClientTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         // when
-        connection.receive().error("");
+        connection.receiveFromServer().error("");
         client.processAllMessages();
 
         // then
@@ -214,11 +215,11 @@ class RemoteNetworkClientTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         // when
-        connection.receive().kick();
+        connection.receiveFromServer().kick();
         client.processAllMessages();
 
         // then

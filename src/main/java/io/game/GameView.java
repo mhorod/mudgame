@@ -20,9 +20,9 @@ import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
-import middleware.communication.SocketDevice.SocketConnectionBuilder;
+import middleware.communication.SocketConnectionBuilder;
 import middleware.local.LocalServer;
-import middleware.remote.RemoteNetworkClient;
+import middleware.remote_clients.RemoteNetworkClient;
 import mudgame.controls.events.Event;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.RemoveEntity;
@@ -49,8 +49,8 @@ public class GameView extends SimpleView {
     private final WorldController worldController;
 
     private final GameClient me;
-    private boolean eventObserved = false;
     private final List<Bot> bots = new ArrayList<>();
+    private boolean eventObserved = false;
 
     public GameView() {
         ServerState serverState = new ClassicServerStateSupplier().get(4);

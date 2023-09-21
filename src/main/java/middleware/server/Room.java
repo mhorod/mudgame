@@ -17,8 +17,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class Room {
-    private static long nextRoomID = 0;
-
     private final GameServer server;
     private final RoomID roomID;
     private final MudServerCore core;
@@ -31,12 +29,11 @@ public final class Room {
     private Optional<User> owner = Optional.empty();
     private boolean isRunning = false;
 
-    public Room(ServerState state, GameServer server) {
+    public Room(ServerState state, RoomID roomID, GameServer server) {
         this.server = server;
-        this.roomID = new RoomID(nextRoomID++);
+        this.roomID = roomID;
         this.core = new MudServerCore(state, this::eventObserver);
 
-        server.putRoom(this);
         for (PlayerID playerID : state.turnManager().players())
             toUserMap.put(playerID, Optional.empty());
     }
