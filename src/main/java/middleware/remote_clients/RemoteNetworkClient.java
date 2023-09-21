@@ -1,5 +1,6 @@
 package middleware.remote_clients;
 
+import core.model.PlayerID;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.NetworkClient;
 import middleware.clients.ServerClient;
@@ -66,8 +67,8 @@ public final class RemoteNetworkClient implements NetworkClient {
         }
 
         @Override
-        public void setCurrentRoom(RoomInfo roomInfo) {
-            getServerClient().setCurrentRoom(roomInfo);
+        public void setCurrentRoom(RoomInfo roomInfo, boolean isOwner, PlayerID myPlayerID) {
+            getServerClient().setCurrentRoom(roomInfo, isOwner, myPlayerID);
         }
 
         @Override

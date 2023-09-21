@@ -208,20 +208,23 @@ class RoomTest {
     void room_info_after_starting_is_correct() {
         // given
         GameServer server = TestGameServer.create();
-        TestUser user = new TestUser(server, "user");
-        user.receive().createRoom(new PlayerID(1), 2);
+        TestUser user1 = new TestUser(server, "user1");
+        user1.receive().createRoom(new PlayerID(1), 2);
+
+        TestUser user2 = new TestUser(server, "user2");
+        user2.receive().joinRoom(new PlayerID(0), user1.user.getRoom().orElseThrow().getRoomID());
 
         // when
-        user.receive().startGame();
+        user1.receive().startGame();
 
         // then
         assertThat(server.getRoomInfoList()).hasSize(1).first()
                 .matches(info -> info.roomID() != null)
-                .matches(info -> info.owner().equals("user"))
+                .matches(info -> info.owner().equals("user1"))
                 .matches(RoomInfo::isRunning)
                 .matches(info -> info.players().equals(new HashMap<>() {{
-                    put(new PlayerID(0), null);
-                    put(new PlayerID(1), "user");
+                    put(new PlayerID(0), "user2");
+                    put(new PlayerID(1), "user1");
                 }}));
     }
 
@@ -290,7 +293,7 @@ class RoomTest {
         // given
         GameServer server = TestGameServer.create();
         TestUser user1 = new TestUser(server);
-        user1.receive().createRoom(new PlayerID(1), 3);
+        user1.receive().createRoom(new PlayerID(1), 2);
         TestUser user2 = new TestUser(server);
         user2.receive().joinRoom(new PlayerID(0), server.getRoomInfoList().get(0).roomID());
 
@@ -302,6 +305,7 @@ class RoomTest {
         user1.receive().startGame();
 
         // then
+        assertThat(user1.user.getRoom().orElseThrow().getRoomInfo().isRunning()).isTrue();
         assertThat(user1.sent).hasSize(1).first().isInstanceOf(ErrorMessage.class);
         assertThat(user2.sent).isEmpty();
     }
@@ -503,7 +507,7 @@ class RoomTest {
         GameServer server = TestGameServer.create();
 
         TestUser user1 = new TestUser(server);
-        user1.receive().createRoom(new PlayerID(0), 3);
+        user1.receive().createRoom(new PlayerID(0), 2);
 
         TestUser user2 = new TestUser(server);
         user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
@@ -530,18 +534,23 @@ class RoomTest {
 
         TestUser user1 = new TestUser(server);
         user1.receive().createRoom(new PlayerID(0), 2);
-        user1.receive().startGame();
 
         TestUser user2 = new TestUser(server);
-
-        user1.sent.clear();
-        user2.sent.clear();
-
-        // when
         user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
+        user1.receive().startGame();
+        user2.receive().leaveRoom();
+
+        TestUser user3 = new TestUser(server);
+
+        user1.sent.clear();
+        user3.sent.clear();
+
+        // when
+        user3.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
+
         // then
-        assertThat(user2.sent)
+        assertThat(user3.sent)
                 .anyMatch(SetCurrentRoomMessage.class::isInstance)
                 .anyMatch(SetGameStateMessage.class::isInstance);
     }
@@ -553,20 +562,29 @@ class RoomTest {
 
         TestUser user1 = new TestUser(server);
         user1.receive().createRoom(new PlayerID(0), 2);
-        user1.receive().startGame();
 
         TestUser user2 = new TestUser(server);
-
-        user1.sent.clear();
-        user2.sent.clear();
-
-        // when
         user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
+        user1.receive().startGame();
+        user2.receive().leaveRoom();
+
+        TestUser user3 = new TestUser(server);
+
+        user1.sent.clear();
+        user3.sent.clear();
+
+        // when
+        user3.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
+
         // then
-        assertThat(user1.sent).hasSize(1);
-        SetCurrentRoomMessage message = (SetCurrentRoomMessage) user1.sent.get(0);
+        SetCurrentRoomMessage message = user1.sent.stream()
+                .filter(SetCurrentRoomMessage.class::isInstance)
+                .map(SetCurrentRoomMessage.class::cast)
+                .findFirst().orElseThrow();
         assertThat(message.roomInfo()).isEqualTo(user1.user.getRoom().orElseThrow().getRoomInfo());
+        assertThat(message.isOwner()).isTrue();
+        assertThat(message.myPlayerID()).isEqualTo(new PlayerID(0));
     }
 
     @Test
@@ -576,12 +594,17 @@ class RoomTest {
 
         TestUser user1 = new TestUser(server, "user1");
         user1.receive().createRoom(new PlayerID(0), 2);
-        user1.receive().startGame();
 
         TestUser user2 = new TestUser(server, "user2");
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
+
+        user1.receive().startGame();
+        user2.receive().leaveRoom();
+
+        TestUser user3 = new TestUser(server, "user3");
 
         // when
-        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
+        user3.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         // then
         assertThat(server.getRoomInfoList()).hasSize(1).first()
@@ -590,7 +613,7 @@ class RoomTest {
                 .matches(RoomInfo::isRunning)
                 .matches(info -> info.players().equals(new HashMap<>() {{
                     put(new PlayerID(0), "user1");
-                    put(new PlayerID(1), "user2");
+                    put(new PlayerID(1), "user3");
                 }}));
     }
 
@@ -599,15 +622,18 @@ class RoomTest {
         // given
         GameServer server = TestGameServer.create();
 
-        TestUser user = new TestUser(server);
-        user.receive().createRoom(new PlayerID(0), 2);
+        TestUser user1 = new TestUser(server);
+        user1.receive().createRoom(new PlayerID(0), 2);
+
+        TestUser user2 = new TestUser(server);
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
 
         // when
-        user.receive().startGame();
-        user.receive().makeAction(new CompleteTurn());
+        user1.receive().startGame();
+        user1.receive().makeAction(new CompleteTurn());
 
         // then
-        List<SetGameStateMessage> setGameStateMessages = user.sent.stream()
+        List<SetGameStateMessage> setGameStateMessages = user1.sent.stream()
                 .filter(SetGameStateMessage.class::isInstance)
                 .map(SetGameStateMessage.class::cast).toList();
         assertThat(setGameStateMessages).hasSize(1).first().matches(
@@ -712,22 +738,152 @@ class RoomTest {
         // given
         GameServer server = TestGameServer.create();
 
-        TestUser user = new TestUser(server);
-        user.receive().createRoom(new PlayerID(0), 2);
-        user.receive().startGame();
+        TestUser user1 = new TestUser(server);
+        user1.receive().createRoom(new PlayerID(0), 2);
 
-        user.sent.clear();
-        user.receive().downloadState();
-        SetDownloadedStateMessage message1 = (SetDownloadedStateMessage) user.sent.get(0);
+        TestUser user2 = new TestUser(server);
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
+
+        user1.receive().startGame();
+
+        user1.sent.clear();
+        user1.receive().downloadState();
+        SetDownloadedStateMessage message1 = (SetDownloadedStateMessage) user1.sent.get(0);
 
         // when
-        user.receive().makeAction(new CompleteTurn());
-        user.sent.clear();
-        user.receive().downloadState();
-        SetDownloadedStateMessage message2 = (SetDownloadedStateMessage) user.sent.get(0);
+        user1.receive().makeAction(new CompleteTurn());
+        user1.sent.clear();
+        user1.receive().downloadState();
+        SetDownloadedStateMessage message2 = (SetDownloadedStateMessage) user1.sent.get(0);
 
         // then
         assertThat(message1.state().turnManager().currentPlayer()).isNotEqualTo(
                 message2.state().turnManager().currentPlayer());
+    }
+
+    @Test
+    void room_that_is_not_full_cannot_be_started() {
+        // given
+        GameServer server = TestGameServer.create();
+
+        TestUser user1 = new TestUser(server, "user1");
+        user1.receive().createRoom(new PlayerID(0), 3);
+
+        TestUser user2 = new TestUser(server, "user2");
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
+
+        user1.sent.clear();
+        user2.sent.clear();
+
+        // when
+        user1.receive().startGame();
+
+        // when
+        assertThat(server.getRoomInfoList()).hasSize(1).first()
+                .matches(info -> info.roomID() != null)
+                .matches(info -> info.owner().equals("user1"))
+                .matches(info -> !info.isRunning())
+                .matches(info -> info.players().equals(new HashMap<>() {{
+                    put(new PlayerID(0), "user1");
+                    put(new PlayerID(1), "user2");
+                    put(new PlayerID(2), null);
+                }}));
+        assertThat(user1.sent).anyMatch(ErrorMessage.class::isInstance);
+        assertThat(user2.sent).isEmpty();
+    }
+
+    @Test
+    void room_list_is_sent_when_someone_creates_room() {
+        // given
+        GameServer server = TestGameServer.create();
+
+        TestUser user1 = new TestUser(server, "user1");
+        TestUser user2 = new TestUser(server, "user2");
+
+        user1.sent.clear();
+
+        // when
+        user2.receive().createRoom(new PlayerID(0), 2);
+
+        // then
+        assertThat(new SetRoomListMessage(server.getRoomInfoList())).isIn(user1.sent);
+    }
+
+    @Test
+    void room_list_is_sent_when_room_is_deleted() {
+        // given
+        GameServer server = TestGameServer.create();
+
+        TestUser user1 = new TestUser(server, "user1");
+        TestUser user2 = new TestUser(server, "user2");
+
+        user2.receive().createRoom(new PlayerID(0), 2);
+        user1.sent.clear();
+
+        // when
+        user2.receive().leaveRoom();
+
+        // then
+        assertThat(new SetRoomListMessage(server.getRoomInfoList())).isIn(user1.sent);
+    }
+
+    @Test
+    void room_list_is_sent_when_someone_joins_room() {
+        // given
+        GameServer server = TestGameServer.create();
+
+        TestUser user1 = new TestUser(server, "user1");
+        TestUser user2 = new TestUser(server, "user2");
+        TestUser user3 = new TestUser(server, "user3");
+
+        user2.receive().createRoom(new PlayerID(0), 2);
+        user1.sent.clear();
+
+        // when
+        user3.receive().joinRoom(new PlayerID(1), user2.user.getRoom().orElseThrow().getRoomID());
+
+        // then
+        assertThat(new SetRoomListMessage(server.getRoomInfoList())).isIn(user1.sent);
+    }
+
+    @Test
+    void room_list_is_sent_when_someone_leaves_room() {
+        // given
+        GameServer server = TestGameServer.create();
+
+        TestUser user1 = new TestUser(server, "user1");
+        TestUser user2 = new TestUser(server, "user2");
+        TestUser user3 = new TestUser(server, "user3");
+
+        user2.receive().createRoom(new PlayerID(0), 2);
+        user3.receive().joinRoom(new PlayerID(1), user2.user.getRoom().orElseThrow().getRoomID());
+        user1.sent.clear();
+
+        // when
+        user2.receive().leaveRoom();
+
+        // then
+        assertThat(new SetRoomListMessage(server.getRoomInfoList())).isIn(user1.sent);
+    }
+
+    @Test
+    void room_list_is_sent_when_someone_starts_game() {
+        // given
+        GameServer server = TestGameServer.create();
+
+        TestUser user1 = new TestUser(server, "user1");
+        TestUser user2 = new TestUser(server, "user2");
+        TestUser user3 = new TestUser(server, "user3");
+
+        user2.receive().createRoom(new PlayerID(0), 2);
+        user3.receive().joinRoom(new PlayerID(1), user2.user.getRoom().orElseThrow().getRoomID());
+        user1.sent.clear();
+
+        // when
+        user2.receive().startGame();
+
+        // then
+        assertThat(user2.user.getRoom().orElseThrow().getRoomInfo().isRunning()).isTrue();
+        assertThat(new SetRoomListMessage(server.getRoomInfoList())).isIn(user1.sent);
     }
 }

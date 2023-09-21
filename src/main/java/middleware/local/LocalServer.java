@@ -6,6 +6,7 @@ import mudgame.controls.actions.Action;
 import mudgame.server.EventOccurrence;
 import mudgame.server.MudServerCore;
 import mudgame.server.state.ServerState;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +34,7 @@ public final class LocalServer {
     }
 
     public ServerState state() {
-        return core.state();
+        return SerializationUtils.clone(core.state());
     }
 
     public List<GameClient> getClients() {

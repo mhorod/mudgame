@@ -1,5 +1,6 @@
 package middleware.messages_to_client;
 
+import core.model.PlayerID;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
 import mudgame.controls.events.Event;
@@ -16,7 +17,7 @@ public interface MessageToClientHandler {
 
     void registerEvent(Event event);
 
-    void setCurrentRoom(RoomInfo roomInfo);
+    void setCurrentRoom(RoomInfo roomInfo, boolean isOwner, PlayerID myPlayerID);
 
     void setGameState(ClientGameState state);
 

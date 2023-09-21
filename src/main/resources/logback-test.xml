@@ -40,6 +40,7 @@
     <!--    <logger name="core" level="OFF"/>-->
     <!--    <logger name="middleware" level="OFF"/>-->
 
+    <logger name="middleware.remote_clients.RemoteNetworkClient" level="INFO"/>
     <logger name="middleware.communication" level="INFO"/>
 
     <logger name="mudgame.server.actions.ActionProcessor">
@@ -49,5 +50,5 @@
     <logger name="mudgame.server.actions.EventSender">
         <appender-ref ref="FILE_EVENTS"/>
     </logger>
-    
+
 </configuration>

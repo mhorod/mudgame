@@ -24,7 +24,9 @@ public final class RemoteServerClient implements ServerClient {
 
     private List<RoomInfo> roomList = List.of();
     private Optional<RoomInfo> currentRoom = Optional.empty();
+    private Optional<PlayerID> myPlayerID = Optional.empty();
     private String name = UserID.DEFAULT_NAME;
+    private boolean isOwner = false;
 
     private Optional<ServerState> downloadedState = Optional.empty();
     private Optional<RemoteGameClient> currentGameClient = Optional.empty();
@@ -57,7 +59,9 @@ public final class RemoteServerClient implements ServerClient {
         coreChanged = true;
     }
 
-    public void setCurrentRoom(RoomInfo roomInfo) {
+    public void setCurrentRoom(RoomInfo roomInfo, boolean isOwner, PlayerID myPlayerID) {
+        this.myPlayerID = Optional.ofNullable(myPlayerID);
+        this.isOwner = isOwner;
         currentRoom = Optional.ofNullable(roomInfo);
     }
 
@@ -82,6 +86,16 @@ public final class RemoteServerClient implements ServerClient {
     @Override
     public Optional<RoomInfo> currentRoom() {
         return currentRoom;
+    }
+
+    @Override
+    public Optional<PlayerID> myPlayerID() {
+        return myPlayerID;
+    }
+
+    @Override
+    public boolean isOwner() {
+        return isOwner;
     }
 
     @Override
