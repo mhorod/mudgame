@@ -2,14 +2,17 @@ package io.menu.views.room_view;
 
 import io.game.GameView;
 import io.menu.Rectangle;
+import io.menu.components.Image;
 import io.menu.views.RoomSelect;
 import io.model.engine.Canvas;
+import io.model.engine.Color;
 import io.model.engine.TextManager;
 import io.model.engine.TextureBank;
 import io.model.input.Input;
 import io.model.input.events.Click;
 import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
+import io.model.textures.Texture;
 import io.views.SimpleView;
 import middleware.clients.ServerClient;
 import middleware.model.RoomID;
@@ -20,6 +23,7 @@ public class RoomView extends SimpleView implements EventHandler {
     private final ServerClient client;
     private final RoomID roomID;
     private final RoomViewCommon common;
+    Image selectedColor;
 
     public RoomView(ServerClient client, RoomID room) {
         this.client = client;
@@ -30,6 +34,7 @@ public class RoomView extends SimpleView implements EventHandler {
     @Override
     public void draw(Canvas canvas) {
         common.draw(canvas);
+        selectedColor.draw(canvas);
     }
 
     @Override
@@ -54,8 +59,17 @@ public class RoomView extends SimpleView implements EventHandler {
             return;
         }
 
+        selectedColor = new Image(Texture.BASE, client.myPlayerID().map(Color::fromPlayerId).orElse(Color.WHITE));
+
         var window = new Rectangle(0, 0, 1, input.window().height() / input.window().width());
         common.fitInto(window, mgr);
+
+        selectedColor.fitInto(new Rectangle(
+                window.position.x(),
+                window.position.y() + 0.4f * window.height,
+                window.width(),
+                window.height * 0.6f
+        ), mgr);
 
         input.events().forEach(event -> event.accept(this));
         common.update(input.mouse().position(), input.mouse().leftPressed(), room);
