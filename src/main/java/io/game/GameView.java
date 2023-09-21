@@ -1,9 +1,6 @@
 package io.game;
 
-import ai.Bot;
-import ai.RandomWalker;
 import core.model.EntityID;
-import core.model.PlayerID;
 import core.model.Position;
 import io.animation.Animation;
 import io.animation.AnimationController;
@@ -22,16 +19,7 @@ import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
-import middleware.clients.ServerClient;
-import middleware.communication.SocketConnectionBuilder;
-import middleware.local.LocalServer;
-import middleware.remote_clients.RemoteNetworkClient;
 import mudgame.controls.events.*;
-import mudgame.server.state.ClassicServerStateSupplier;
-import mudgame.server.state.ServerState;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 public class GameView extends SimpleView {
@@ -51,41 +39,9 @@ public class GameView extends SimpleView {
 
     private final GameClient me;
     private Finishable eventAnimation;
-    private final List<Bot> bots = new ArrayList<>();
 
-    public GameView() {
-        ServerState serverState = new ClassicServerStateSupplier().get(4);
-        var server = new LocalServer(serverState);
-
-        if (true) {
-            me = server.getClients().get(0);
-            for (int i = 1; i < server.playerCount(); i++)
-                bots.add(new RandomWalker(server.getClient(i)));
-        } else {
-            // --------------------------------------------------
-            // if this causes many merge conflicts remove it
-            try {
-                RemoteNetworkClient.GLOBAL_CLIENT.connect(
-                        new SocketConnectionBuilder("localhost", 6789));
-
-                while (RemoteNetworkClient.GLOBAL_CLIENT.getServerClient().isEmpty())
-                    RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
-
-                ServerClient serverClient = RemoteNetworkClient.GLOBAL_CLIENT.getServerClient()
-                        .orElseThrow();
-                serverClient.createRoom(new PlayerID(0), 5);
-                serverClient.startGame();
-
-                while (serverClient.getGameClient().isEmpty())
-                    RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
-
-                me = serverClient.getGameClient().orElseThrow();
-            } catch (Throwable throwable) {
-                throw new RuntimeException(throwable);
-            }
-            // --------------------------------------------------
-        }
-
+    public GameView(GameClient client) {
+        me = client;
         map = new Map(me.getCore().terrain(), me.getCore().entityBoard(), me.getCore().claimedArea());
         hud = new HUD(me.getCore().turnView(), cost -> false);
         animations.addAnimation(cameraController);
@@ -146,9 +102,6 @@ public class GameView extends SimpleView {
 
     @Override
     public void update(Input input, TextureBank bank, TextManager mgr) {
-        for (Bot bot : bots)
-            bot.update();
-        RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
         processEvents();
         worldController.update();
 

@@ -2,6 +2,8 @@ package io.menu;
 
 import io.animation.Easer;
 import io.game.GameView;
+import io.menu.create_room.CreateRoom;
+import io.menu.room_view.RoomView;
 import io.menu.scroll.ScrollBox;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
@@ -13,13 +15,11 @@ import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.model.textures.Texture;
 import io.views.SimpleView;
-import middleware.clients.GameClient;
 import middleware.clients.ServerClient;
 import middleware.model.RoomInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class RoomSelect extends SimpleView implements EventHandler {
     private final ServerClient client;
@@ -33,6 +33,12 @@ public class RoomSelect extends SimpleView implements EventHandler {
 
     public RoomSelect(ServerClient client) {
         this.client = client;
+        scrollEaser = new Easer(0) {
+            @Override
+            public void onUpdate(float value) {
+                scrollBox.setScroll(value);
+            }
+        };
     }
 
     @Override
@@ -42,10 +48,9 @@ public class RoomSelect extends SimpleView implements EventHandler {
 
     @Override
     public void update(Input input, TextureBank bank, TextManager mgr) {
-        Optional<GameClient> gameClient = client.getGameClient();
-        if (gameClient.isPresent()) {
-            gameClient.orElseThrow();
-            changeView(new GameView());
+        var maybeGameClient = client.getGameClient();
+        if (maybeGameClient.isPresent()) {
+            changeView(new GameView(maybeGameClient.get()));
             return;
         }
 
@@ -53,21 +58,15 @@ public class RoomSelect extends SimpleView implements EventHandler {
         List<Runnable> handlers = new ArrayList<>();
 
         texts.add("CREATE");
-        handlers.add(() -> changeView(new RoomCreate(client)));
+        handlers.add(() -> changeView(new CreateRoom(client)));
 
         for (RoomInfo info : client.getRoomList()) {
             texts.add(info.toString());
-            handlers.add(() -> changeView(new RoomCreate(client, info)));
+            handlers.add(() -> changeView(new RoomView(client, info.roomID())));
         }
 
         buttons = new ButtonBlock(0.1f, texts, handlers);
         scrollBox = new ScrollBox(buttons);
-        scrollEaser = new Easer(0) {
-            @Override
-            public void onUpdate(float value) {
-                scrollBox.setScroll(value);
-            }
-        };
 
         var window = new Rectangle(input.window().height() / input.window().width());
         window.position = new ScreenPosition(0, 0);
@@ -84,7 +83,7 @@ public class RoomSelect extends SimpleView implements EventHandler {
         scrollBox.fitInto(scene, mgr);
         buttons.update(input.mouse().position(), input.mouse().leftPressed());
         logo.fitInto(new Rectangle(scene.position.x() + scene.width() / 2, scene.position.y(),
-                                   scene.width() / 2, scene.height));
+                scene.width() / 2, scene.height));
         input.events().forEach(event -> event.accept(this));
     }
 
@@ -97,6 +96,6 @@ public class RoomSelect extends SimpleView implements EventHandler {
     public void onScroll(Scroll scroll) {
         scrollEaser.setTarget(
                 Math.min(Math.max(scrollEaser.getTarget() + scroll.amount() * 0.1f, 0),
-                         scrollBox.getMaxScroll()));
+                        scrollBox.getMaxScroll()));
     }
 }

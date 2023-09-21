@@ -44,7 +44,7 @@ public class Button implements UIComponent {
     @Override
     public void fitInto(Rectangle rectangle, TextManager mgr) {
         bounds.fitInto(rectangle);
-        float boarderSize = rectangle.height * 0.15f;
+        float boarderSize = bounds.height * 0.15f;
         Rectangle contentBounds = new Rectangle(
                 bounds.position.x() + boarderSize,
                 bounds.position.y() + boarderSize,
