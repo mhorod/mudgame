@@ -1,4 +1,4 @@
-package mudgame.integration.assertions;
+package testutils.integration.assertions;
 
 public class ServerScenarioResultAssert {
 }

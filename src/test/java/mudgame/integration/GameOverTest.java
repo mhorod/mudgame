@@ -1,22 +1,24 @@
-package mudgame.integration.tests;
+package mudgame.integration;
 
-import mudgame.integration.utils.RectangleTerrain;
-import mudgame.integration.utils.Scenario;
-import mudgame.integration.utils.ScenarioResult;
+import testutils.integration.utils.RectangleTerrain;
+import testutils.integration.utils.Scenario;
+import testutils.integration.utils.ScenarioResult;
 import org.junit.jupiter.api.Test;
 
 import static core.resources.ResourceType.MUD;
-import static mudgame.integration.scenarios.Scenarios.two_players;
+import static testutils.integration.scenarios.Scenarios.two_players;
+import static testutils.Actions.createPawn;
 import static testutils.Players.PLAYER_0;
 import static testutils.Positions.pos;
 
-class GameOverTest extends IntegrationTestBase {
+class GameOverTest {
     @Test
     void game_is_over_when_condition_is_met() {
         // given
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(RectangleTerrain.land(5, 5))
-                .withResources(PLAYER_0, MUD, 10);
+                .withResources(PLAYER_0, MUD, 10)
+                .build();
 
         // when
         ScenarioResult result = scenario

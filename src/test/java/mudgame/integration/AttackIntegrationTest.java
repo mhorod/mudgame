@@ -1,37 +1,41 @@
-package mudgame.integration.tests;
+package mudgame.integration;
 
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
 import core.model.EntityID;
+import testutils.integration.utils.Scenario;
 import mudgame.controls.events.AttackEntityEvent;
 import mudgame.controls.events.AttackPosition;
 import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.ProduceResources;
-import mudgame.integration.utils.RectangleTerrain;
-import mudgame.integration.utils.Scenario;
-import mudgame.integration.utils.ScenarioResult;
+import testutils.integration.utils.RectangleTerrain;
+import testutils.integration.utils.ScenarioResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static core.entities.model.EntityType.PAWN;
-import static mudgame.integration.assertions.ClientScenarioResultAssert.assertThatClient;
-import static mudgame.integration.scenarios.Scenarios.*;
+import static testutils.integration.assertions.ClientScenarioResultAssert.assertThatClient;
+import static testutils.integration.assertions.IntegrationAssertions.assertIntegrity;
+import static testutils.integration.assertions.IntegrationAssertions.assertNoEvents;
+import static testutils.Actions.attack;
 import static testutils.Entities.*;
 import static testutils.Players.*;
 import static testutils.Positions.pos;
+import static testutils.integration.scenarios.Scenarios.*;
 
-class AttackIntegrationTest extends IntegrationTestBase {
+class AttackIntegrationTest {
     @Test
     void pawns_cannot_attack() {
         // given
         Entity pawn0 = pawn(PLAYER_0);
         Entity pawn1 = pawn(PLAYER_1);
 
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(pawn0, pos(0, 0))
-                .with(pawn1, pos(0, 1));
+                .with(pawn1, pos(0, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -49,9 +53,10 @@ class AttackIntegrationTest extends IntegrationTestBase {
         Entity warrior = warrior(PLAYER_0);
         Entity pawn = pawn(PLAYER_1);
 
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(warrior, pos(0, 0))
-                .with(pawn, pos(0, 1));
+                .with(pawn, pos(0, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -72,9 +77,10 @@ class AttackIntegrationTest extends IntegrationTestBase {
         Entity warrior0 = warrior(PLAYER_0);
         Entity warrior1 = warrior(PLAYER_1);
 
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(warrior0, pos(0, 0))
-                .with(warrior1, pos(0, 1));
+                .with(warrior1, pos(0, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -95,9 +101,10 @@ class AttackIntegrationTest extends IntegrationTestBase {
         Entity warrior0 = warrior(PLAYER_0);
         Entity warrior1 = warrior(PLAYER_1);
 
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(warrior0, pos(0, 0))
-                .with(warrior1, pos(1, 1));
+                .with(warrior1, pos(1, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -117,9 +124,10 @@ class AttackIntegrationTest extends IntegrationTestBase {
         pawn.damage(7); // Leave 1HP
 
         // given
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(warrior, pos(0, 0))
-                .with(pawn, pos(0, 1));
+                .with(pawn, pos(0, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -143,9 +151,10 @@ class AttackIntegrationTest extends IntegrationTestBase {
         Entity warrior1 = warrior(PLAYER_1);
         warrior1.damage(11); // Leave 1 HP
 
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(warrior0, pos(0, 0))
-                .with(warrior1, pos(0, 1));
+                .with(warrior1, pos(0, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -171,9 +180,10 @@ class AttackIntegrationTest extends IntegrationTestBase {
         Entity warrior1 = warrior(PLAYER_1);
         warrior1.damage(11); // Leave 1 HP
 
-        Scenario<?> scenario = three_players()
+        Scenario scenario = three_players()
                 .with(warrior0, pos(0, 0))
-                .with(warrior1, pos(0, 1));
+                .with(warrior1, pos(0, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -193,10 +203,11 @@ class AttackIntegrationTest extends IntegrationTestBase {
         Entity pawn = pawn(PLAYER_2);
         warrior1.damage(11); // Leave 1 HP
 
-        Scenario<?> scenario = three_players()
+        Scenario scenario = three_players()
                 .with(warrior0, pos(0, 2))
                 .with(warrior1, pos(0, 3))
-                .with(pawn, pos(0, 0));
+                .with(pawn, pos(0, 0))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -216,11 +227,12 @@ class AttackIntegrationTest extends IntegrationTestBase {
         Entity pawn = pawn(PLAYER_2);
         warrior1.damage(11); // Leave 1 HP
 
-        Scenario<?> scenario = three_players()
+        Scenario scenario = three_players()
                 .with(RectangleTerrain.land(1, 6))
                 .with(warrior0, pos(0, 2))
                 .with(warrior1, pos(0, 3))
-                .with(pawn, pos(0, 5));
+                .with(pawn, pos(0, 5))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -238,9 +250,10 @@ class AttackIntegrationTest extends IntegrationTestBase {
         Entity warrior = warrior(PLAYER_0);
         Entity rock = entity(new EntityData(PAWN, List.of()), PLAYER_1);
 
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(warrior, pos(0, 0))
-                .with(rock, pos(0, 1));
+                .with(rock, pos(0, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -258,9 +271,10 @@ class AttackIntegrationTest extends IntegrationTestBase {
         Entity warrior = warrior(PLAYER_0);
         Entity pawn = pawn(PLAYER_0);
 
-        Scenario<?> scenario = single_player()
+        Scenario scenario = single_player()
                 .with(warrior, pos(0, 0))
-                .with(pawn, pos(0, 1));
+                .with(pawn, pos(0, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -276,9 +290,10 @@ class AttackIntegrationTest extends IntegrationTestBase {
         // given
         Entity warrior0 = warrior(PLAYER_1);
         Entity warrior1 = pawn(PLAYER_2);
-        Scenario<?> scenario = three_players()
+        Scenario scenario = three_players()
                 .with(warrior0, pos(0, 0))
-                .with(warrior1, pos(0, 1));
+                .with(warrior1, pos(0, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -294,7 +309,9 @@ class AttackIntegrationTest extends IntegrationTestBase {
     void cannot_attack_with_non_existent_entity() {
         // given
         Entity warrior = warrior(PLAYER_1);
-        Scenario<?> scenario = two_players().with(warrior, pos(0, 0));
+        Scenario scenario = two_players()
+                .with(warrior, pos(0, 0))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -310,7 +327,7 @@ class AttackIntegrationTest extends IntegrationTestBase {
     void cannot_attack_non_existent_entity() {
         // given
         Entity warrior = warrior(PLAYER_0);
-        Scenario<?> scenario = two_players().with(warrior, pos(0, 0));
+        Scenario scenario = two_players().with(warrior, pos(0, 0)).build();
 
         // when
         ScenarioResult result = scenario
