@@ -4,5 +4,6 @@ build
 .classpath
 .project
 *.log
+*.mud
 .settings/
 bin/
