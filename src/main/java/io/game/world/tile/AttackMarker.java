@@ -7,6 +7,6 @@ import io.game.world.WorldTexture;
 
 public class AttackMarker extends WorldEntity {
     public AttackMarker(Position position) {
-        super(WorldPosition.from(position), WorldTexture.ATTACK_MARKER, 0);
+        super(WorldPosition.from(position), WorldTexture.ATTACK_MARKER, 3);
     }
 }
