@@ -38,6 +38,8 @@ public class TextureBank implements io.model.engine.TextureBank {
         textures.put(io.model.textures.Texture.BUTTON_BIG_PRESSED, new TextureRegion(ui, 512, 181, 720, 181));
         textures.put(io.model.textures.Texture.BUTTON_TINY, new TextureRegion(ui, 512, 362, 182, 181));
         textures.put(io.model.textures.Texture.BUTTON_TINY_PRESSED, new TextureRegion(ui, 512, 543, 182, 181));
+        textures.put(io.model.textures.Texture.BANNER_LEFT, new TextureRegion(ui, 695, 363, 386, 246));
+        textures.put(io.model.textures.Texture.BANNER_TOP, new TextureRegion(ui, 694, 610, 524, 247));
         textures.put(io.model.textures.Texture.SCROLL_TOP, new TextureRegion(ui, 450, 0, 62, 34));
         textures.put(io.model.textures.Texture.SCROLL_MID, new TextureRegion(ui, 450, 34, 62, 33));
         textures.put(io.model.textures.Texture.SCROLL_BOT, new TextureRegion(ui, 450, 328, 62, 33));

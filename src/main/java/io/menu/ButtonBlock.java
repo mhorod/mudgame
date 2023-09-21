@@ -41,8 +41,8 @@ public class ButtonBlock implements UIComponent {
 
 
     @Override
-    public float getAspectRatio() {
-        return content.getAspectRatio();
+    public float getAspectRatio(TextManager mgr) {
+        return content.getAspectRatio(mgr);
     }
 
     @Override

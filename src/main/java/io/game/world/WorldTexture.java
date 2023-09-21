@@ -63,6 +63,10 @@ public enum WorldTexture {
         );
     }
 
+    public Texture getTexture() {
+        return texture;
+    }
+
     public void draw(WorldPosition position, Canvas canvas, Camera camera) {
         canvas.draw(getDrawData(position, camera));
     }

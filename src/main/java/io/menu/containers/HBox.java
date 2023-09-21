@@ -23,25 +23,25 @@ public class HBox implements UIComponent {
 
 
     @Override
-    public float getAspectRatio() {
+    public float getAspectRatio(TextManager mgr) {
         float aspect = -gap;
-        for (UIComponent component : components) aspect += component.getAspectRatio() + gap;
+        for (UIComponent component : components) aspect += component.getAspectRatio(mgr) + gap;
         return 1 / aspect;
     }
 
     @Override
     public void fitInto(Rectangle rect, TextManager mgr) {
-        Rectangle bounds = new Rectangle(getAspectRatio());
+        Rectangle bounds = new Rectangle(getAspectRatio(mgr));
         bounds.fitInto(rect);
         float x = bounds.position.x();
         for (var component : components) {
             var componentBounds = new Rectangle(
                     x,
                     bounds.position.y(),
-                    bounds.height / component.getAspectRatio(),
+                    bounds.height / component.getAspectRatio(mgr),
                     bounds.height
             );
-            x += bounds.height / component.getAspectRatio() + gap * bounds.height;
+            x += bounds.height / component.getAspectRatio(mgr) + gap * bounds.height;
             component.fitInto(componentBounds, mgr);
 
         }

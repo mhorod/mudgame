@@ -6,7 +6,6 @@ import io.model.engine.TextManager;
 public class Label implements UIComponent {
 
     String text;
-    private float aspectRatio;
     Rectangle bounds;
 
     public Label(String text) {
@@ -14,14 +13,13 @@ public class Label implements UIComponent {
     }
 
     @Override
-    public float getAspectRatio() {
-        return aspectRatio;
+    public float getAspectRatio(TextManager mgr) {
+        return 1 / mgr.getTextAspectRatio(text);
     }
 
     @Override
     public void fitInto(Rectangle rectangle, TextManager mgr) {
-        aspectRatio = 1 / mgr.getTextAspectRatio(text);
-        bounds = new Rectangle(aspectRatio);
+        bounds = new Rectangle(getAspectRatio(mgr));
         bounds.fitInto(rectangle);
     }
 

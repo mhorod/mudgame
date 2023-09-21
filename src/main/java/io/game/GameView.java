@@ -5,6 +5,8 @@ import ai.RandomWalker;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import core.resources.PlayerResourcesView;
+import core.resources.Resources;
 import io.animation.Animation;
 import io.animation.AnimationController;
 import io.animation.Finishable;
@@ -87,7 +89,12 @@ public class GameView extends SimpleView {
         }
 
         map = new Map(me.getCore().terrain(), me.getCore().entityBoard());
-        hud = new HUD(me.getCore().turnView());
+        hud = new HUD(me.getCore().turnView(), new PlayerResourcesView() {
+            @Override
+            public boolean canAfford(Resources cost) {
+                return false;
+            }
+        });
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
         worldController = new WorldController(
@@ -187,7 +194,7 @@ public class GameView extends SimpleView {
                 }
             });
         }
-        hud.update(input.mouse().position(), input.mouse().leftPressed(), mgr);
+        hud.update(input.mouse().position(), input.window().height() / input.window().width(), input.mouse().leftPressed(), mgr);
         dragDetector.update(input.mouse(), input.deltaTime());
         animations.update(input.deltaTime());
         camera.setAspectRatio(input.window().height() / input.window().width());

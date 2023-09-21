@@ -24,13 +24,17 @@ public class Image implements UIComponent {
     }
 
     @Override
-    public float getAspectRatio() {
+    public float getAspectRatio(TextManager mgr) {
         return texture.aspectRatio();
     }
 
     @Override
     public void fitInto(Rectangle rectangle, TextManager mgr) {
         bounds.fitInto(rectangle);
+    }
+
+    public Rectangle getBounds() {
+        return bounds;
     }
 
     @Override

@@ -19,14 +19,14 @@ public class ScrollBox implements UIComponent {
     }
 
     @Override
-    public float getAspectRatio() {
+    public float getAspectRatio(TextManager mgr) {
         return 1f;
     }
 
     @Override
     public void fitInto(Rectangle rectangle, TextManager mgr) {
         var contentWidth = rectangle.width() * 0.9f;
-        var contentHeight = contents.getAspectRatio() * contentWidth;
+        var contentHeight = contents.getAspectRatio(mgr) * contentWidth;
         maxScroll = Math.max((contentHeight - rectangle.height) / contentWidth, 0);
         if (scrollAmount > maxScroll)
             scrollAmount = maxScroll;

@@ -35,12 +35,14 @@ public class Normal extends WorldState {
 
     @Override
     public void onTileHover(Position position) {
-
+        state.hud().hideEntityInfo();
     }
 
     @Override
-    public void onEntityHover(EntityID entity) {
-
+    public void onEntityHover(EntityID entityID) {
+        var entity = state.entities().findEntityByID(entityID);
+        if (entity != null)
+            state.hud().showEntityInfo(entity);
     }
 
     @Override

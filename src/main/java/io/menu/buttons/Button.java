@@ -37,7 +37,7 @@ public class Button implements UIComponent {
     }
 
     @Override
-    public float getAspectRatio() {
+    public float getAspectRatio(TextManager mgr) {
         return normal.aspectRatio();
     }
 
