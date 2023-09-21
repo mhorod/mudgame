@@ -2,9 +2,9 @@ package io.menu.views.create_room;
 
 import io.animation.Animation;
 import io.animation.Easer;
-import io.menu.Label;
 import io.menu.Rectangle;
 import io.menu.UIComponent;
+import io.menu.components.Label;
 import io.menu.scroll.ScrollBar;
 import io.model.engine.Canvas;
 import io.model.engine.TextManager;

@@ -1,9 +1,9 @@
 package io.game.ui;
 
-import io.menu.Image;
-import io.menu.Label;
 import io.menu.Rectangle;
 import io.menu.UIComponent;
+import io.menu.components.Image;
+import io.menu.components.Label;
 import io.model.engine.Canvas;
 import io.model.engine.TextManager;
 import io.model.textures.Texture;

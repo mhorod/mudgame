@@ -1,6 +1,5 @@
 package io.menu.components;
 
-import io.menu.Image;
 import io.menu.Rectangle;
 import io.menu.UIComponent;
 import io.menu.containers.HBox;

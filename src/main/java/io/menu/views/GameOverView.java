@@ -1,9 +1,9 @@
 package io.menu.views;
 
 import core.model.PlayerID;
-import io.menu.Label;
 import io.menu.Rectangle;
 import io.menu.UIComponent;
+import io.menu.components.Label;
 import io.menu.components.SignedImage;
 import io.menu.containers.HBox;
 import io.model.engine.Canvas;

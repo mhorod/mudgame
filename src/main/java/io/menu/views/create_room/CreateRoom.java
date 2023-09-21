@@ -1,10 +1,11 @@
 package io.menu.views.create_room;
 
 import io.game.GameView;
-import io.menu.Label;
 import io.menu.Rectangle;
 import io.menu.buttons.Button;
 import io.menu.buttons.ButtonSmall;
+import io.menu.components.Label;
+import io.menu.views.RoomSelect;
 import io.menu.views.room_view.OwnerRoomView;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
@@ -25,6 +26,7 @@ public class CreateRoom extends SimpleView implements EventHandler {
     ColorPicker colorPicker = new ColorPicker(1);
     Button load = new ButtonSmall(new Label("LOAD"));
     Label or = new Label("OR");
+    Button goBack = new ButtonSmall(new Label("BACK"));
 
     public CreateRoom(ServerClient client) {
         this.client = client;
@@ -36,6 +38,7 @@ public class CreateRoom extends SimpleView implements EventHandler {
         colorPicker.draw(canvas);
         or.draw(canvas);
         load.draw(canvas);
+        goBack.draw(canvas);
     }
 
     @Override
@@ -69,6 +72,13 @@ public class CreateRoom extends SimpleView implements EventHandler {
                 scene.height * 0.1f
         ), mgr);
 
+        goBack.fitInto(new Rectangle(
+                window.position.x(),
+                window.position.y() + window.height - 0.1f * window.width(),
+                window.width() * 0.1f,
+                window.width() * 0.1f
+        ), mgr);
+
         numberPicker.update(input.deltaTime());
         input.events().forEach(event -> event.accept(this));
         colorPicker.fitInto(new Rectangle(
@@ -99,6 +109,8 @@ public class CreateRoom extends SimpleView implements EventHandler {
             if (client != null)
                 client.createRoom(playerID, numberPicker.getNumber());
         });
+        if (goBack.contains(click.position()))
+            changeView(new RoomSelect(client));
     }
 
     @Override

@@ -1,13 +1,12 @@
 package io.menu.views.room_view;
 
 import io.game.GameView;
-import io.menu.Image;
-import io.menu.Label;
 import io.menu.Rectangle;
-import io.menu.RoomSelect;
 import io.menu.buttons.Button;
 import io.menu.buttons.ButtonMedium;
-import io.model.ScreenPosition;
+import io.menu.components.Image;
+import io.menu.components.Label;
+import io.menu.views.RoomSelect;
 import io.model.engine.Canvas;
 import io.model.engine.Color;
 import io.model.engine.TextManager;
@@ -21,7 +20,6 @@ import io.views.SimpleView;
 import middleware.clients.ServerClient;
 import middleware.model.RoomID;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -30,20 +28,21 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
     private final RoomID roomID;
     Image selectedColor;
 
-    PlayersView playersView = new PlayersView(Map.of());
     Button start = new ButtonMedium(new Label("LET'S GO"));
+    private final RoomViewCommon common;
 
 
     public OwnerRoomView(ServerClient client, RoomID room) {
         this.client = client;
         this.roomID = room;
+        common = new RoomViewCommon(client, room, this::changeView);
     }
 
     @Override
     public void draw(Canvas canvas) {
-        playersView.draw(canvas);
         selectedColor.draw(canvas);
         start.draw(canvas);
+        common.draw(canvas);
     }
 
     @Override
@@ -57,7 +56,6 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
             return;
         }
         var room = maybeRoom.get();
-        playersView.setPlayers(room.players());
         start.setPressed(!room.players().values().stream().allMatch(Objects::nonNull));
         selectedColor = new Image(Texture.BASE, client.myPlayerID().map(Color::fromPlayerId).orElse(Color.WHITE));
 
@@ -67,46 +65,28 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
             return;
         }
 
-        var window = new Rectangle(input.window().height() / input.window().width());
-        window.position = new ScreenPosition(0, 0);
-        window.height = input.window().height() / input.window().width();
-
-        var scene = new Rectangle(
-                0.025f,
-                0.025f,
-                window.width() - 0.05f,
-                window.height - 0.05f
-        );
-
-        playersView.fitInto(new Rectangle(
-                scene.position.x(),
-                scene.position.y(),
-                scene.width(),
-                scene.height * 0.3f
-        ), mgr);
+        var window = new Rectangle(0, 0, 1, input.window().height() / input.window().width());
         selectedColor.fitInto(new Rectangle(
-                scene.position.x(),
-                scene.position.y() + scene.height * 0.4f,
-                scene.width() * 0.5f,
-                scene.height * 0.6f
+                window.position.x(),
+                window.position.y() + window.height * 0.4f,
+                window.width() * 0.5f,
+                window.height * 0.6f
         ), mgr);
         start.fitInto(new Rectangle(
-                scene.position.x() + scene.width() * 0.6f,
-                scene.position.y() + scene.height * 0.4f,
-                scene.width() * 0.3f,
-                scene.height * 0.6f
+                window.position.x() + window.width() * 0.6f,
+                window.position.y() + window.height * 0.4f,
+                window.width() * 0.3f,
+                window.height * 0.6f
         ), mgr);
+        common.fitInto(window, mgr);
         input.events().forEach(event -> event.accept(this));
-        playersView.update(input.mouse().position(), input.mouse().leftPressed());
         start.update(input.mouse().position(), input.mouse().leftPressed());
+        common.update(input.mouse().position(), input.mouse().leftPressed(), room);
     }
 
     @Override
     public void onClick(Click click) {
-        playersView.click(click.position(), playerID -> {
-            if (client != null)
-                client.joinRoom(roomID, playerID);
-        });
+        common.click(click);
         if (start.contains(click.position()))
             client.startGame();
     }

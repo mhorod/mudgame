@@ -1,5 +1,7 @@
-package io.menu;
+package io.menu.components;
 
+import io.menu.Rectangle;
+import io.menu.UIComponent;
 import io.model.engine.Canvas;
 import io.model.engine.Color;
 import io.model.engine.TextManager;

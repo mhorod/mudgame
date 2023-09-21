@@ -1,11 +1,11 @@
 package io.menu.views.create_room;
 
 import core.model.PlayerID;
-import io.menu.Image;
 import io.menu.Rectangle;
 import io.menu.UIComponent;
 import io.menu.buttons.Button;
 import io.menu.buttons.ButtonSmall;
+import io.menu.components.Image;
 import io.menu.containers.HBox;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;

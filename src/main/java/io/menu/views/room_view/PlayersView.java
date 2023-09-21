@@ -22,6 +22,8 @@ import java.util.stream.IntStream;
 public class PlayersView implements UIComponent {
     private HBox content;
     private List<? extends Button> buttons;
+    private Rectangle bounds;
+    private TextManager mgr;
 
     public PlayersView(Map<PlayerID, String> players) {
         setPlayers(players);
@@ -47,6 +49,8 @@ public class PlayersView implements UIComponent {
                         ));
                 }).toList();
         content = new HBox(0.1f, buttons);
+        if (bounds != null)
+            content.fitInto(bounds, mgr);
     }
 
     public void setLocked(Collection<PlayerID> lockedIds) {
@@ -73,6 +77,8 @@ public class PlayersView implements UIComponent {
 
     @Override
     public void fitInto(Rectangle rectangle, TextManager mgr) {
+        bounds = rectangle;
+        this.mgr = mgr;
         content.fitInto(rectangle, mgr);
     }
 
