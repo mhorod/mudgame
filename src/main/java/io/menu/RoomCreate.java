@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class RoomSelect extends SimpleView implements EventHandler {
+public class RoomCreate extends SimpleView implements EventHandler {
     private final ServerClient client;
 
     ButtonBlock buttons;
@@ -31,8 +31,16 @@ public class RoomSelect extends SimpleView implements EventHandler {
 
     Rectangle logo = new Rectangle(Texture.LOGO.aspectRatio());
 
-    public RoomSelect(ServerClient client) {
+    public RoomCreate(ServerClient client, RoomInfo info) {
         this.client = client;
+    }
+
+    public RoomCreate(ServerClient client) {
+        this.client = client;
+    }
+
+    public RoomCreate() {
+        this.client = null;
     }
 
     @Override
@@ -42,32 +50,13 @@ public class RoomSelect extends SimpleView implements EventHandler {
 
     @Override
     public void update(Input input, TextureBank bank, TextManager mgr) {
-        Optional<GameClient> gameClient = client.getGameClient();
-        if (gameClient.isPresent()) {
-            gameClient.orElseThrow();
-            changeView(new GameView());
-            return;
-        }
-
-        List<String> texts = new ArrayList<>();
-        List<Runnable> handlers = new ArrayList<>();
-
-        texts.add("CREATE");
-        handlers.add(() -> changeView(new RoomCreate(client)));
-
-        for (RoomInfo info : client.getRoomList()) {
-            texts.add(info.toString());
-            handlers.add(() -> changeView(new RoomCreate(client, info)));
-        }
-
-        buttons = new ButtonBlock(0.1f, texts, handlers);
-        scrollBox = new ScrollBox(buttons);
-        scrollEaser = new Easer(0) {
-            @Override
-            public void onUpdate(float value) {
-                scrollBox.setScroll(value);
+        if (client != null) {
+            Optional<GameClient> gameClient = client.getGameClient();
+            if (gameClient.isPresent()) {
+                changeView(new GameView());
+                return;
             }
-        };
+        }
 
         var window = new Rectangle(input.window().height() / input.window().width());
         window.position = new ScreenPosition(0, 0);

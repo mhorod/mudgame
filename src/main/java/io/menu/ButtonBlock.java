@@ -20,7 +20,9 @@ public class ButtonBlock implements UIComponent {
         buttons = IntStream.rangeClosed(1, text.size())
                 .mapToObj(i -> new ButtonMedium(new Label(text.get(text.size() - i))))
                 .toList();
-        this.handlers = handlers;
+        this.handlers = IntStream.rangeClosed(1, text.size())
+                .mapToObj(i -> handlers.get(handlers.size() - i))
+                .toList();
         content = new VBox(gap, buttons);
     }
 
