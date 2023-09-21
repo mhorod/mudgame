@@ -1,7 +1,7 @@
 package middleware.server;
 
 import lombok.extern.slf4j.Slf4j;
-import middleware.communication.SocketDevice.SocketDeviceBuilder;
+import middleware.communication.SocketDeviceBuilder;
 import mudgame.server.state.ServerStateSupplier;
 
 import java.io.IOException;
@@ -15,16 +15,12 @@ import java.util.TimerTask;
 public final class RemoteServer {
     private static final Duration SCAN_CLOSED_CONNECTIONS_DELAY = Duration.ofSeconds(15);
 
-    private final ServerStateSupplier serverStateSupplier;
-    private final GameServer server = new GameServer();
+    private final GameServer server;
     private final ServerSocket serverSocket;
     private final Timer timer;
 
-    public RemoteServer(
-            ServerStateSupplier serverStateSupplier,
-            ServerSocket serverSocket, Timer timer
-    ) {
-        this.serverStateSupplier = serverStateSupplier;
+    public RemoteServer(ServerStateSupplier stateSupplier, ServerSocket serverSocket, Timer timer) {
+        this.server = new GameServer(stateSupplier);
         this.serverSocket = serverSocket;
         this.timer = timer;
         new Thread(this::workReceiveConnections).start();
@@ -53,10 +49,8 @@ public final class RemoteServer {
     }
 
     private void receiveConnection(Socket socket) {
-        synchronized (server) {
-            User user = new User(serverStateSupplier, new SocketDeviceBuilder(socket), server);
-            log.info("New connection from {} got {}", socket.getInetAddress(), user.getUserID());
-        }
+        User user = server.createUser(new SocketDeviceBuilder(socket));
+        log.info("New connection from {} got {}", socket.getInetAddress(), user.getUserID());
     }
 
     private void workReceiveConnections() {

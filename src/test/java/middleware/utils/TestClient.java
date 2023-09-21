@@ -1,6 +1,6 @@
 package middleware.utils;
 
-import middleware.remote.RemoteNetworkClient;
+import middleware.remote_clients.RemoteNetworkClient;
 
 import java.time.Duration;
 import java.time.Instant;

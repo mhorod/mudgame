@@ -23,8 +23,17 @@
         </encoder>
     </appender>
 
+    <appender name="FILE_LATEST" class="ch.qos.logback.core.FileAppender">
+        <file>latest.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>${defaultPattern}</pattern>
+        </encoder>
+    </appender>
+
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE_LATEST"/>
     </root>
 
     <!--    <logger name="io" level="OFF"/>-->
@@ -36,9 +45,9 @@
     <logger name="mudgame.server.actions.ActionProcessor">
         <appender-ref ref="FILE_ACTIONS"/>
     </logger>
-    
+
     <logger name="mudgame.server.actions.EventSender">
         <appender-ref ref="FILE_EVENTS"/>
     </logger>
-
+    
 </configuration>

@@ -1,4 +1,4 @@
-package middleware.clients;
+package middleware.communication;
 
 public enum NetworkStatus {
     OK, ATTEMPTING, DISCONNECTED, FAILED

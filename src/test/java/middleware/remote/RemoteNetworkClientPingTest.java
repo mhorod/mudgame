@@ -1,15 +1,15 @@
 package middleware.remote;
 
 import middleware.clients.NetworkClient;
-import middleware.clients.NetworkStatus;
+import middleware.communication.NetworkStatus;
 import middleware.utils.TestClient;
-import middleware.utils.TestClientNetworkConnection;
+import middleware.utils.TestConnection;
 import org.junit.jupiter.api.Test;
 
 import static middleware.messages_to_server.MessageToServer.PingToServerMessage;
 import static middleware.messages_to_server.MessageToServer.PongToServerMessage;
-import static middleware.remote.RemoteNetworkClient.PING_AFTER_IDLE;
-import static middleware.remote.RemoteNetworkClient.PING_TIMEOUT;
+import static middleware.remote_clients.RemoteNetworkClient.PING_AFTER_IDLE;
+import static middleware.remote_clients.RemoteNetworkClient.PING_TIMEOUT;
 import static middleware.utils.Wait.EPS;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,11 +20,11 @@ public class RemoteNetworkClientPingTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         // when
-        connection.receive().pingToClient();
+        connection.receiveFromServer().pingToClient();
         client.processAllMessages();
 
         // then
@@ -37,11 +37,11 @@ public class RemoteNetworkClientPingTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         // when
-        connection.receive().pongToClient();
+        connection.receiveFromServer().pongToClient();
         client.processAllMessages();
 
         // then
@@ -54,7 +54,7 @@ public class RemoteNetworkClientPingTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         // when
@@ -71,7 +71,7 @@ public class RemoteNetworkClientPingTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         // when
@@ -88,7 +88,7 @@ public class RemoteNetworkClientPingTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         // when
@@ -109,7 +109,7 @@ public class RemoteNetworkClientPingTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         testClient.advance(PING_AFTER_IDLE.plus(EPS));
@@ -130,7 +130,7 @@ public class RemoteNetworkClientPingTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         testClient.advance(PING_AFTER_IDLE.plus(EPS));
@@ -151,7 +151,7 @@ public class RemoteNetworkClientPingTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         testClient.advance(PING_AFTER_IDLE.plus(EPS));
@@ -159,7 +159,7 @@ public class RemoteNetworkClientPingTest {
 
         // when
         testClient.advance(PING_TIMEOUT.minus(EPS));
-        connection.receive().pongToClient();
+        connection.receiveFromServer().pongToClient();
         client.processAllMessages();
         testClient.advance(EPS.multipliedBy(2));
         client.processAllMessages();
@@ -175,7 +175,7 @@ public class RemoteNetworkClientPingTest {
         TestClient testClient = new TestClient();
         NetworkClient client = testClient.client;
 
-        TestClientNetworkConnection connection = new TestClientNetworkConnection();
+        TestConnection connection = new TestConnection();
         client.connect(connection);
 
         testClient.advance(PING_AFTER_IDLE.plus(EPS));
@@ -183,7 +183,7 @@ public class RemoteNetworkClientPingTest {
 
         // when
         testClient.advance(PING_TIMEOUT.plus(EPS));
-        connection.receive().pongToClient();
+        connection.receiveFromServer().pongToClient();
         client.processAllMessages();
 
         // then
