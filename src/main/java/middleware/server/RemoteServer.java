@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 @Slf4j
 public final class RemoteServer {
-    private static final Duration SCAN_CLOSED_CONNECTIONS_DELAY = Duration.ofSeconds(15);
+    private static final Duration SCAN_CLOSED_CONNECTIONS_DELAY = Duration.ofSeconds(10);
 
     private final GameServer server;
     private final ServerSocket serverSocket;

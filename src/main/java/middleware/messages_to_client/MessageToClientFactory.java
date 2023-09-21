@@ -1,5 +1,6 @@
 package middleware.messages_to_client;
 
+import core.model.PlayerID;
 import lombok.AllArgsConstructor;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
@@ -36,8 +37,8 @@ public final class MessageToClientFactory implements MessageToClientHandler {
     }
 
     @Override
-    public void setCurrentRoom(RoomInfo roomInfo) {
-        consumer.accept(new SetCurrentRoomMessage(roomInfo));
+    public void setCurrentRoom(RoomInfo roomInfo, boolean isOwner, PlayerID myPlayerID) {
+        consumer.accept(new SetCurrentRoomMessage(roomInfo, isOwner, myPlayerID));
     }
 
     @Override
