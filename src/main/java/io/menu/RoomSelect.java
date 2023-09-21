@@ -2,9 +2,10 @@ package io.menu;
 
 import io.animation.Easer;
 import io.game.GameView;
-import io.menu.create_room.CreateRoom;
-import io.menu.room_view.RoomView;
+import io.menu.components.RoomInfoView;
 import io.menu.scroll.ScrollBox;
+import io.menu.views.create_room.CreateRoom;
+import io.menu.views.room_view.RoomView;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.TextManager;
@@ -54,18 +55,18 @@ public class RoomSelect extends SimpleView implements EventHandler {
             return;
         }
 
-        List<String> texts = new ArrayList<>();
+        List<UIComponent> contents = new ArrayList<>();
         List<Runnable> handlers = new ArrayList<>();
 
-        texts.add("CREATE");
+        contents.add(new Label("CREATE"));
         handlers.add(() -> changeView(new CreateRoom(client)));
 
         for (RoomInfo info : client.getRoomList()) {
-            texts.add(info.toString());
+            contents.add(new RoomInfoView(info));
             handlers.add(() -> changeView(new RoomView(client, info.roomID())));
         }
 
-        buttons = new ButtonBlock(0.1f, texts, handlers);
+        buttons = new ButtonBlock(0.01f, contents, handlers);
         scrollBox = new ScrollBox(buttons);
 
         var window = new Rectangle(input.window().height() / input.window().width());

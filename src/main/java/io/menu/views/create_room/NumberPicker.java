@@ -1,4 +1,4 @@
-package io.menu.create_room;
+package io.menu.views.create_room;
 
 import io.animation.Animation;
 import io.animation.Easer;

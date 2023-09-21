@@ -16,11 +16,11 @@ public class ButtonBlock implements UIComponent {
 
     private final UIComponent content;
 
-    public ButtonBlock(float gap, List<String> text, List<Runnable> handlers) {
-        buttons = IntStream.rangeClosed(1, text.size())
-                .mapToObj(i -> new ButtonMedium(new Label(text.get(text.size() - i))))
+    public ButtonBlock(float gap, List<UIComponent> components, List<Runnable> handlers) {
+        buttons = IntStream.rangeClosed(1, components.size())
+                .mapToObj(i -> new ButtonMedium(components.get(components.size() - i)))
                 .toList();
-        this.handlers = IntStream.rangeClosed(1, text.size())
+        this.handlers = IntStream.rangeClosed(1, components.size())
                 .mapToObj(i -> handlers.get(handlers.size() - i))
                 .toList();
         content = new VBox(gap, buttons);

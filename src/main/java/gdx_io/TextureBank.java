@@ -47,6 +47,7 @@ public class TextureBank implements io.model.engine.TextureBank {
         textures.put(io.model.textures.Texture.SCROLL_BACK_MID, new TextureRegion(ui, 450, 395, 62, 33));
         textures.put(io.model.textures.Texture.SCROLL_BACK_BOT, new TextureRegion(ui, 450, 689, 62, 34));
         textures.put(io.model.textures.Texture.LOGO, new TextureRegion(ui, 0, 362, 449, 544));
+        textures.put(io.model.textures.Texture.FIRE, new TextureRegion(ui, 484, 762, 180, 307));
         textures.put(io.model.textures.Texture.FOG, new TextureRegion(tiles, 5, 236, 326, 212));
         textures.put(io.model.textures.Texture.FOG_LEFT, new TextureRegion(tiles, 9, 498, 329, 282));
         textures.put(io.model.textures.Texture.FOG_RIGHT, new TextureRegion(tiles, 381, 530, 325, 282));

@@ -45,6 +45,7 @@ public enum Texture {
     BUTTON_BIG_PRESSED(182f / 720f),
     BANNER_LEFT(246f / 386f),
     BANNER_TOP(247f / 524f),
+    FIRE(307f / 180f),
     ;
     private final float ratio;
 

@@ -44,12 +44,12 @@ public class Button implements UIComponent {
     @Override
     public void fitInto(Rectangle rectangle, TextManager mgr) {
         bounds.fitInto(rectangle);
-        float boarderSize = bounds.height * 0.15f;
+        float borderSize = bounds.height * 0.15f;
         Rectangle contentBounds = new Rectangle(
-                bounds.position.x() + boarderSize,
-                bounds.position.y() + boarderSize,
-                bounds.width() - 2 * boarderSize,
-                bounds.height - 2 * boarderSize
+                bounds.position.x() + borderSize,
+                bounds.position.y() + borderSize,
+                bounds.width() - 2 * borderSize,
+                bounds.height - 2 * borderSize
         );
         content.fitInto(contentBounds, mgr);
     }

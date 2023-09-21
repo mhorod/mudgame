@@ -13,7 +13,8 @@ import io.model.textures.TextureDrawData;
 import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.NetworkClient;
-import middleware.communication.*;
+import middleware.communication.NetworkStatus;
+import middleware.communication.SocketConnectionBuilder;
 import middleware.remote_clients.RemoteNetworkClient;
 
 import java.util.List;
@@ -29,14 +30,15 @@ public class MainMenu extends SimpleView implements EventHandler {
         buttons = new ButtonBlock(
                 0.1f,
                 List.of(
-                        "LOCAL",
-                        "LOCALHOST",
-                        "REMOTE",
-                        "EXIT"
+                        new Label("LOCAL"),
+                        new Label("LOCALHOST"),
+                        new Label("REMOTE"),
+                        new Label("EXIT")
                 ),
                 List.of(
 //                        () -> changeView(new RoomSelect()),
-                        () -> { },
+                        () -> {
+                        },
                         () -> client.connect(new SocketConnectionBuilder("localhost", 6789)),
                         () -> client.connect(new SocketConnectionBuilder("13.69.185.38", 6789)),
                         () -> System.exit(0)
@@ -70,10 +72,10 @@ public class MainMenu extends SimpleView implements EventHandler {
 
         input.events().forEach(event -> event.accept(this));
         buttons.fitInto(new Rectangle(scene.position.x(), scene.position.y(), scene.width() / 2,
-                                      scene.height), mgr);
+                scene.height), mgr);
         buttons.update(input.mouse().position(), input.mouse().leftPressed());
         logo.fitInto(new Rectangle(scene.position.x() + scene.width() / 2, scene.position.y(),
-                                   scene.width() / 2, scene.height));
+                scene.width() / 2, scene.height));
     }
 
     @Override

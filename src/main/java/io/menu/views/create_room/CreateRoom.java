@@ -1,11 +1,11 @@
-package io.menu.create_room;
+package io.menu.views.create_room;
 
 import io.game.GameView;
 import io.menu.Label;
 import io.menu.Rectangle;
 import io.menu.buttons.Button;
 import io.menu.buttons.ButtonSmall;
-import io.menu.room_view.OwnerRoomView;
+import io.menu.views.room_view.OwnerRoomView;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.TextManager;

@@ -1,13 +1,10 @@
-package io.menu.room_view;
+package io.menu.views.room_view;
 
 import io.game.GameView;
 import io.menu.Image;
-import io.menu.Label;
 import io.menu.Rectangle;
 import io.menu.RoomSelect;
-import io.menu.buttons.Button;
-import io.menu.buttons.ButtonMedium;
-import io.menu.create_room.ColorPicker;
+import io.menu.views.create_room.ColorPicker;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.Color;
@@ -23,19 +20,17 @@ import middleware.clients.ServerClient;
 import middleware.model.RoomID;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
 
-public class OwnerRoomView extends SimpleView implements EventHandler {
+public class RoomView extends SimpleView implements EventHandler {
     private final ServerClient client;
     private final RoomID roomID;
     Image selectedColor;
 
     ColorPicker colorPicker;
-    Button start = new ButtonMedium(new Label("LET'S GO"));
 
 
-    public OwnerRoomView(ServerClient client, RoomID room) {
+    public RoomView(ServerClient client, RoomID room) {
         this.client = client;
         this.roomID = room;
     }
@@ -44,7 +39,6 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
     public void draw(Canvas canvas) {
         colorPicker.draw(canvas);
         selectedColor.draw(canvas);
-        start.draw(canvas);
     }
 
     @Override
@@ -65,7 +59,6 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
                         .map(Map.Entry::getKey)
                         .toList()
         );
-        start.setPressed(!room.players().values().stream().allMatch(Objects::nonNull));
         selectedColor = new Image(Texture.BASE, Color.WHITE);
 
         var maybeGameClient = client.getGameClient();
@@ -94,18 +87,11 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
         selectedColor.fitInto(new Rectangle(
                 scene.position.x(),
                 scene.position.y() + scene.height * 0.4f,
-                scene.width() * 0.5f,
-                scene.height * 0.6f
-        ), mgr);
-        start.fitInto(new Rectangle(
-                scene.position.x() + scene.width() * 0.6f,
-                scene.position.y() + scene.height * 0.4f,
-                scene.width() * 0.3f,
+                scene.width(),
                 scene.height * 0.6f
         ), mgr);
         input.events().forEach(event -> event.accept(this));
         colorPicker.update(input.mouse().position(), input.mouse().leftPressed());
-        start.update(input.mouse().position(), input.mouse().leftPressed());
     }
 
     @Override
@@ -114,8 +100,6 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
             if (client != null)
                 client.joinRoom(roomID, playerID);
         });
-        if (start.contains(click.position()))
-            client.startGame();
     }
 
     @Override

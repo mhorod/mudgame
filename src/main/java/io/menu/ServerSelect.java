@@ -9,7 +9,7 @@ import io.model.input.events.EventHandler;
 import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import middleware.clients.NetworkClient;
-import middleware.communication.*;
+import middleware.communication.SocketConnectionBuilder;
 import middleware.remote_clients.RemoteNetworkClient;
 
 import java.util.List;
@@ -23,9 +23,9 @@ public class ServerSelect extends SimpleView implements EventHandler {
         buttons = new ButtonBlock(
                 0.1f,
                 List.of(
-                        "LOCALHOST",
-                        "AZURE",
-                        "GO BACK"
+                        new Label("LOCALHOST"),
+                        new Label("AZURE"),
+                        new Label("GO BACK")
                 ),
                 List.of(
                         () -> client.connect(new SocketConnectionBuilder("localhost", 6789)),
