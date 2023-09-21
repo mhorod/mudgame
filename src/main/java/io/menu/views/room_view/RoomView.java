@@ -4,7 +4,6 @@ import io.game.GameView;
 import io.menu.Image;
 import io.menu.Rectangle;
 import io.menu.RoomSelect;
-import io.menu.views.create_room.ColorPicker;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.Color;
@@ -27,7 +26,7 @@ public class RoomView extends SimpleView implements EventHandler {
     private final RoomID roomID;
     Image selectedColor;
 
-    ColorPicker colorPicker;
+    PlayersView playersView = new PlayersView(Map.of());
 
 
     public RoomView(ServerClient client, RoomID room) {
@@ -37,7 +36,7 @@ public class RoomView extends SimpleView implements EventHandler {
 
     @Override
     public void draw(Canvas canvas) {
-        colorPicker.draw(canvas);
+        playersView.draw(canvas);
         selectedColor.draw(canvas);
     }
 
@@ -52,14 +51,8 @@ public class RoomView extends SimpleView implements EventHandler {
             return;
         }
         var room = maybeRoom.get();
-        colorPicker = new ColorPicker(room.players().size());
-        colorPicker.setLocked(
-                room.players().entrySet().stream()
-                        .filter(entry -> entry.getValue() != null)
-                        .map(Map.Entry::getKey)
-                        .toList()
-        );
-        selectedColor = new Image(Texture.BASE, Color.WHITE);
+        playersView.setPlayers(room.players());
+        selectedColor = new Image(Texture.BASE, client.myPlayerID().map(Color::fromPlayerId).orElse(Color.WHITE));
 
         var maybeGameClient = client.getGameClient();
         if (maybeGameClient.isPresent()) {
@@ -78,7 +71,7 @@ public class RoomView extends SimpleView implements EventHandler {
                 window.height - 0.05f
         );
 
-        colorPicker.fitInto(new Rectangle(
+        playersView.fitInto(new Rectangle(
                 scene.position.x(),
                 scene.position.y(),
                 scene.width(),
@@ -91,12 +84,12 @@ public class RoomView extends SimpleView implements EventHandler {
                 scene.height * 0.6f
         ), mgr);
         input.events().forEach(event -> event.accept(this));
-        colorPicker.update(input.mouse().position(), input.mouse().leftPressed());
+        playersView.update(input.mouse().position(), input.mouse().leftPressed());
     }
 
     @Override
     public void onClick(Click click) {
-        colorPicker.click(click.position(), playerID -> {
+        playersView.click(click.position(), playerID -> {
             if (client != null)
                 client.joinRoom(roomID, playerID);
         });
