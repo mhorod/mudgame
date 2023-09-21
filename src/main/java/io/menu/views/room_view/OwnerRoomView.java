@@ -9,6 +9,7 @@ import io.menu.components.Label;
 import io.menu.views.RoomSelect;
 import io.model.engine.Canvas;
 import io.model.engine.Color;
+import io.model.engine.StateManager;
 import io.model.engine.TextManager;
 import io.model.engine.TextureBank;
 import io.model.input.Input;
@@ -46,7 +47,7 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
     }
 
     @Override
-    public void update(Input input, TextureBank bank, TextManager mgr) {
+    public void update(Input input, TextureBank bank, TextManager mgr, StateManager stateManager) {
         var maybeRoom = Stream.concat(
                 client.getRoomList().stream().filter(info -> info.roomID().equals(roomID)),
                 client.currentRoom().stream()

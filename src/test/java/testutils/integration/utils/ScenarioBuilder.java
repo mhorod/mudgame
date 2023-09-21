@@ -1,10 +1,9 @@
-package mudgame.integration.utils;
+package testutils.integration.utils;
 
 import core.claiming.ClaimedArea;
 import core.entities.EntityBoard;
 import core.entities.model.Entity;
 import core.fogofwar.FogOfWar;
-import core.fogofwar.FogOfWarView;
 import core.gameover.GameOverCondition;
 import core.model.PlayerID;
 import core.model.Position;
@@ -13,14 +12,12 @@ import core.resources.ResourceType;
 import core.terrain.model.Terrain;
 import core.terrain.model.TerrainType;
 import core.turns.TurnManager;
-import mudgame.controls.actions.Action;
 import mudgame.server.rules.DefaultRules;
 import mudgame.server.rules.RuleProvider;
 import mudgame.server.state.ServerGameState;
 import mudgame.server.state.ServerState;
 
-@SuppressWarnings("unchecked")
-public class Scenario<T extends Scenario<T>> {
+public class ScenarioBuilder {
 
     private TurnManager turnManager;
     private EntityBoard entityBoard;
@@ -31,9 +28,10 @@ public class Scenario<T extends Scenario<T>> {
     private RuleProvider ruleProvider;
     private GameOverConditionProvider gameOverConditionProvider;
 
-    public ScenarioGame act(PlayerID playerID, Action... actions) {
+
+    public Scenario build() {
         ServerState state = serverState();
-        return new ScenarioGame(state).act(playerID, actions);
+        return new Scenario(state);
     }
 
     private ServerState serverState() {
@@ -54,7 +52,7 @@ public class Scenario<T extends Scenario<T>> {
         );
     }
 
-    public Scenario(int playerCount) {
+    public ScenarioBuilder(int playerCount) {
         turnManager = new TurnManager(playerCount);
         entityBoard = new EntityBoard();
         fow = new FogOfWar(turnManager.players());
@@ -65,38 +63,36 @@ public class Scenario<T extends Scenario<T>> {
     }
 
 
-    public T with(Terrain terrain) {
+    public ScenarioBuilder with(Terrain terrain) {
         this.terrain = terrain;
-        return (T) this;
+        return this;
     }
 
-    public T with(ClaimedArea claimedArea) {
+    public ScenarioBuilder with(ClaimedArea claimedArea) {
         this.claimedArea = claimedArea;
-        return (T) this;
+        return this;
     }
 
-    public T with(Entity entity, Position position) {
+    public ScenarioBuilder with(Entity entity, Position position) {
         entityBoard.placeEntity(entity, position);
         fow.placeEntity(entity, position);
         claimedArea.placeEntity(entity, position);
-        return (T) this;
+        return this;
     }
 
-    public T with(TerrainType terrainType, Position position) {
+    public ScenarioBuilder with(TerrainType terrainType, Position position) {
         terrain.setTerrainAt(position, terrainType);
-        return (T) this;
+        return this;
     }
 
-    public FogOfWarView fow() { return fow; }
-
-    public T withResources(PlayerID player, ResourceType mud, int amount) {
+    public ScenarioBuilder withResources(PlayerID player, ResourceType mud, int amount) {
         resourceManager.set(player, mud, amount);
-        return (T) this;
+        return this;
     }
 
-    public T with(GameOverConditionProvider gameOverConditionProvider) {
+    public ScenarioBuilder with(GameOverConditionProvider gameOverConditionProvider) {
         this.gameOverConditionProvider = gameOverConditionProvider;
-        return (T) this;
+        return this;
     }
 
 }

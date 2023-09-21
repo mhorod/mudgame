@@ -51,6 +51,11 @@ test {
 
 mainClassName = 'Program'
 
+task server(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'Server'
+}
+
 task mudServer(type: Jar) {
     archiveFileName = 'mudServer.jar'
     manifest { attributes('Main-Class': 'Server') }

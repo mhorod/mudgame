@@ -1,4 +1,4 @@
-package mudgame.integration.utils;
+package testutils.integration.utils;
 
 import core.model.PlayerID;
 import mudgame.client.ClientGameState;
@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 
 import static java.util.stream.Collectors.toMap;
 
-public class ScenarioGame {
+public class Scenario {
 
     private class EventSender implements EventOccurrenceObserver {
         @Override
@@ -33,7 +33,7 @@ public class ScenarioGame {
     private final Map<PlayerID, MudClientCore> clientCores;
     Map<PlayerID, List<Event>> receivedEvents;
 
-    public ScenarioGame(ServerState initialState) {
+    public Scenario(ServerState initialState) {
         EventSender sender = new EventSender();
         serverCore = new MudServerCore(initialState, sender);
         clientCores = initialState.turnManager()
@@ -52,7 +52,10 @@ public class ScenarioGame {
                 ));
     }
 
-    public ScenarioGame act(PlayerID player, Action... actions) {
+    public MudServerCore serverCore() { return serverCore; }
+    public MudClientCore clientCore(PlayerID playerID) { return clientCores.get(playerID); }
+
+    public Scenario act(PlayerID player, Action... actions) {
         for (Action a : actions)
             serverCore.process(a, player);
         return this;

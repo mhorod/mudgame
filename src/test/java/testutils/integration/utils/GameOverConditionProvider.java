@@ -1,4 +1,4 @@
-package mudgame.integration.utils;
+package testutils.integration.utils;
 
 import core.gameover.GameOverCondition;
 import mudgame.server.state.ServerGameState;

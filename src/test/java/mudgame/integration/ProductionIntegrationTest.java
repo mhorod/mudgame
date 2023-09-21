@@ -1,26 +1,29 @@
-package mudgame.integration.tests;
+package mudgame.integration;
 
+import testutils.integration.utils.Scenario;
 import mudgame.controls.events.NextTurn;
 import mudgame.controls.events.ProduceResources;
-import mudgame.integration.scenarios.SinglePlayerWithBase;
-import mudgame.integration.utils.Scenario;
-import mudgame.integration.utils.ScenarioResult;
+import testutils.integration.utils.ScenarioResult;
 import org.junit.jupiter.api.Test;
 
 import static core.resources.ResourceType.MUD;
-import static mudgame.integration.assertions.ClientScenarioResultAssert.assertThatClient;
-import static mudgame.integration.scenarios.Scenarios.single_player_with_base;
-import static mudgame.integration.scenarios.Scenarios.two_players;
+import static testutils.integration.assertions.ClientScenarioResultAssert.assertThatClient;
+import static testutils.integration.assertions.IntegrationAssertions.assertIntegrity;
+import static testutils.Actions.completeTurn;
 import static testutils.Entities.base;
 import static testutils.Players.PLAYER_0;
 import static testutils.Players.PLAYER_1;
 import static testutils.Positions.pos;
+import static testutils.integration.scenarios.Scenarios.single_player;
+import static testutils.integration.scenarios.Scenarios.two_players;
 
-class ProductionIntegrationTest extends IntegrationTestBase {
+class ProductionIntegrationTest {
     @Test
     void base_produces_resources_when_new_turn_starts() {
         // given
-        SinglePlayerWithBase scenario = single_player_with_base();
+        Scenario scenario = single_player()
+                .with(base(PLAYER_0), pos(0, 0))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -37,9 +40,10 @@ class ProductionIntegrationTest extends IntegrationTestBase {
     @Test
     void player_does_not_produce_resources_in_first_turn() {
         // given
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(base(PLAYER_0), pos(0, 0))
-                .with(base(PLAYER_1), pos(1, 1));
+                .with(base(PLAYER_1), pos(1, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario
@@ -58,9 +62,10 @@ class ProductionIntegrationTest extends IntegrationTestBase {
     @Test
     void player_produces_resources_in_second_turn() {
         // given
-        Scenario<?> scenario = two_players()
+        Scenario scenario = two_players()
                 .with(base(PLAYER_0), pos(0, 0))
-                .with(base(PLAYER_1), pos(1, 1));
+                .with(base(PLAYER_1), pos(1, 1))
+                .build();
 
         // when
         ScenarioResult result = scenario

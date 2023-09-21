@@ -8,10 +8,7 @@ import io.menu.buttons.ButtonMedium;
 import io.menu.components.Label;
 import io.menu.components.SignedImage;
 import io.menu.containers.HBox;
-import io.model.engine.Canvas;
-import io.model.engine.Color;
-import io.model.engine.TextManager;
-import io.model.engine.TextureBank;
+import io.model.engine.*;
 import io.model.input.Input;
 import io.model.input.events.Click;
 import io.model.input.events.EventHandler;
@@ -45,7 +42,7 @@ public class GameOverView extends SimpleView implements EventHandler {
     }
 
     @Override
-    public void update(Input input, TextureBank bank, TextManager mgr) {
+    public void update(Input input, TextureBank bank, TextManager mgr, StateManager stateManager) {
         var window = new Rectangle(0, 0, 1, input.window().height() / input.window().width());
         var scene = new Rectangle(
                 window.position.x() + 0.025f,

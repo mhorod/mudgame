@@ -1,7 +1,8 @@
-package mudgame.integration.assertions;
+package testutils.integration.assertions;
 
 import core.entities.model.Entity;
 import core.entities.model.EntityType;
+import testutils.integration.utils.ScenarioResult;
 import mudgame.controls.events.Event;
 import core.model.PlayerID;
 import core.model.Position;
@@ -9,7 +10,6 @@ import core.resources.ResourceType;
 import core.spawning.PlayerSpawnManager;
 import lombok.RequiredArgsConstructor;
 import mudgame.client.ClientGameState;
-import mudgame.integration.utils.ScenarioResult;
 
 import java.util.List;
 
