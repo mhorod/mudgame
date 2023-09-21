@@ -13,6 +13,7 @@ import io.game.world.WorldTexture;
 import io.game.world.entity.Condense;
 import io.game.world.entity.Dissipate;
 import io.game.world.entity.EntityAnimation;
+import io.model.engine.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ public class AnimatedTile implements Animation {
 
     private final Position position;
     private TerrainType terrain;
+    private Color color;
     private List<Entity> entities;
     private boolean covered;
 
@@ -31,11 +33,12 @@ public class AnimatedTile implements Animation {
 
     private final AnimationController<EntityAnimation> animations = new AnimationController<>();
 
-    public AnimatedTile(Position position, TerrainType type, List<Entity> entities, boolean covered) {
+    public AnimatedTile(Position position, TerrainType type, List<Entity> entities, Color color, boolean covered) {
         this.position = position;
         this.terrain = type;
         this.entities = entities;
         this.covered = covered;
+        this.color = color;
     }
 
     public List<WorldEntity> getEntities(Set<EntityID> animatedEntities, Set<Position> highlightedTiles, FogGenerator generator) {
@@ -52,8 +55,8 @@ public class AnimatedTile implements Animation {
         entities.addAll(animations.getAnimations().stream().map(EntityAnimation::getEntity).toList());
 
         switch (terrain) {
-            case LAND, MOUNTAIN -> entities.add(new Tile(position, WorldTexture.TILE_DARK));
-            case WATER -> entities.add(new Tile(position, WorldTexture.TILE_LIGHT));
+            case LAND, MOUNTAIN -> entities.add(new Tile(position, WorldTexture.TILE_DARK, color));
+            case WATER -> entities.add(new Tile(position, WorldTexture.TILE_LIGHT, color));
             case UNKNOWN -> entities.add(generator.getFog(position));
         }
         return entities;
@@ -69,6 +72,10 @@ public class AnimatedTile implements Animation {
 
     public void setEntities(List<Entity> entities) {
         this.entities = entities;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public void exist() {

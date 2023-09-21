@@ -1,5 +1,6 @@
 package io.game.world;
 
+import core.claiming.ClaimedAreaView;
 import core.entities.EntityBoardView;
 import core.model.EntityID;
 import core.model.Position;
@@ -18,6 +19,7 @@ import io.game.world.event_animations.*;
 import io.game.world.tile.AnimatedTile;
 import io.game.world.tile.AttackMarker;
 import io.game.world.tile.Fog;
+import io.model.engine.Color;
 import io.model.engine.TextureBank;
 import mudgame.controls.events.*;
 
@@ -28,15 +30,17 @@ public class Map implements Animation {
     ArrayList<EntityAnimation> otherAnimations = new ArrayList<>();
     private final TerrainView terrain;
     private final EntityBoardView entities;
+    private final ClaimedAreaView claims;
     private final ArrayList<Position> path = new ArrayList<>();
     private Set<Position> highlightedTiles = null;
     private Set<Position> attackMarkers = null;
     HashMap<Position, AnimatedTile> tmpTiles = new HashMap<>();
     private Animation mapAnimation;
 
-    public Map(TerrainView terrain, EntityBoardView entities) {
+    public Map(TerrainView terrain, EntityBoardView entities, ClaimedAreaView claims) {
         this.terrain = terrain;
         this.entities = entities;
+        this.claims = claims;
     }
 
     public void setPath(List<Position> positions) {
@@ -76,7 +80,8 @@ public class Map implements Animation {
     public AnimatedTile tileFromPosition(Position pos) {
         if (tmpTiles.containsKey(pos))
             return tmpTiles.get(pos);
-        var tile = new AnimatedTile(pos, terrain.terrainAt(pos), entities.entitiesAt(pos), false);
+        var color = claims.owner(pos).map(Color::fromPlayerId).orElse(Color.WHITE);
+        var tile = new AnimatedTile(pos, terrain.terrainAt(pos), entities.entitiesAt(pos), color, false);
         tmpTiles.put(pos, tile);
         return tile;
     }

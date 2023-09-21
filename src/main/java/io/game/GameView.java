@@ -5,8 +5,6 @@ import ai.RandomWalker;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
-import core.resources.PlayerResourcesView;
-import core.resources.Resources;
 import io.animation.Animation;
 import io.animation.AnimationController;
 import io.animation.Finishable;
@@ -88,13 +86,8 @@ public class GameView extends SimpleView {
             // --------------------------------------------------
         }
 
-        map = new Map(me.getCore().terrain(), me.getCore().entityBoard());
-        hud = new HUD(me.getCore().turnView(), new PlayerResourcesView() {
-            @Override
-            public boolean canAfford(Resources cost) {
-                return false;
-            }
-        });
+        map = new Map(me.getCore().terrain(), me.getCore().entityBoard(), me.getCore().claimedArea());
+        hud = new HUD(me.getCore().turnView(), cost -> false);
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
         worldController = new WorldController(
