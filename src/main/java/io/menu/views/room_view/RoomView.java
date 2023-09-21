@@ -44,6 +44,10 @@ public class RoomView extends SimpleView implements EventHandler {
 
     @Override
     public void update(Input input, TextureBank bank, TextManager mgr, StateManager stateManager) {
+        if (client.isOwner()) {
+            changeView(new OwnerRoomView(client, roomID));
+            return;
+        }
         var maybeRoom = Stream.concat(
                 client.getRoomList().stream().filter(info -> info.roomID().equals(roomID)),
                 client.currentRoom().stream()
