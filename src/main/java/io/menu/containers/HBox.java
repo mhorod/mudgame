@@ -26,7 +26,6 @@ public class HBox implements UIComponent {
     public float getAspectRatio(TextManager mgr) {
         float aspect = -gap;
         for (UIComponent component : components) aspect += 1 / component.getAspectRatio(mgr) + gap;
-        System.out.println(aspect);
         return 1 / aspect;
     }
 

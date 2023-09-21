@@ -53,7 +53,7 @@ public class GdxGameUI implements ApplicationListener, Canvas {
     @Override
     public void render() {
         RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
-        view.update(inputParser.getInput(), textureBank, this);
+        view.update(inputParser.getInput(), textureBank, this, new AWTStateManager());
         ScreenUtils.clear(Color.WHITE);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();

@@ -10,6 +10,7 @@ import io.game.world.Map;
 import io.game.world.MapObserver;
 import io.game.world.controller.WorldController;
 import io.model.engine.Canvas;
+import io.model.engine.StateManager;
 import io.model.engine.TextManager;
 import io.model.engine.TextureBank;
 import io.model.input.Input;
@@ -101,7 +102,7 @@ public class GameView extends SimpleView {
     }
 
     @Override
-    public void update(Input input, TextureBank bank, TextManager mgr) {
+    public void update(Input input, TextureBank bank, TextManager mgr, StateManager stateManager) {
         processEvents();
         worldController.update();
 
