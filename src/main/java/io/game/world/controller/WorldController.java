@@ -105,6 +105,11 @@ public class WorldController implements WorldBehavior {
     }
 
     @Override
+    public void onKillEntity(KillEntity e) {
+        state.onKillEntity(e);
+    }
+
+    @Override
     public void onEntityTypeSelected(EntityType type) {
         state.onEntityTypeSelected(type);
     }

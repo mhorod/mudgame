@@ -13,16 +13,15 @@ public class AttackEntityAnimation implements Animation {
     private final AttackEntityEvent event;
     private final Map map;
 
-    private final Position from, to;
+    private final Position from;
 
-    private Finishable attack;
+    private final Finishable attack;
     private Finishable retreat;
 
     public AttackEntityAnimation(Map map, AttackEntityEvent event, Position from, Position to) {
         this.event = event;
         this.map = map;
         this.from = from;
-        this.to = to;
         attack = map.entityFromID(event.attacker()).setAnimation(new JumpTo(to));
     }
 

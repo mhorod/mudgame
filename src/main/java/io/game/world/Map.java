@@ -157,6 +157,10 @@ public class Map implements Animation {
         return mapAnimation = new VisibilityChangeAnimation(this, event);
     }
 
+    public Finishable animate(KillEntity event) {
+        return mapAnimation = new KillEntityAnimation(this, event);
+    }
+
     public Finishable animate(SpawnEntity event) {
         return mapAnimation = new SpawnEntityAnimation(this, event);
     }

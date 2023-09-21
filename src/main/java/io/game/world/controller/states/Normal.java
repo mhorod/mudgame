@@ -59,6 +59,11 @@ public class Normal extends WorldState {
     }
 
     @Override
+    public void onKillEntity(KillEntity e) {
+
+    }
+
+    @Override
     public void onVisibilityChange(VisibilityChange event) {
     }
 

@@ -82,6 +82,11 @@ public class UnitSelected extends WorldState {
     }
 
     @Override
+    public void onKillEntity(KillEntity e) {
+
+    }
+
+    @Override
     public void onVisibilityChange(VisibilityChange event) {
     }
 

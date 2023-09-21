@@ -120,6 +120,9 @@ public class GameView extends SimpleView {
         } else if (event instanceof AttackEntityEvent e) {
             eventAnimation = map.animate(e);
             worldController.onAttackEntity(e);
+        } else if (event instanceof KillEntity e) {
+            eventAnimation = map.animate(e);
+            worldController.onKillEntity(e);
         } else if (event instanceof NextTurn e) {
             worldController.onNextTurn(e);
         }
