@@ -22,7 +22,7 @@ public class PlayerAttackManager {
 
         int range = attacker.getAttack().map(Attack::range).orElse(0);
         return entityBoard.allEntities().stream()
-                .filter(e -> e.owner() != playerID)
+                .filter(e -> !e.owner().equals(playerID))
                 .map(Entity::id)
                 .filter(this::isEnemy)
                 .filter(id -> isInRange(range, attackerID, id))
@@ -30,7 +30,7 @@ public class PlayerAttackManager {
     }
 
     private boolean isEnemy(EntityID attackedID) {
-        return entityBoard.entityOwner(attackedID) != playerID;
+        return !entityBoard.entityOwner(attackedID).equals(playerID);
     }
 
     private boolean isInRange(int range, EntityID attackerID, EntityID attackedID) {
