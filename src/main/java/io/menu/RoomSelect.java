@@ -34,6 +34,7 @@ public class RoomSelect extends SimpleView implements EventHandler {
 
     public RoomSelect(ServerClient client) {
         this.client = client;
+        this.scrollBox = new ScrollBox(new Label("loading"));
         scrollEaser = new Easer(0) {
             @Override
             public void onUpdate(float value) {
@@ -67,7 +68,7 @@ public class RoomSelect extends SimpleView implements EventHandler {
         }
 
         buttons = new ButtonBlock(0.01f, contents, handlers);
-        scrollBox = new ScrollBox(buttons);
+        scrollBox.setContents(buttons);
 
         var window = new Rectangle(input.window().height() / input.window().width());
         window.position = new ScreenPosition(0, 0);
@@ -80,8 +81,8 @@ public class RoomSelect extends SimpleView implements EventHandler {
                 window.height - 0.05f
         );
 
-        scrollEaser.update(input.deltaTime());
         scrollBox.fitInto(scene, mgr);
+        scrollEaser.update(input.deltaTime());
         buttons.update(input.mouse().position(), input.mouse().leftPressed());
         logo.fitInto(new Rectangle(scene.position.x() + scene.width() / 2, scene.position.y(),
                 scene.width() / 2, scene.height));
