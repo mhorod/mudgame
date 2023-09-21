@@ -3,6 +3,7 @@ package mudgame.client.events;
 import mudgame.client.ClientGameState;
 import mudgame.controls.events.AttackEntityEvent;
 import mudgame.controls.events.ChargeResources;
+import mudgame.controls.events.ClaimChanges;
 import mudgame.controls.events.Event;
 import mudgame.controls.events.GameOver;
 import mudgame.controls.events.KillEntity;
@@ -18,12 +19,14 @@ public final class EventProcessor {
     private final EntityEventProcessor entityEventProcessor;
     private final ResourceEventProcessor resourceEventProcessor;
     private final CompleteTurnProcessor completeTurnProcessor;
+    private final ClaimEventProcessor claimEventProcessor;
 
     public EventProcessor(ClientGameState state) {
         this.state = state;
         entityEventProcessor = new EntityEventProcessor(state);
         resourceEventProcessor = new ResourceEventProcessor(state);
         completeTurnProcessor = new CompleteTurnProcessor(state);
+        claimEventProcessor = new ClaimEventProcessor(state);
     }
 
     public void process(Event event) {
@@ -47,6 +50,8 @@ public final class EventProcessor {
             resourceEventProcessor.produceResources(e);
         else if (event instanceof ChargeResources e)
             resourceEventProcessor.chargeResources(e);
+        else if (event instanceof ClaimChanges e)
+            claimEventProcessor.claimChange(e);
     }
 
 

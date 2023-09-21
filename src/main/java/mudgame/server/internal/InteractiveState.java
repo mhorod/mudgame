@@ -2,10 +2,12 @@ package mudgame.server.internal;
 
 import core.entities.model.Entity;
 import core.entities.model.EntityType;
+import core.fogofwar.PlayerFogOfWarView;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import core.resources.Resources;
+import core.terrain.TerrainView;
 import lombok.extern.slf4j.Slf4j;
 import mudgame.server.state.ServerState;
 

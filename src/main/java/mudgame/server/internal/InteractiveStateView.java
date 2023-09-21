@@ -2,11 +2,13 @@ package mudgame.server.internal;
 
 import core.claiming.ClaimChange;
 import core.entities.model.Entity;
+import core.fogofwar.PlayerFogOfWarView;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.EntityPathfinder;
 import core.pathfinder.Pathfinder;
+import core.terrain.TerrainView;
 import core.terrain.model.TerrainType;
 import lombok.RequiredArgsConstructor;
 import mudgame.server.state.ServerState;
@@ -101,5 +103,13 @@ public class InteractiveStateView {
 
     public List<Entity> playerEntities(PlayerID player) {
         return state.entityBoard().playerEntities(player);
+    }
+
+    public PlayerFogOfWarView playerFow(PlayerID player) {
+        return state.fogOfWar().playerFogOfWar(player);
+    }
+
+    public TerrainView terrain() {
+        return state.terrain();
     }
 }
