@@ -19,7 +19,7 @@ public class Dissipate extends EntityAnimation {
     }
 
     @Override
-    public boolean finished() {
+    public boolean _finished() {
         return totalTime >= TIME;
     }
 

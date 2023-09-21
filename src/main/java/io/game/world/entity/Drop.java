@@ -23,7 +23,7 @@ public class Drop extends EntityAnimation {
     }
 
     @Override
-    public boolean finished() {
+    public boolean _finished() {
         return totalTime > fallTime + BOUNCE_TIME;
     }
 

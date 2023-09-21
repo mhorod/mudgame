@@ -24,6 +24,8 @@ public class AnimatedEntity implements Animation {
     }
 
     public Finishable setAnimation(EntityAnimation animation) {
+        if (this.animation != null)
+            this.animation.end();
         this.animation = animation;
         this.animation.init(entity);
         return animation;
@@ -85,7 +87,7 @@ public class AnimatedEntity implements Animation {
     public void update(float deltaTime) {
         if (animation == null) return;
         animation.update(deltaTime);
-        if (animation.finished()) {
+        if (animation._finished()) {
             animation = null;
             falling = false;
         }

@@ -12,7 +12,7 @@ public class Raise extends EntityAnimation {
     }
 
     @Override
-    public boolean finished() {
+    public boolean _finished() {
         return easer.finished();
     }
 

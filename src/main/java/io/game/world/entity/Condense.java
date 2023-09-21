@@ -19,7 +19,7 @@ public class Condense extends EntityAnimation {
     }
 
     @Override
-    public boolean finished() {
+    public boolean _finished() {
         return totalTime >= TIME;
     }
 

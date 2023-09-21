@@ -29,7 +29,7 @@ public class Step extends EntityAnimation {
     }
 
     @Override
-    public boolean finished() {
+    public boolean _finished() {
         return totalTime >= duration;
     }
 

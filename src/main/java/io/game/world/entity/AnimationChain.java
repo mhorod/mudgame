@@ -13,7 +13,7 @@ public class AnimationChain extends EntityAnimation {
 
     @Override
     public void update(float deltaTime) {
-        while (!animations.isEmpty() && animations.peek().finished()) {
+        while (!animations.isEmpty() && animations.peek()._finished()) {
             animations.poll();
             if (!animations.isEmpty())
                 animations.peek().init(getEntity());
@@ -23,7 +23,7 @@ public class AnimationChain extends EntityAnimation {
     }
 
     @Override
-    public boolean finished() {
+    public boolean _finished() {
         return animations.isEmpty();
     }
 
