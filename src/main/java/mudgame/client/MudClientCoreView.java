@@ -5,6 +5,7 @@ import core.entities.EntityBoardView;
 import core.fogofwar.PlayerFogOfWarView;
 import core.model.PlayerID;
 import core.pathfinder.Pathfinder;
+import core.resources.PlayerResourcesView;
 import core.spawning.PlayerSpawnManager;
 import core.terrain.TerrainView;
 import core.turns.PlayerTurnView;
@@ -19,4 +20,5 @@ public interface MudClientCoreView {
     PlayerFogOfWarView fogOfWar();
     PlayerTurnView turnView();
     PlayerAttackManager playerAttackManager();
+    PlayerResourcesView playerResources();
 }

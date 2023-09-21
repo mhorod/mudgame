@@ -30,6 +30,7 @@ public class PlayerResourceManager implements PlayerResourcesView, Serializable 
         resources.set(type, amount);
     }
 
+    @Override
     public int amount(ResourceType resourceType) {
         return resources.amount(resourceType);
     }
