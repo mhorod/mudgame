@@ -60,8 +60,6 @@ public class Map implements Animation {
             attackMarkers = null;
         else
             attackMarkers = new HashSet<>(positions);
-
-        System.out.println(attackMarkers);
     }
 
     public AnimatedEntity entityFromID(EntityID id) {
