@@ -1,5 +1,6 @@
 package ai;
 
+import com.badlogic.gdx.Game;
 import core.entities.model.Entity;
 import core.model.PlayerID;
 import core.model.Position;
@@ -12,11 +13,15 @@ import java.util.List;
 import java.util.Random;
 
 @Slf4j
-@RequiredArgsConstructor
 public class RandomWalker implements Bot {
     private final Random random = new Random();
     private final GameClient client;
     private PlayerID currentPlayer;
+
+    public RandomWalker(GameClient client) {
+        this.client = client;
+        currentPlayer = client.getCore().turnView().currentPlayer();
+    }
 
     public void update() {
         while (client.hasEvent()) {

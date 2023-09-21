@@ -6,14 +6,23 @@
         </encoder>
     </appender>
 
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>latest.log</file>
+        <append>false</append>
+        
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%.+4thread] %-5level %logger{36} -%kvp- %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
     </root>
 
     <!--    <logger name="io" level="OFF"/>-->
     <!--    <logger name="core" level="OFF"/>-->
     <!--    <logger name="middleware" level="OFF"/>-->
 
-    <logger name="middleware.communication.SocketReceiver" level="INFO"/>
-    <logger name="middleware.communication.SocketSender" level="INFO"/>
+    <logger name="middleware.communication" level="INFO"/>
 </configuration>

@@ -132,12 +132,13 @@ public final class User {
         this.userID = userID;
         this.server = server;
 
+        sendError("You got: " + userID);
         sendRoomList();
     }
 
     public MessageToClientHandler getClientHandler() {
         return new MessageToClientFactory(message -> {
-            log.debug("[TO: {}]: {}", userID, message);
+            log.info("[TO: {}]: {}", userID, message);
             networkDevice.send(message);
         });
     }
@@ -166,7 +167,7 @@ public final class User {
 
     public void processMessage(MessageToServer message) {
         synchronized (server) {
-            log.debug("[FROM: {}]: {}", userID, message);
+            log.info("[FROM: {}]: {}", userID, message);
             if (networkDevice.isClosed()) {
                 kick();
                 return;

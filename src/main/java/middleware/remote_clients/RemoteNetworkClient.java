@@ -20,7 +20,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.InstantSource;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,12 +34,10 @@ public final class RemoteNetworkClient implements NetworkClient {
     public static NetworkClient GLOBAL_CLIENT = new RemoteNetworkClient(InstantSource.system());
 
     private final InstantSource clock;
-    private final Queue<MessageToClient> messageQueue = new LinkedBlockingQueue<>();
     private final Queue<Optional<NetworkDeviceBuilder>> builderQueue = new LinkedBlockingQueue<>();
 
     private NetworkStatus networkStatus = NetworkStatus.DISCONNECTED;
-    private Optional<NetworkDevice> networkDevice = Optional.empty();
-    private Optional<RemoteServerClient> currentServerClient = Optional.empty();
+    private Optional<Connection> currentConnection = Optional.empty();
 
     private final MessageToClientHandler messageToClientHandler = new MessageToClientHandler() {
         @Override
@@ -59,24 +56,28 @@ public final class RemoteNetworkClient implements NetworkClient {
             // noop
         }
 
+        private RemoteServerClient getServerClient() {
+            return currentConnection.orElseThrow().serverClient();
+        }
+
         @Override
         public void registerEvent(Event event) {
-            currentServerClient.orElseThrow().registerEvent(event);
+            getServerClient().registerEvent(event);
         }
 
         @Override
         public void setCurrentRoom(RoomInfo roomInfo) {
-            currentServerClient.orElseThrow().setCurrentRoom(roomInfo);
+            getServerClient().setCurrentRoom(roomInfo);
         }
 
         @Override
         public void setGameState(ClientGameState state) {
-            currentServerClient.orElseThrow().setGameState(state);
+            getServerClient().setGameState(state);
         }
 
         @Override
         public void setRoomList(List<RoomInfo> roomList) {
-            currentServerClient.orElseThrow().setRoomList(roomList);
+            getServerClient().setRoomList(roomList);
         }
 
         @Override
@@ -86,16 +87,19 @@ public final class RemoteNetworkClient implements NetworkClient {
 
         @Override
         public void changeName(String name) {
-            currentServerClient.orElseThrow().changeName(name);
+            getServerClient().changeName(name);
         }
 
         @Override
         public void setDownloadedState(ServerState state) {
-            currentServerClient.orElseThrow().setDownloadedState(state);
+            getServerClient().setDownloadedState(state);
         }
     };
     private Instant lastIncoming = Instant.EPOCH;
     private Instant lastPing = Instant.EPOCH;
+
+    private record Connection(NetworkDevice networkDevice, RemoteServerClient serverClient,
+                              Queue<MessageToClient> messageQueue) { }
 
     public RemoteNetworkClient(InstantSource clock) {
         this.clock = clock;
@@ -103,7 +107,7 @@ public final class RemoteNetworkClient implements NetworkClient {
 
     private void verifyNetworkStatus() {
         if (networkStatus == NetworkStatus.OK) {
-            if (networkDevice.orElseThrow().isClosed()) {
+            if (currentConnection.orElseThrow().networkDevice().isClosed()) {
                 clearStateAndSetStatus(NetworkStatus.FAILED);
                 return;
             }
@@ -118,56 +122,60 @@ public final class RemoteNetworkClient implements NetworkClient {
     }
 
     private void clearStateAndSetStatus(NetworkStatus status) {
-        if (networkDevice.isPresent()) {
-            networkDevice.orElseThrow().close();
-            networkDevice = Optional.empty();
-            currentServerClient = Optional.empty();
+        if (currentConnection.isPresent()) {
+            currentConnection.orElseThrow().networkDevice().close();
+            currentConnection = Optional.empty();
         }
         networkStatus = status;
     }
 
     public void disconnect() {
-        if (networkDevice.isPresent()) {
+        if (currentConnection.isPresent())
             getServerHandler().disconnect();
-            networkDevice.orElseThrow().close();
-        }
         clearStateAndSetStatus(NetworkStatus.DISCONNECTED);
         log.info("disconnect() called");
     }
 
     @Override
     public void connect(NetworkDeviceBuilder builder) {
+        Queue<MessageToClient> messageQueue = new LinkedBlockingQueue<>();
         Optional<NetworkDevice> device = builder.build(messageQueue::add, MessageToClient.class);
 
         if (device.isEmpty())
             clearStateAndSetStatus(NetworkStatus.FAILED);
         else {
             clearStateAndSetStatus(NetworkStatus.OK);
-            networkDevice = device;
-            currentServerClient = Optional.of(new RemoteServerClient(this));
+            currentConnection = Optional.of(new Connection(
+                    device.orElseThrow(),
+                    new RemoteServerClient(this),
+                    messageQueue)
+            );
             lastIncoming = lastPing = clock.instant();
         }
+        log.info("connect(NetworkDeviceBuilder) called, status is {}", networkStatus);
     }
 
     @Override
     public void connect(NetworkConnectionBuilder builder) {
         clearStateAndSetStatus(NetworkStatus.ATTEMPTING);
         new Thread(() -> builderQueue.add(builder.connect(CONNECTION_TIMEOUT))).start();
+        log.info("connect(NetworkConnectionBuilder) called, status is {}", networkStatus);
     }
 
     @Override
     public NetworkStatus getNetworkStatus() {
-        verifyNetworkStatus();
         return networkStatus;
     }
 
     @Override
     public Optional<ServerClient> getServerClient() {
-        return currentServerClient.map(ServerClient.class::cast);
+        return currentConnection.map(Connection::serverClient).map(ServerClient.class::cast);
     }
 
     @Override
     public void processAllMessages() {
+        log.debug("processAllMessages() called, current status is {}", networkStatus);
+
         while (!builderQueue.isEmpty()) {
             Optional<? extends NetworkDeviceBuilder> builder = builderQueue.remove();
             if (builder.isPresent())
@@ -176,6 +184,10 @@ public final class RemoteNetworkClient implements NetworkClient {
                 clearStateAndSetStatus(NetworkStatus.FAILED);
         }
 
+        if (networkStatus != NetworkStatus.OK)
+            return;
+
+        Queue<MessageToClient> messageQueue = currentConnection.orElseThrow().messageQueue();
         while (!messageQueue.isEmpty()) {
             MessageToClient message = messageQueue.remove();
             log.info("[REC] {}", message);
@@ -193,7 +205,7 @@ public final class RemoteNetworkClient implements NetworkClient {
                 return;
             }
             log.info("[SND]: {}", message);
-            networkDevice.orElseThrow().send(message);
+            currentConnection.orElseThrow().networkDevice().send(message);
         });
     }
 }

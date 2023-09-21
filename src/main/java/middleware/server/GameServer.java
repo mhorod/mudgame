@@ -46,7 +46,7 @@ public final class GameServer {
         return userMap.values().stream().toList();
     }
 
-    public User createUser(NetworkDeviceBuilder builder) {
+    public synchronized User createUser(NetworkDeviceBuilder builder) {
         User user = new User(builder, new UserID(nextUserID++), this);
         userMap.put(user.getUserID(), user);
         return user;

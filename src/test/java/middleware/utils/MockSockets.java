@@ -9,10 +9,12 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -84,14 +86,25 @@ public final class MockSockets {
     public Socket[] connectedSockets() {
         AtomicBoolean closed = new AtomicBoolean();
 
-        StreamPair[] streams = new StreamPair[]{createStreams(closed), createStreams(closed)};
+        StreamPair[] streams = new StreamPair[2];
         Socket[] sockets = new Socket[2];
+
+        Runnable close = () -> {
+            if (closed.getAndSet(true))
+                return;
+
+            for (int i = 0; i < 2; ++i)
+                streams[i].queue.add(-1);
+        };
+
+        for (int i = 0; i < 2; ++i)
+            streams[i] = createStreams(closed::get, close);
 
         for (int i = 0; i < 2; ++i) {
             sockets[i] = mock(Socket.class);
 
             doAnswer(invocation -> {
-                closed.set(true);
+                close.run();
                 return null;
             }).when(sockets[i]).close();
 
@@ -108,27 +121,27 @@ public final class MockSockets {
         return sockets;
     }
 
-    private StreamPair createStreams(AtomicBoolean closed) {
+    private StreamPair createStreams(Supplier<Boolean> isClosed, Runnable close) {
         BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
 
         OutputStream output = new OutputStream() {
             @Override
             public void write(int b) throws IOException {
-                if (closed.get())
+                if (isClosed.get())
                     throw new IOException();
                 queue.add(b);
             }
 
             @Override
             public void close() {
-                closed.set(true);
+                close.run();
             }
         };
 
         InputStream input = new InputStream() {
             @Override
             public int read() throws IOException {
-                if (closed.get())
+                if (isClosed.get())
                     throw new IOException();
                 int data;
                 try {
@@ -136,21 +149,21 @@ public final class MockSockets {
                 } catch (InterruptedException e) {
                     throw new IOException(e);
                 }
-                if (closed.get())
+                if (isClosed.get())
                     throw new IOException();
                 return data;
             }
 
             @Override
             public void close() {
-                closed.set(true);
+                close.run();
             }
         };
 
-        return new StreamPair(output, input);
+        return new StreamPair(output, input, queue);
     }
 
-    private record StreamPair(OutputStream output, InputStream input) { }
+    private record StreamPair(OutputStream output, InputStream input, Queue<Integer> queue) { }
 
     public record ServerSocketWithController(ServerSocket socket, Consumer<Socket> controller) { }
 }

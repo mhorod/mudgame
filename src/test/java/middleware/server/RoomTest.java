@@ -32,8 +32,16 @@ class RoomTest {
         TestUser user2 = new TestUser(server);
 
         // then
-        SetRoomListMessage message1 = (SetRoomListMessage) user1.sent.get(0);
-        SetRoomListMessage message2 = (SetRoomListMessage) user2.sent.get(0);
+        SetRoomListMessage message1 = user1.sent.stream()
+                .filter(SetRoomListMessage.class::isInstance)
+                .map(SetRoomListMessage.class::cast)
+                .findFirst()
+                .orElseThrow();
+        SetRoomListMessage message2 = user2.sent.stream()
+                .filter(SetRoomListMessage.class::isInstance)
+                .map(SetRoomListMessage.class::cast)
+                .findFirst()
+                .orElseThrow();
 
         assertThat(message1.roomList()).isEmpty();
         assertThat(message2.roomList()).isEqualTo(server.getRoomInfoList());
@@ -663,6 +671,9 @@ class RoomTest {
         user1.receive().createRoom(new PlayerID(0), 2);
         TestUser user2 = new TestUser(server, "user2");
         user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
+
+        user1.sent.clear();
+        user2.sent.clear();
 
         // when
         user1.receive().downloadState();

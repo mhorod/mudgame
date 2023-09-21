@@ -49,10 +49,8 @@ public final class RemoteServer {
     }
 
     private void receiveConnection(Socket socket) {
-        synchronized (server) {
-            User user = server.createUser(new SocketDeviceBuilder(socket));
-            log.info("New connection from {} got {}", socket.getInetAddress(), user.getUserID());
-        }
+        User user = server.createUser(new SocketDeviceBuilder(socket));
+        log.info("New connection from {} got {}", socket.getInetAddress(), user.getUserID());
     }
 
     private void workReceiveConnections() {

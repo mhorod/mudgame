@@ -19,7 +19,7 @@ public class UserTest {
     private static final ServerStateSupplier serverStateSupplier = new ClassicServerStateSupplier();
 
     @Test
-    void user_receives_id_and_room_list() {
+    void user_receives_room_list() {
         // given
         GameServer server = TestGameServer.create();
 
@@ -27,8 +27,7 @@ public class UserTest {
         TestUser user = new TestUser(server);
 
         // then
-        assertThat(user.sent).hasSize(1);
-        assertThat(user.sent.get(0)).isInstanceOf(SetRoomListMessage.class);
+        assertThat(user.sent).anyMatch(SetRoomListMessage.class::isInstance);
     }
 
     @Test
