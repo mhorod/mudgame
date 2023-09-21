@@ -7,6 +7,14 @@
         </encoder>
     </appender>
 
+    <appender name="FILE_LATEST" class="ch.qos.logback.core.FileAppender">
+        <file>latest.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>${defaultPattern}</pattern>
+        </encoder>
+    </appender>
+
     <appender name="FILE_ACTIONS" class="ch.qos.logback.core.FileAppender">
         <file>actions.log</file>
         <append>false</append>
@@ -17,14 +25,6 @@
 
     <appender name="FILE_EVENTS" class="ch.qos.logback.core.FileAppender">
         <file>events.log</file>
-        <append>false</append>
-        <encoder>
-            <pattern>${defaultPattern}</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="FILE_LATEST" class="ch.qos.logback.core.FileAppender">
-        <file>latest.log</file>
         <append>false</append>
         <encoder>
             <pattern>${defaultPattern}</pattern>

@@ -15,6 +15,7 @@ public final class ActionProcessor {
     private final EntityActionProcessor entityActionProcessor;
     private final CompleteTurnProcessor completeTurnProcessor;
     private final GameOverProcessor gameOverProcessor;
+    private final ActionRecorder actionRecorder = new ActionRecorder();
 
     public ActionProcessor(
             ServerState serverState,
@@ -29,6 +30,7 @@ public final class ActionProcessor {
     }
 
     public void process(Action action, PlayerID actor) {
+        actionRecorder.record(action, actor);
         if (!ruleChecker.satisfiesRules(action, actor))
             return;
 
