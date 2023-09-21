@@ -3,7 +3,6 @@ package ai;
 import core.entities.model.Entity;
 import core.model.PlayerID;
 import core.model.Position;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
 import mudgame.controls.events.NextTurn;
@@ -12,11 +11,15 @@ import java.util.List;
 import java.util.Random;
 
 @Slf4j
-@RequiredArgsConstructor
 public class RandomWalker implements Bot {
     private final Random random = new Random();
     private final GameClient client;
     private PlayerID currentPlayer;
+
+    public RandomWalker(GameClient client) {
+        this.client = client;
+        currentPlayer = client.getCore().turnView().currentPlayer();
+    }
 
     public void update() {
         while (client.hasEvent()) {
@@ -40,7 +43,7 @@ public class RandomWalker implements Bot {
             for (Entity e : entities())
                 client.getControls().moveEntity(e.id(), randomPosition(positions));
         }
-        
+
         client.getControls().completeTurn();
         currentPlayer = null;
     }

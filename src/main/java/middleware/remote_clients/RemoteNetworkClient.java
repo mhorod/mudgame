@@ -1,10 +1,12 @@
-package middleware.remote;
+package middleware.remote_clients;
 
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.NetworkClient;
-import middleware.clients.NetworkDevice;
-import middleware.clients.NetworkStatus;
 import middleware.clients.ServerClient;
+import middleware.communication.NetworkConnectionBuilder;
+import middleware.communication.NetworkDevice;
+import middleware.communication.NetworkDeviceBuilder;
+import middleware.communication.NetworkStatus;
 import middleware.messages_to_client.MessageToClient;
 import middleware.messages_to_client.MessageToClientHandler;
 import middleware.messages_to_server.MessageToServerFactory;
@@ -18,13 +20,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.InstantSource;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import static middleware.clients.NetworkDevice.NetworkConnectionBuilder;
-import static middleware.clients.NetworkDevice.NetworkDeviceBuilder;
 
 @Slf4j
 public final class RemoteNetworkClient implements NetworkClient {
@@ -36,12 +34,11 @@ public final class RemoteNetworkClient implements NetworkClient {
     public static NetworkClient GLOBAL_CLIENT = new RemoteNetworkClient(InstantSource.system());
 
     private final InstantSource clock;
-    private final Queue<MessageToClient> messageQueue = new LinkedBlockingQueue<>();
     private final Queue<Optional<NetworkDeviceBuilder>> builderQueue = new LinkedBlockingQueue<>();
 
     private NetworkStatus networkStatus = NetworkStatus.DISCONNECTED;
-    private NetworkDevice networkDevice;
-    private RemoteServerClient currentServerClient;
+    private Optional<Connection> currentConnection = Optional.empty();
+
     private final MessageToClientHandler messageToClientHandler = new MessageToClientHandler() {
         @Override
         public void error(String errorText) {
@@ -59,24 +56,28 @@ public final class RemoteNetworkClient implements NetworkClient {
             // noop
         }
 
+        private RemoteServerClient getServerClient() {
+            return currentConnection.orElseThrow().serverClient();
+        }
+
         @Override
         public void registerEvent(Event event) {
-            Objects.requireNonNull(currentServerClient).registerEvent(event);
+            getServerClient().registerEvent(event);
         }
 
         @Override
         public void setCurrentRoom(RoomInfo roomInfo) {
-            Objects.requireNonNull(currentServerClient).setCurrentRoom(roomInfo);
+            getServerClient().setCurrentRoom(roomInfo);
         }
 
         @Override
         public void setGameState(ClientGameState state) {
-            Objects.requireNonNull(currentServerClient).setGameState(state);
+            getServerClient().setGameState(state);
         }
 
         @Override
         public void setRoomList(List<RoomInfo> roomList) {
-            Objects.requireNonNull(currentServerClient).setRoomList(roomList);
+            getServerClient().setRoomList(roomList);
         }
 
         @Override
@@ -86,16 +87,19 @@ public final class RemoteNetworkClient implements NetworkClient {
 
         @Override
         public void changeName(String name) {
-            Objects.requireNonNull(currentServerClient).changeName(name);
+            getServerClient().changeName(name);
         }
 
         @Override
         public void setDownloadedState(ServerState state) {
-            Objects.requireNonNull(currentServerClient).setDownloadedState(state);
+            getServerClient().setDownloadedState(state);
         }
     };
     private Instant lastIncoming = Instant.EPOCH;
     private Instant lastPing = Instant.EPOCH;
+
+    private record Connection(NetworkDevice networkDevice, RemoteServerClient serverClient,
+                              Queue<MessageToClient> messageQueue) { }
 
     public RemoteNetworkClient(InstantSource clock) {
         this.clock = clock;
@@ -103,7 +107,7 @@ public final class RemoteNetworkClient implements NetworkClient {
 
     private void verifyNetworkStatus() {
         if (networkStatus == NetworkStatus.OK) {
-            if (networkDevice.isClosed()) {
+            if (currentConnection.orElseThrow().networkDevice().isClosed()) {
                 clearStateAndSetStatus(NetworkStatus.FAILED);
                 return;
             }
@@ -118,64 +122,72 @@ public final class RemoteNetworkClient implements NetworkClient {
     }
 
     private void clearStateAndSetStatus(NetworkStatus status) {
-        if (networkDevice != null) {
-            networkDevice.close();
-            networkDevice = null;
-            currentServerClient = null;
+        if (currentConnection.isPresent()) {
+            currentConnection.orElseThrow().networkDevice().close();
+            currentConnection = Optional.empty();
         }
         networkStatus = status;
     }
 
     public void disconnect() {
-        if (networkDevice != null) {
+        if (currentConnection.isPresent())
             getServerHandler().disconnect();
-            networkDevice.close();
-        }
         clearStateAndSetStatus(NetworkStatus.DISCONNECTED);
         log.info("disconnect() called");
     }
 
     @Override
     public void connect(NetworkDeviceBuilder builder) {
+        Queue<MessageToClient> messageQueue = new LinkedBlockingQueue<>();
         Optional<NetworkDevice> device = builder.build(messageQueue::add, MessageToClient.class);
 
         if (device.isEmpty())
             clearStateAndSetStatus(NetworkStatus.FAILED);
         else {
             clearStateAndSetStatus(NetworkStatus.OK);
-            networkDevice = device.get();
-            currentServerClient = new RemoteServerClient(this);
+            currentConnection = Optional.of(new Connection(
+                    device.orElseThrow(),
+                    new RemoteServerClient(this),
+                    messageQueue)
+            );
             lastIncoming = lastPing = clock.instant();
         }
+        log.info("connect(NetworkDeviceBuilder) called, status is {}", networkStatus);
     }
 
     @Override
     public void connect(NetworkConnectionBuilder builder) {
         clearStateAndSetStatus(NetworkStatus.ATTEMPTING);
         new Thread(() -> builderQueue.add(builder.connect(CONNECTION_TIMEOUT))).start();
+        log.info("connect(NetworkConnectionBuilder) called, status is {}", networkStatus);
     }
 
     @Override
     public NetworkStatus getNetworkStatus() {
-        verifyNetworkStatus();
         return networkStatus;
     }
 
     @Override
     public Optional<ServerClient> getServerClient() {
-        return Optional.ofNullable(currentServerClient);
+        return currentConnection.map(Connection::serverClient).map(ServerClient.class::cast);
     }
 
     @Override
     public void processAllMessages() {
+        log.debug("processAllMessages() called, current status is {}", networkStatus);
+
         while (!builderQueue.isEmpty()) {
             Optional<? extends NetworkDeviceBuilder> builder = builderQueue.remove();
             if (builder.isPresent())
-                connect(builder.get());
+                connect(builder.orElseThrow());
             else
                 clearStateAndSetStatus(NetworkStatus.FAILED);
         }
 
+        if (networkStatus != NetworkStatus.OK)
+            return;
+
+        Queue<MessageToClient> messageQueue = currentConnection.orElseThrow().messageQueue();
         while (!messageQueue.isEmpty()) {
             MessageToClient message = messageQueue.remove();
             log.info("[REC] {}", message);
@@ -193,7 +205,7 @@ public final class RemoteNetworkClient implements NetworkClient {
                 return;
             }
             log.info("[SND]: {}", message);
-            networkDevice.send(message);
+            currentConnection.orElseThrow().networkDevice().send(message);
         });
     }
 }

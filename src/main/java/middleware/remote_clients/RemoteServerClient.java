@@ -1,4 +1,4 @@
-package middleware.remote;
+package middleware.remote_clients;
 
 import core.model.PlayerID;
 import lombok.extern.slf4j.Slf4j;

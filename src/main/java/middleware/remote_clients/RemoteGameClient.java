@@ -1,4 +1,4 @@
-package middleware.remote;
+package middleware.remote_clients;
 
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.AbstractGameClient;

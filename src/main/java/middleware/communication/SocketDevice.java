@@ -1,17 +1,13 @@
 package middleware.communication;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import middleware.clients.NetworkDevice;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -60,7 +56,7 @@ public final class SocketDevice implements NetworkDevice {
                 Optional<Object> messageOrNull = queue.take();
                 if (messageOrNull.isEmpty())
                     break;
-                Object message = messageOrNull.get();
+                Object message = messageOrNull.orElseThrow();
                 log.debug(message.toString());
                 stream.writeObject(message);
             }
@@ -101,35 +97,4 @@ public final class SocketDevice implements NetworkDevice {
                 .anyMatch(NotSerializableException.class::isInstance);
     }
 
-    @AllArgsConstructor
-    public static final class SocketDeviceBuilder implements NetworkDeviceBuilder {
-        private final Socket socket;
-
-        @Override
-        public Optional<NetworkDevice> build(Consumer<Object> observer) {
-            if (socket.isClosed())
-                return Optional.empty();
-            else
-                return Optional.of(new SocketDevice(socket, observer));
-        }
-    }
-
-    @Slf4j
-    @AllArgsConstructor
-    public static final class SocketConnectionBuilder implements NetworkConnectionBuilder {
-        private final String address;
-        private final int port;
-
-        @Override
-        public Optional<NetworkDeviceBuilder> connect(Duration timeout) {
-            try {
-                Socket socket = new Socket();
-                socket.connect(new InetSocketAddress(address, port), (int) timeout.toMillis());
-                return Optional.of(new SocketDeviceBuilder(socket));
-            } catch (IOException exception) {
-                log.debug(exception.toString());
-                return Optional.empty();
-            }
-        }
-    }
 }

@@ -16,11 +16,11 @@ import java.util.Map;
 public final class LocalServer {
     private final MudServerCore core;
     private final List<GameClient> clients = new ArrayList<>();
-    private final Map<PlayerID, LocalClient> clientMap = new HashMap<>();
+    private final Map<PlayerID, LocalGameClient> clientMap = new HashMap<>();
 
     public LocalServer(ServerState state) {
         for (PlayerID playerID : state.turnManager().players()) {
-            LocalClient client = new LocalClient(state.toClientGameState(playerID), this);
+            LocalGameClient client = new LocalGameClient(state.toClientGameState(playerID), this);
             clients.add(client);
             clientMap.put(playerID, client);
         }
