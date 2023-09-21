@@ -1,5 +1,6 @@
 package middleware.messages_to_client;
 
+import core.model.PlayerID;
 import middleware.model.RoomInfo;
 import mudgame.client.ClientGameState;
 import mudgame.controls.events.Event;
@@ -39,10 +40,11 @@ public interface MessageToClient extends Serializable {
         }
     }
 
-    record SetCurrentRoomMessage(RoomInfo roomInfo) implements MessageToClient {
+    record SetCurrentRoomMessage(RoomInfo roomInfo, boolean isOwner, PlayerID myPlayerID)
+            implements MessageToClient {
         @Override
         public void execute(MessageToClientHandler handler) {
-            handler.setCurrentRoom(roomInfo);
+            handler.setCurrentRoom(roomInfo, isOwner, myPlayerID);
         }
     }
 

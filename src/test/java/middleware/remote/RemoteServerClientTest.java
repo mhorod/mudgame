@@ -61,11 +61,13 @@ class RemoteServerClientTest {
         ServerClient serverClient = testClient.serverClient;
 
         // when
-        testClient.receive().setCurrentRoom(ROOM_INFO);
+        testClient.receive().setCurrentRoom(ROOM_INFO, true, new PlayerID(1));
         networkClient.processAllMessages();
 
         // then
         assertThat(serverClient.currentRoom().orElseThrow()).isEqualTo(ROOM_INFO);
+        assertThat(serverClient.myPlayerID().orElseThrow()).isEqualTo(new PlayerID(1));
+        assertThat(serverClient.isOwner()).isTrue();
     }
 
     @Test

@@ -17,6 +17,10 @@ public interface ServerClient {
 
     Optional<RoomInfo> currentRoom();
 
+    Optional<PlayerID> myPlayerID();
+
+    boolean isOwner();
+
     void leaveCurrentRoom();
 
     void refreshRoomList();

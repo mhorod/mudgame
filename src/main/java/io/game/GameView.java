@@ -43,7 +43,7 @@ public class GameView extends SimpleView {
     public GameView(GameClient client) {
         me = client;
         map = new Map(me.getCore().terrain(), me.getCore().entityBoard(), me.getCore().claimedArea());
-        hud = new HUD(me.getCore().turnView(), cost -> false);
+        hud = new HUD(me.getCore().turnView(), me.getCore().playerResources());
         animations.addAnimation(cameraController);
         animations.addAnimation(map);
         worldController = new WorldController(

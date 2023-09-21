@@ -3,6 +3,7 @@ package middleware.local;
 import core.model.PlayerID;
 import middleware.clients.GameClient;
 import mudgame.server.state.ClassicServerStateSupplier;
+import mudgame.server.state.ServerState;
 import mudgame.server.state.ServerStateSupplier;
 import org.junit.jupiter.api.Test;
 
@@ -78,5 +79,19 @@ class LocalTest {
         assertThat(client1.peekEvent().isPresent()).isFalse();
         assertThat(client1.hasEvent()).isFalse();
         assertThat(client1.getCore().turnView().isMyTurn()).isTrue();
+    }
+
+    @Test
+    void state_is_deeply_copied() {
+        // given
+        LocalServer server = new LocalServer(serverStateSupplier.get(2));
+        ServerState state = server.state();
+
+        // when
+        server.getClient(0).getControls().completeTurn();
+
+        // then
+        assertThat(state.turnManager().currentPlayer()).isEqualTo(new PlayerID(0));
+        assertThat(server.state().turnManager().currentPlayer()).isEqualTo(new PlayerID(1));
     }
 }

@@ -248,7 +248,16 @@ public final class User {
     }
 
     public void sendCurrentRoom() {
-        getClientHandler().setCurrentRoom(currentRoom.map(Room::getRoomInfo).orElse(null));
+        if (currentRoom.isEmpty()) {
+            getClientHandler().setCurrentRoom(null, false, null);
+            return;
+        }
+        Room room = currentRoom.orElseThrow();
+        getClientHandler().setCurrentRoom(
+                room.getRoomInfo(),
+                equals(room.getOwner().orElseThrow()),
+                currentPlayerID.orElseThrow()
+        );
     }
 
     public void sendRoomList() {

@@ -67,7 +67,7 @@ public class Resources implements Serializable {
     }
 
     public int amount(ResourceType resourceType) {
-        return amount.get(resourceType);
+        return amount.getOrDefault(resourceType, 0);
     }
 
     public boolean isEmpty() {

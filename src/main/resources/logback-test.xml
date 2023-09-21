@@ -40,6 +40,7 @@
     <!--    <logger name="core" level="OFF"/>-->
     <logger name="middleware" level="INFO"/>
 
+    <logger name="middleware.remote_clients.RemoteNetworkClient" level="INFO"/>
     <logger name="middleware.communication" level="INFO"/>
 
     <logger name="mudgame.server.actions.ActionProcessor">

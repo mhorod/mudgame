@@ -49,6 +49,7 @@ public final class Room {
 
     public void sendUpdatedInfo() {
         connectedUsers.forEach(User::sendCurrentRoom);
+        server.sendUpdatedInfo();
     }
 
     public void sendGameState(User user) {
@@ -96,12 +97,16 @@ public final class Room {
         if (user.equals(owner.orElse(null)))
             owner = connectedUsers.stream().findFirst();
 
-        sendUpdatedInfo();
         checkRemoval();
+        sendUpdatedInfo();
     }
 
     public RoomID getRoomID() {
         return roomID;
+    }
+
+    public Optional<User> getOwner() {
+        return owner;
     }
 
     public RoomInfo getRoomInfo() {
@@ -119,6 +124,8 @@ public final class Room {
         if (sendErrorIfStarted(actor))
             return;
         if (sendErrorIfNotOwner(actor))
+            return;
+        if (sendErrorIfNotFull(actor))
             return;
 
         isRunning = true;
@@ -138,6 +145,14 @@ public final class Room {
     private boolean sendErrorIfNotStarted(User user) {
         if (!isRunning) {
             user.sendError("Game is not started yet");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean sendErrorIfNotFull(User user) {
+        if (connectedUsers.size() != validPlayerIDs.size()) {
+            user.sendError("Room is not full");
             return true;
         }
         return false;
