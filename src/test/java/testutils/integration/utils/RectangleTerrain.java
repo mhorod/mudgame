@@ -1,4 +1,4 @@
-package mudgame.integration.utils;
+package testutils.integration.utils;
 
 import core.model.Position;
 import core.terrain.model.Terrain;

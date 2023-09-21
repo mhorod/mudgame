@@ -1,7 +1,9 @@
 package testutils;
 
 import core.model.PlayerID;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class Players {
     public static PlayerID PLAYER_0 = player(0);
     public static PlayerID PLAYER_1 = player(1);

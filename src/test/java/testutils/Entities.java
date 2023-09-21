@@ -4,7 +4,9 @@ import core.entities.model.Entity;
 import core.entities.model.EntityData;
 import core.model.EntityID;
 import core.model.PlayerID;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class Entities {
     static int nextID = 0;
 
