@@ -17,6 +17,8 @@ public class PlayerAttackManager {
 
     public List<EntityID> attackableEntities(EntityID attackerID) {
         Entity attacker = entityBoard.findEntityByID(attackerID);
+        if (!attacker.owner().equals(playerID))
+            return List.of();
         if (attacker.getAttack().isEmpty())
             return List.of();
 
