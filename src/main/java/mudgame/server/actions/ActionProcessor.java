@@ -15,7 +15,7 @@ public final class ActionProcessor {
     private final EntityActionProcessor entityActionProcessor;
     private final CompleteTurnProcessor completeTurnProcessor;
     private final GameOverProcessor gameOverProcessor;
-    private final ActionRecorder actionRecorder = new ActionRecorder();
+    private final ActionRecorder actionRecorder;
 
     public ActionProcessor(
             ServerState serverState,
@@ -27,6 +27,7 @@ public final class ActionProcessor {
         this.entityActionProcessor = new EntityActionProcessor(state, sender);
         this.completeTurnProcessor = new CompleteTurnProcessor(state, sender);
         this.gameOverProcessor = new GameOverProcessor(state, sender);
+        this.actionRecorder = new ActionRecorder(serverState);
     }
 
     public void process(Action action, PlayerID actor) {

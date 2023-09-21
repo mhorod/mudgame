@@ -37,11 +37,15 @@ public final class LocalServer {
         return SerializationUtils.clone(core.state());
     }
 
+    public MudServerCore core() {
+        return core;
+    }
+
     public List<GameClient> getClients() {
         return Collections.unmodifiableList(clients);
     }
 
-    void processAction(Action action, PlayerID actor) {
+    public void processAction(Action action, PlayerID actor) {
         core.process(action, actor);
     }
 
