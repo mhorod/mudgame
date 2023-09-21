@@ -1,6 +1,7 @@
 package mudgame.server.actions.entities;
 
 import core.entities.model.Entity;
+import core.entities.model.components.Attack;
 import core.entities.model.components.visitors.GetAttack;
 import core.entities.model.components.visitors.GetHealth;
 import core.model.PlayerID;
@@ -47,7 +48,7 @@ class AttackProcessor {
     void attack(Entity attacker, Entity attacked) {
         if (!canAttack(attacker, attacked))
             return;
-        int damage = getAttack.getAttack(attacker).damage();
+        int damage = attacker.getAttack().map(Attack::damage).orElse(0);
         int healthLeft = attacked.damage(damage).orElse(0);
         sendAttack(attacker, attacked, damage);
         if (healthLeft <= 0) {
@@ -75,10 +76,9 @@ class AttackProcessor {
         if (!state.containsEntity(attacker.id()) ||
             !state.containsEntity(attacked.id()))
             return false;
-        else if (getAttack.getAttack(attacker) == null || attacked.getHealth().isEmpty())
+        else if (attacker.getAttack().isEmpty())
             return false;
-        else if (getAttack.getAttack(attacker) == null ||
-                 attacked.getHealth().get().getCurrentHealth() <= 0)
+        else if (attacked.getHealth().isEmpty())
             return false;
         else
             return true;

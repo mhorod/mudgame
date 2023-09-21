@@ -37,11 +37,15 @@ public class RandomWalker implements Bot {
 
         log.info("Random walker {} updating...", client.myPlayerID());
         List<Position> positions = client.getCore().fogOfWar().visiblePositions();
-        if (entities().size() < 5)
-            client.getControls().createEntity(randomPosition(positions));
 
-        for (Entity e : entities())
-            client.getControls().moveEntity(e.id(), randomPosition(positions));
+        if (!positions.isEmpty()) {
+            if (entities().size() < 5)
+                client.getControls().createEntity(randomPosition(positions));
+
+            for (Entity e : entities())
+                client.getControls().moveEntity(e.id(), randomPosition(positions));
+        }
+        
         client.getControls().completeTurn();
         currentPlayer = null;
     }

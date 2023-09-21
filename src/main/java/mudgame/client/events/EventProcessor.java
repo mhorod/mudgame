@@ -17,11 +17,13 @@ public final class EventProcessor {
     private final ClientGameState state;
     private final EntityEventProcessor entityEventProcessor;
     private final ResourceEventProcessor resourceEventProcessor;
+    private final CompleteTurnProcessor completeTurnProcessor;
 
     public EventProcessor(ClientGameState state) {
         this.state = state;
         entityEventProcessor = new EntityEventProcessor(state);
         resourceEventProcessor = new ResourceEventProcessor(state);
+        completeTurnProcessor = new CompleteTurnProcessor(state);
     }
 
     public void process(Event event) {
@@ -34,7 +36,7 @@ public final class EventProcessor {
         else if (event instanceof MoveEntityAlongPath e)
             entityEventProcessor.moveEntityAlongPath(e);
         else if (event instanceof NextTurn e)
-            nextTurn(e);
+            completeTurnProcessor.nextTurn(e);
         else if (event instanceof GameOver e)
             gameOver(e);
         else if (event instanceof AttackEntityEvent e)
@@ -47,9 +49,6 @@ public final class EventProcessor {
             resourceEventProcessor.chargeResources(e);
     }
 
-    private void nextTurn(NextTurn e) {
-        state.turnManager().nextTurn(e.currentPlayer());
-    }
 
     private void gameOver(GameOver e) {
         state.gameOverCondition().gameOver(e.winners());

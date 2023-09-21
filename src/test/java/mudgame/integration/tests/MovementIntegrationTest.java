@@ -2,6 +2,7 @@ package mudgame.integration.tests;
 
 import core.entities.model.Entity;
 import mudgame.controls.events.MoveEntityAlongPath;
+import mudgame.controls.events.NextTurn;
 import mudgame.controls.events.PlaceEntity;
 import mudgame.controls.events.RemoveEntity;
 import mudgame.integration.scenarios.SinglePlayerWithBase;
@@ -111,19 +112,23 @@ class MovementIntegrationTest extends IntegrationTestBase {
         Entity marshWiggle = marshWiggle(PLAYER_0);
         Scenario<?> scenario = single_player()
                 .with(RectangleTerrain.land(6, 6))
-                .with(base(PLAYER_0), pos(0, 0))
+                .with(pawn(PLAYER_0), pos(0, 0))
                 .with(marshWiggle, pos(0, 1));
 
         // when
         ScenarioResult result = scenario
                 .act(PLAYER_0, move(marshWiggle, pos(3, 3)))
+                .act(PLAYER_0, completeTurn())
                 .act(PLAYER_0, move(marshWiggle, pos(5, 5)))
                 .finish();
 
         // then
         assertIntegrity(result);
         assertThatClient(result, PLAYER_0)
-                .receivedEventTypes(MoveEntityAlongPath.class, MoveEntityAlongPath.class)
+                .receivedEventTypes(
+                        MoveEntityAlongPath.class,
+                        NextTurn.class,
+                        MoveEntityAlongPath.class)
                 .owns(pos(4, 4))
                 .doesNotOwn(pos(3, 3));
     }
@@ -188,5 +193,70 @@ class MovementIntegrationTest extends IntegrationTestBase {
         assertThatClient(result, PLAYER_1)
                 .receivedEventTypes(PlaceEntity.class, MoveEntityAlongPath.class)
                 .seesClaim(PLAYER_0, pos(3, 3));
+    }
+
+    @Test
+    void pawn_has_limited_movement_in_single_turn() {
+        // given
+        Entity pawn = pawn(PLAYER_0);
+        Scenario<?> scenario = single_player()
+                .with(RectangleTerrain.land(10, 10))
+                .with(pawn, pos(0, 0));
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0,
+                     move(pawn, pos(0, 2)),
+                     move(pawn, pos(0, 4)),
+                     move(pawn, pos(0, 6)),
+                     move(pawn, pos(0, 8))
+                )
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(
+                        MoveEntityAlongPath.class,
+                        MoveEntityAlongPath.class,
+                        MoveEntityAlongPath.class
+                );
+    }
+
+    @Test
+    void pawn_movement_is_reset_in_new_turn() {
+        // given
+        Entity pawn = pawn(PLAYER_0);
+        Scenario<?> scenario = single_player()
+                .with(RectangleTerrain.land(10, 10))
+                .with(pawn, pos(0, 0));
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0,
+                     move(pawn, pos(0, 2)),
+                     move(pawn, pos(0, 4)),
+                     move(pawn, pos(0, 6)),
+                     move(pawn, pos(0, 8)),
+                     completeTurn(),
+                     move(pawn, pos(2, 6)),
+                     move(pawn, pos(4, 6)),
+                     move(pawn, pos(6, 6)),
+                     move(pawn, pos(8, 6))
+                )
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(
+                        MoveEntityAlongPath.class,
+                        MoveEntityAlongPath.class,
+                        MoveEntityAlongPath.class,
+                        NextTurn.class,
+                        MoveEntityAlongPath.class,
+                        MoveEntityAlongPath.class,
+                        MoveEntityAlongPath.class
+                );
     }
 }

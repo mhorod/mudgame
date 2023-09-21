@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.PriorityQueue;
 
@@ -74,12 +73,7 @@ public class EntityPathfinder implements Pathfinder, Serializable {
     }
 
     Optional<Integer> getTurnMovement(EntityID entityID) {
-        return entityBoard.findEntityByID(entityID)
-                .components()
-                .stream()
-                .map(movementVisitor::visit)
-                .filter(Objects::nonNull)
-                .findFirst();
+        return entityBoard.findEntityByID(entityID).getMovement().map(Movement::getCurrentMovement);
     }
 
 
