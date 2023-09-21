@@ -6,6 +6,7 @@ import core.fogofwar.PlayerFogOfWarView;
 import core.model.PlayerID;
 import core.pathfinder.Pathfinder;
 import core.pathfinder.PlayerPathfinder;
+import core.resources.PlayerResourcesView;
 import core.spawning.PlayerSpawnManager;
 import core.terrain.TerrainView;
 import core.turns.PlayerTurnView;
@@ -35,7 +36,7 @@ public class MudClientCore implements MudClientCoreView {
                 state.entityBoard(),
                 state.fogOfWar(),
                 state.claimedArea(),
-                state().resourceManager(),
+                state.resourceManager(),
                 state.terrain()
         );
         playerAttackManager = new PlayerAttackManager(
@@ -97,4 +98,8 @@ public class MudClientCore implements MudClientCoreView {
         return playerAttackManager;
     }
 
+    @Override
+    public PlayerResourcesView playerResources() {
+        return state.resourceManager();
+    }
 }
