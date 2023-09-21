@@ -38,7 +38,7 @@
 
     <!--    <logger name="io" level="OFF"/>-->
     <!--    <logger name="core" level="OFF"/>-->
-    <!--    <logger name="middleware" level="OFF"/>-->
+    <logger name="middleware" level="INFO"/>
 
     <logger name="middleware.remote_clients.RemoteNetworkClient" level="INFO"/>
     <logger name="middleware.communication" level="INFO"/>

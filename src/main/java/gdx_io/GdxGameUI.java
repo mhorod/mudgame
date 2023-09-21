@@ -14,6 +14,7 @@ import io.model.ScreenPosition;
 import io.model.View;
 import io.model.engine.Canvas;
 import io.model.textures.TextureDrawData;
+import middleware.remote_clients.RemoteNetworkClient;
 
 public class GdxGameUI implements ApplicationListener, Canvas {
     private final View view;
@@ -30,7 +31,8 @@ public class GdxGameUI implements ApplicationListener, Canvas {
 
     @Override
     public void create() {
-        font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
+        font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"),
+                false);
         glyphLayout = new GlyphLayout();
         camera = new OrthographicCamera();
         batch = new SpriteBatch();
@@ -50,7 +52,8 @@ public class GdxGameUI implements ApplicationListener, Canvas {
 
     @Override
     public void render() {
-        view.update(inputParser.getInput(), textureBank);
+        RemoteNetworkClient.GLOBAL_CLIENT.processAllMessages();
+        view.update(inputParser.getInput(), textureBank, this);
         ScreenUtils.clear(Color.WHITE);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -114,18 +117,21 @@ public class GdxGameUI implements ApplicationListener, Canvas {
 
     @Override
     public void drawText(String text, ScreenPosition position, float height) {
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight()));
         var fontHeight = height * Gdx.graphics.getWidth();
         font.getData().setScale(fontHeight * 0.0208f);
         font.setColor(Color.BLACK);
-        font.draw(batch, text, position.x() * Gdx.graphics.getWidth(), position.y() * Gdx.graphics.getWidth() + fontHeight);
+        font.draw(batch, text, position.x() * Gdx.graphics.getWidth(),
+                position.y() * Gdx.graphics.getWidth() + fontHeight);
         batch.setProjectionMatrix(camera.combined);
     }
 
     @Override
     public float getTextAspectRatio(String text) {
+        font.getData().setScale(1);
         glyphLayout.setText(font, text);
-        return glyphLayout.width / glyphLayout.height;
+        return (glyphLayout.width) / glyphLayout.height;
     }
 
     @Override

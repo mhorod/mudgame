@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 public class Camera {
     private float tileWidth = 0.5f;
+    private float aspectRatio = 1f;
     public float offsetX, offsetY;
 
     public float getTileWidth() {
@@ -20,13 +21,13 @@ public class Camera {
         tileWidth = zoom;
     }
 
-    public void forAllVisibleTiles(float windowAspectRatio, Consumer<Position> f) {
-        int fromI = (int) Math.ceil((-offsetX + offsetY * Tile.ASPECT_RATIO - windowAspectRatio * Tile.ASPECT_RATIO) / tileWidth);
+    public void forAllVisibleTiles(Consumer<Position> f) {
+        int fromI = (int) Math.ceil((-offsetX + offsetY * Tile.ASPECT_RATIO - aspectRatio * Tile.ASPECT_RATIO) / tileWidth);
         int toI = (int) Math.ceil((-offsetX + offsetY * Tile.ASPECT_RATIO + 1) / tileWidth);
         for (int i = fromI - 1; i < toI + 1; i++) {
             int fromJ = (int) Math.ceil(Math.max(
                     (2 * offsetX - 2) / tileWidth + i,
-                    2 * Tile.ASPECT_RATIO * (offsetY - windowAspectRatio) / tileWidth - i
+                    2 * Tile.ASPECT_RATIO * (offsetY - aspectRatio) / tileWidth - i
             ));
             int toJ = (int) Math.ceil(Math.min(
                     2 * offsetX / tileWidth + i,
@@ -35,6 +36,10 @@ public class Camera {
             for (int j = fromJ - 1; j < toJ + 1; j++)
                 f.accept(new Position(i, j));
         }
+    }
+
+    public void setAspectRatio(float aspectRatio) {
+        this.aspectRatio = aspectRatio;
     }
 
     public ScreenPosition convert(WorldPosition pos) {

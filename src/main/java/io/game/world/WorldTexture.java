@@ -19,6 +19,7 @@ public enum WorldTexture {
     FOG_RIGHT(Texture.FOG_RIGHT, new Center(0.5f, 0.62f), 1.15f),
     FOG_TALL(Texture.FOG_TALL, new Center(0.5f, 0.62f), 1.15f),
     SHADOW(Texture.SHADOW, new Center(0.5f, 0.5f), 1.0f),
+    ATTACK_MARKER(Texture.ATTACK_MARKER, new Center(0.5f, 0.2f), 0.6f),
     ARROW_NONE(Texture.ARROW_NONE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SW_NE(Texture.ARROW_SW_NE, new Center(0.5f, 0.5f), 1.0f),
     ARROW_SE_NW(Texture.ARROW_SE_NW, new Center(0.5f, 0.5f), 1.0f),
@@ -37,6 +38,7 @@ public enum WorldTexture {
     BASE(Texture.BASE, new Center(0.5f, 0.23f), 0.8f),
     TOWER(Texture.TOWER, new Center(0.5f, 0.187f), 0.8f),
     WARRIOR(Texture.WARRIOR, new Center(0.5f, 0.23f), 0.5f),
+    MARSH_WIGGLE(Texture.MARSH_WIGGLE, new Center(0.5f, 0.15f), 0.6f),
     PAWN(Texture.PAWN, new Center(0.5f, 0.15f), 0.38f);
     private final Texture texture;
     private final Center center;
@@ -55,10 +57,14 @@ public enum WorldTexture {
                 new ScreenPosition(
                         centerPosition.x() - width * center.x() * camera.getTileWidth(),
                         centerPosition.y() -
-                        width * center.y() * camera.getTileWidth() * texture.aspectRatio()
+                                width * center.y() * camera.getTileWidth() * texture.aspectRatio()
                 ),
                 camera.getTileWidth() * width * texture.aspectRatio()
         );
+    }
+
+    public Texture getTexture() {
+        return texture;
     }
 
     public void draw(WorldPosition position, Canvas canvas, Camera camera) {
@@ -73,7 +79,8 @@ public enum WorldTexture {
 
     public static WorldTexture from(EntityType type) {
         return switch (type) {
-            case MARSH_WIGGLE, PAWN -> PAWN;
+            case PAWN -> PAWN;
+            case MARSH_WIGGLE -> MARSH_WIGGLE;
             case BASE -> BASE;
             case WARRIOR -> WARRIOR;
             case TOWER -> TOWER;

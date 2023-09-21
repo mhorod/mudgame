@@ -2,6 +2,7 @@ package io.views;
 
 import io.model.View;
 import io.model.engine.Canvas;
+import io.model.engine.TextManager;
 import io.model.engine.TextureBank;
 import io.model.input.Input;
 
@@ -11,6 +12,7 @@ public class CompositeView implements View {
     private SimpleView view;
     private Input input;
     private TextureBank bank;
+    private TextManager mgr;
 
     public CompositeView(SimpleView initialView) {
         initialView.parent = this;
@@ -20,7 +22,7 @@ public class CompositeView implements View {
     void changeView(SimpleView newView) {
         newView.parent = this;
         view = newView;
-        newView.update(new Input(List.of(), input.mouse(), input.window(), input.deltaTime()), bank);
+        newView.update(new Input(List.of(), input.mouse(), input.window(), input.deltaTime()), bank, mgr);
     }
 
     @Override
@@ -29,9 +31,10 @@ public class CompositeView implements View {
     }
 
     @Override
-    public void update(Input input, TextureBank bank) {
+    public void update(Input input, TextureBank bank, TextManager mgr) {
         this.input = input;
         this.bank = bank;
-        view.update(input, bank);
+        this.mgr = mgr;
+        view.update(input, bank, mgr);
     }
 }

@@ -1,34 +1,29 @@
 package io.menu;
 
+import io.menu.buttons.Button;
+import io.menu.buttons.ButtonMedium;
+import io.menu.containers.VBox;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
+import io.model.engine.TextManager;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
 public class ButtonBlock implements UIComponent {
-    private final float gap;
-    List<Button> buttons;
+    private final List<? extends Button> buttons;
+    private final List<Runnable> handlers;
 
-    public ButtonBlock(float gap, List<String> text, List<Runnable> handlers) {
-        this.gap = gap;
-        buttons = IntStream.rangeClosed(1, text.size())
-                .mapToObj(i -> new Button(text.get(text.size() - i), handlers.get(handlers.size() - i)))
+    private final UIComponent content;
+
+    public ButtonBlock(float gap, List<UIComponent> components, List<Runnable> handlers) {
+        buttons = IntStream.rangeClosed(1, components.size())
+                .mapToObj(i -> new ButtonMedium(components.get(components.size() - i)))
                 .toList();
-    }
-
-    public void fitInto(Rectangle rect) {
-        float noButtons = buttons.size() * (1 + gap) - gap;
-        float aspect = noButtons * Button.ASPECT_RATIO;
-        float myHeight = Math.min(rect.height, rect.width() * aspect);
-        var position = new ScreenPosition(
-                rect.position.x() + rect.width() / 2 - myHeight / aspect / 2,
-                rect.position.y() + rect.height / 2 - myHeight / 2
-        );
-        for (int i = 0; i < buttons.size(); i++) {
-            buttons.get(i).position = new ScreenPosition(position.x(), position.y() + i * (myHeight / noButtons) * (1 + gap));
-            buttons.get(i).height = myHeight / noButtons;
-        }
+        this.handlers = IntStream.rangeClosed(1, components.size())
+                .mapToObj(i -> handlers.get(handlers.size() - i))
+                .toList();
+        content = new VBox(gap, buttons);
     }
 
     public void update(ScreenPosition mouse, boolean pressed) {
@@ -36,7 +31,9 @@ public class ButtonBlock implements UIComponent {
     }
 
     public void click(ScreenPosition pos) {
-        buttons.forEach(button -> button.click(pos));
+        for (int i = 0; i < buttons.size(); i++)
+            if (buttons.get(i).contains(pos))
+                handlers.get(i).run();
     }
 
     @Override
@@ -46,8 +43,13 @@ public class ButtonBlock implements UIComponent {
 
 
     @Override
-    public float getAspectRatio() {
-        return (buttons.size() * (1 + gap) - gap) * Button.ASPECT_RATIO;
+    public float getAspectRatio(TextManager mgr) {
+        return content.getAspectRatio(mgr);
+    }
+
+    @Override
+    public void fitInto(Rectangle rect, TextManager mgr) {
+        content.fitInto(rect, mgr);
     }
 
 }

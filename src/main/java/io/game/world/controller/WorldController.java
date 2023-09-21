@@ -1,19 +1,21 @@
 package io.game.world.controller;
 
 import core.entities.EntityBoardView;
+import core.entities.model.EntityType;
 import core.model.EntityID;
+import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.Pathfinder;
 import core.spawning.PlayerSpawnManager;
 import core.terrain.TerrainView;
 import io.animation.Finishable;
 import io.animation.FutureExecutor;
+import io.game.ui.HUD;
 import io.game.world.Map;
 import io.game.world.controller.states.Normal;
-import mudgame.controls.events.MoveEntityAlongPath;
-import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.SpawnEntity;
-import mudgame.controls.events.VisibilityChange;
+import mudgame.client.PlayerAttackManager;
+import mudgame.controls.Controls;
+import mudgame.controls.events.*;
 
 import java.util.HashSet;
 
@@ -23,15 +25,18 @@ public class WorldController implements WorldBehavior {
 
     public WorldController(
             Map map,
+            HUD hud,
+            PlayerID myID,
             EntityBoardView entities,
             TerrainView terrain,
             Pathfinder pathfinder,
             PlayerSpawnManager spawnManager,
+            PlayerAttackManager attackManager,
             Controls controls
     ) {
         state = new Normal(
-                new CommonState(map, terrain, entities, pathfinder, spawnManager, controls,
-                                new HashSet<>()));
+                new CommonState(map, hud, myID, terrain, entities, pathfinder, spawnManager, attackManager, controls,
+                        new HashSet<>()));
         state.init(this);
     }
 
@@ -87,5 +92,30 @@ public class WorldController implements WorldBehavior {
     @Override
     public void onMoveEntityAlongPath(MoveEntityAlongPath e) {
         state.onMoveEntityAlongPath(e);
+    }
+
+    @Override
+    public void onNextTurn(NextTurn e) {
+        state.onNextTurn(e);
+    }
+
+    @Override
+    public void onAttackEntity(AttackEntityEvent e) {
+        state.onAttackEntity(e);
+    }
+
+    @Override
+    public void onKillEntity(KillEntity e) {
+        state.onKillEntity(e);
+    }
+
+    @Override
+    public void onEntityTypeSelected(EntityType type) {
+        state.onEntityTypeSelected(type);
+    }
+
+    @Override
+    public void onEndTurn() {
+        state.onEndTurn();
     }
 }

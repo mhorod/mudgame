@@ -2,12 +2,10 @@ package io.game.world.controller;
 
 import core.model.EntityID;
 import core.model.Position;
-import mudgame.controls.events.MoveEntityAlongPath;
-import mudgame.controls.events.RemoveEntity;
-import mudgame.controls.events.SpawnEntity;
-import mudgame.controls.events.VisibilityChange;
+import io.game.ui.HUDListener;
+import mudgame.controls.events.*;
 
-public interface WorldBehavior {
+public interface WorldBehavior extends HUDListener {
     void onTileClick(Position position);
 
     void onEntityClick(EntityID entity);
@@ -22,6 +20,11 @@ public interface WorldBehavior {
 
     void onRemoveEntity(RemoveEntity event);
 
-
     void onMoveEntityAlongPath(MoveEntityAlongPath e);
+
+    void onNextTurn(NextTurn e);
+
+    void onAttackEntity(AttackEntityEvent e);
+
+    void onKillEntity(KillEntity e);
 }
