@@ -96,4 +96,19 @@ public class ReplayTest {
             runScenarioFromBase64(scanner.next());
         }
     }
+
+    @Test
+    void scenario1() {
+        runScenario();
+    }
+
+    @Test
+    void scenario2() {
+        runScenario();
+    }
+
+    @Test
+    void scenario3() {
+        runScenario();
+    }
 }
