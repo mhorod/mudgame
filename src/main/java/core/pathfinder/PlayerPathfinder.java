@@ -7,6 +7,7 @@ import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
 import core.terrain.TerrainView;
+import core.turns.TurnView;
 
 import java.util.List;
 
@@ -14,24 +15,29 @@ public class PlayerPathfinder implements Pathfinder {
     private final PlayerID playerID;
     private final EntityBoardView entityBoard;
     private final Pathfinder pathfinder;
+    private final TurnView turnView;
 
     public PlayerPathfinder(
             PlayerID playerID,
             TerrainView terrain,
             EntityBoardView entityBoard,
-            PlayerFogOfWar fow
+            PlayerFogOfWar fow,
+            TurnView turnView
     ) {
         this.playerID = playerID;
         this.entityBoard = entityBoard;
+        this.turnView = turnView;
         this.pathfinder = new EntityPathfinder(terrain, entityBoard, FogOfWar.from(fow));
     }
 
     @Override
     public ReachablePositions reachablePositions(EntityID entityID) {
-        if (entityBoard.entityOwner(entityID).equals(playerID))
-            return pathfinder.reachablePositions(entityID);
-        else
+        if (!turnView.currentPlayer().equals(playerID))
             return ReachablePositions.empty();
+        else if (!entityBoard.entityOwner(entityID).equals(playerID))
+            return ReachablePositions.empty();
+        else
+            return pathfinder.reachablePositions(entityID);
     }
 
     @Override

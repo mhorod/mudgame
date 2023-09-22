@@ -16,6 +16,7 @@ import mudgame.server.actions.EventSender;
 import mudgame.server.internal.InteractiveState;
 import mudgame.server.internal.MovedEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -158,7 +159,7 @@ final class MoveProcessor {
         if (end <= begin)
             return List.of();
 
-        return result.subList(begin, end);
+        return new ArrayList<>(result.subList(begin, end));
     }
 
     private List<SingleMove> getMoves(EntityID entityID, Position destination) {

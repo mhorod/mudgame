@@ -886,4 +886,39 @@ class RoomTest {
         assertThat(user2.user.getRoom().orElseThrow().getRoomInfo().isRunning()).isTrue();
         assertThat(new SetRoomListMessage(server.getRoomInfoList())).isIn(user1.sent);
     }
+
+    @Test
+    void user_leaving_room_receives_set_current_room_if_room_is_deleted() {
+        // given
+        GameServer server = TestGameServer.create();
+
+        TestUser user1 = new TestUser(server, "user1");
+        user1.receive().createRoom(new PlayerID(0), 2);
+        user1.sent.clear();
+
+        // when
+        user1.receive().leaveRoom();
+
+        // when
+        assertThat(new SetCurrentRoomMessage(null, false, null)).isIn(user1.sent);
+    }
+
+    @Test
+    void user_leaving_room_receives_set_current_room() {
+        // given
+        GameServer server = TestGameServer.create();
+
+        TestUser user1 = new TestUser(server, "user1");
+        TestUser user2 = new TestUser(server, "user1");
+
+        user1.receive().createRoom(new PlayerID(0), 2);
+        user2.receive().joinRoom(new PlayerID(1), user1.user.getRoom().orElseThrow().getRoomID());
+        user1.sent.clear();
+
+        // when
+        user1.receive().leaveRoom();
+
+        // when
+        assertThat(new SetCurrentRoomMessage(null, false, null)).isIn(user1.sent);
+    }
 }
