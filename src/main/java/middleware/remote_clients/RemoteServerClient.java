@@ -100,6 +100,7 @@ public final class RemoteServerClient implements ServerClient {
 
     @Override
     public void leaveCurrentRoom() {
+        setCurrentRoom(null, false, null);
         getServerHandler().leaveRoom();
     }
 
