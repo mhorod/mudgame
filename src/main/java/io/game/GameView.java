@@ -12,7 +12,7 @@ import io.game.world.Map;
 import io.game.world.MapObserver;
 import io.game.world.controller.WorldController;
 import io.menu.views.GameOverView;
-import io.menu.views.MainMenu;
+import io.menu.views.RoomSelect;
 import io.model.engine.Canvas;
 import io.model.engine.StateManager;
 import io.model.engine.TextManager;
@@ -176,7 +176,8 @@ public class GameView extends SimpleView implements HUDMetaListener {
 
     @Override
     public void onQuit() {
-        changeView(new MainMenu());
+        client.leaveCurrentRoom();
+        changeView(new RoomSelect(client));
     }
 
     @Override
