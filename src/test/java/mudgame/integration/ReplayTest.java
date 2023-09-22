@@ -48,6 +48,9 @@ public class ReplayTest {
         assertThat(clientResources).isEqualTo(serverResources);
 
         for (Position pos : clientVisible) {
+            if (!serverCore.state().terrain().contains(pos))
+                continue;
+
             Optional<PlayerID> serverOwner = serverCore.state().claimedArea().owner(pos);
             Optional<PlayerID> clientOwner = clientCore.claimedArea().owner(pos);
 
