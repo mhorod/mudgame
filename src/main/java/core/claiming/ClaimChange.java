@@ -37,4 +37,8 @@ public record ClaimChange(List<ClaimedPosition> claimedPositions,
                         .toList()
         );
     }
+
+    public boolean isEmpty() {
+        return claimedPositions.isEmpty() && unclaimedPositions.isEmpty();
+    }
 }

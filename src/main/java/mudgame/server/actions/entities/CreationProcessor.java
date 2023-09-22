@@ -1,15 +1,19 @@
 package mudgame.server.actions.entities;
 
+import core.claiming.ClaimChange;
 import core.model.PlayerID;
 import core.model.Position;
 import core.resources.Resources;
 import mudgame.controls.actions.CreateEntity;
 import mudgame.controls.events.ChargeResources;
+import mudgame.controls.events.ClaimChanges;
 import mudgame.controls.events.SpawnEntity;
 import mudgame.controls.events.VisibilityChange;
 import mudgame.server.actions.EventSender;
 import mudgame.server.internal.CreatedEntity;
 import mudgame.server.internal.InteractiveState;
+
+import java.util.List;
 
 /**
  * Creates new entities and sends the events
@@ -26,10 +30,7 @@ final class CreationProcessor {
     void createEntity(CreateEntity a) {
         CreatedEntity createdEntity = state.createEntity(a.type(), a.owner(), a.position());
 
-        state.players()
-                .stream()
-                .filter(p -> state.playerSees(p, a.position()))
-                .forEach(p -> sendTo(p, a, createdEntity));
+        state.players().forEach(p -> sendTo(p, a, createdEntity));
     }
 
     private void sendTo(
@@ -38,8 +39,13 @@ final class CreationProcessor {
         if (player.equals(action.owner())) {
             sender.send(ownerEvent(createdEntity, action.position()), player);
             sender.send(chargeResources(createdEntity), player);
-        } else {
+        } else if (state.playerSees(player, action.position())) {
             sender.send(otherEvent(player, createdEntity, action.position()), player);
+        } else {
+            ClaimChange claimChange = createdEntity.claimChange()
+                    .masked(state.playerFow(player), state.terrain());
+            if (!claimChange.isEmpty())
+                sender.send(new ClaimChanges(List.of(claimChange)), player);
         }
     }
 

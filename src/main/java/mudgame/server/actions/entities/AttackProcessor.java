@@ -1,5 +1,6 @@
 package mudgame.server.actions.entities;
 
+import core.claiming.ClaimChange;
 import core.entities.model.Entity;
 import core.entities.model.components.Attack;
 import core.entities.model.components.visitors.GetAttack;
@@ -10,6 +11,7 @@ import core.resources.Resources;
 import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.events.AttackEntityEvent;
 import mudgame.controls.events.AttackPosition;
+import mudgame.controls.events.ClaimChanges;
 import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.Event;
 import mudgame.controls.events.KillEntity;
@@ -19,6 +21,7 @@ import mudgame.server.actions.EventSender;
 import mudgame.server.internal.InteractiveState;
 import mudgame.server.internal.RemovedEntity;
 
+import java.util.List;
 import java.util.Map;
 
 import static core.resources.ResourceType.MUD;
@@ -96,6 +99,12 @@ class AttackProcessor {
                 sender.send(ownerKillEvent(entity, removedEntity), player);
             else if (state.playerSees(player, position))
                 sender.send(otherKillEvent(player, entity, removedEntity), player);
+            else {
+                ClaimChange claimChange = removedEntity.claimChange()
+                        .masked(state.playerFow(player), state.terrain());
+                if (!claimChange.isEmpty())
+                    sender.send(new ClaimChanges(List.of(claimChange)), player);
+            }
         }
     }
 

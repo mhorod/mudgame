@@ -6,6 +6,7 @@ import core.model.PlayerID;
 import core.model.Position;
 import core.pathfinder.Pathfinder;
 import mudgame.controls.actions.MoveEntity;
+import mudgame.controls.events.ClaimChanges;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.MoveEntityAlongPath.SingleMove;
 import mudgame.controls.events.PlaceEntity;
@@ -48,11 +49,24 @@ final class MoveProcessor {
 
     private void sendMovesToOther(PlayerID player, EntityID entityID, List<SingleMove> moves) {
         List<SingleMove> masked = masked(player, moves);
-        if (!masked.isEmpty()) {
+        if (masked.isEmpty()) {
+            ClaimChanges claimChanges = claimChanges(player, moves);
+            if (!claimChanges.claimChanges().isEmpty())
+                sender.send(claimChanges, player);
+        } else {
             prepare(player, entityID, masked);
             sender.send(new MoveEntityAlongPath(entityID, masked), player);
             cleanup(player, entityID, masked);
         }
+    }
+
+    private ClaimChanges claimChanges(PlayerID player, List<SingleMove> moves) {
+        List<ClaimChange> changes = moves.stream()
+                .map(SingleMove::claimChange)
+                .map(c -> c.masked(state.playerFow(player), state.terrain()))
+                .filter(c -> !c.isEmpty())
+                .toList();
+        return new ClaimChanges(changes);
     }
 
     private void prepare(PlayerID player, EntityID entityID, List<SingleMove> masked) {
