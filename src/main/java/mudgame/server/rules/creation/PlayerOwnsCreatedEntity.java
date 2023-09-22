@@ -10,7 +10,7 @@ public final class PlayerOwnsCreatedEntity implements ActionRule {
     @Override
     public boolean isSatisfied(Action action, PlayerID actor) {
         if (action instanceof CreateEntity createEntity)
-            return createEntity.owner().equals(actor);
+            return actor.equals(createEntity.owner());
         else
             return true;
     }
