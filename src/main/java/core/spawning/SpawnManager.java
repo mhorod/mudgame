@@ -8,6 +8,7 @@ import core.model.PlayerID;
 import core.model.Position;
 import core.resources.ResourcesView;
 import core.terrain.TerrainView;
+import core.turns.TurnView;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -22,7 +23,8 @@ public class SpawnManager implements Serializable {
             FogOfWarView fow,
             ClaimedAreaView claimedArea,
             ResourcesView resources,
-            TerrainView terrain
+            TerrainView terrain,
+            TurnView turnView
     ) {
         playerSpawnManagers = fow.players().stream()
                 .collect(
@@ -34,7 +36,8 @@ public class SpawnManager implements Serializable {
                                         fow.playerFogOfWarView(p),
                                         claimedArea,
                                         resources.playerResources(p),
-                                        terrain
+                                        terrain,
+                                        turnView
                                 ))
                 );
     }

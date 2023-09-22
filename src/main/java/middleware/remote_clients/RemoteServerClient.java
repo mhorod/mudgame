@@ -62,7 +62,7 @@ public final class RemoteServerClient implements ServerClient {
     public void setCurrentRoom(RoomInfo roomInfo, boolean isOwner, PlayerID myPlayerID) {
         this.myPlayerID = Optional.ofNullable(myPlayerID);
         this.isOwner = isOwner;
-        currentRoom = Optional.ofNullable(roomInfo);
+        this.currentRoom = Optional.ofNullable(roomInfo);
     }
 
     public void registerEvent(Event event) {
@@ -100,6 +100,10 @@ public final class RemoteServerClient implements ServerClient {
 
     @Override
     public void leaveCurrentRoom() {
+        currentRoom = Optional.empty();
+        myPlayerID = Optional.empty();
+        isOwner = false;
+        currentGameClient = Optional.empty();
         getServerHandler().leaveRoom();
     }
 

@@ -38,7 +38,8 @@ public final class ClientScenarioResultAssert {
                         state.fogOfWar(),
                         state.claimedArea(),
                         state.resourceManager(),
-                        state.terrain()
+                        state.terrain(),
+                        state.turnManager()
                 )
         );
     }

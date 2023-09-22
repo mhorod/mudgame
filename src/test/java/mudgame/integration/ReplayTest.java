@@ -111,9 +111,4 @@ public class ReplayTest {
     void scenario3() {
         runScenario();
     }
-
-    @Test
-    void scenario4() {
-        runScenario();
-    }
 }

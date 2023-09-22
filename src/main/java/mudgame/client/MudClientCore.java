@@ -39,7 +39,8 @@ public class MudClientCore implements MudClientCoreView {
                 state.fogOfWar(),
                 state.claimedArea(),
                 state.resourceManager(),
-                state.terrain()
+                state.terrain(),
+                state.turnManager()
         );
         playerAttackManager = new PlayerAttackManager(
                 state.playerID(),
