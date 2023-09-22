@@ -127,10 +127,10 @@ public class CreateRoom extends SimpleView implements EventHandler {
         ), mgr);
 
         goBack.fitInto(new Rectangle(
-                window.position.x(),
-                window.position.y() + window.height - 0.1f * window.width(),
-                window.width() * 0.1f,
-                window.width() * 0.1f
+                scene.position.x(),
+                scene.position.y() + scene.height - 0.1f * scene.width(),
+                scene.width() * 0.1f,
+                scene.width() * 0.1f
         ), mgr);
 
         numberPicker.update(input.deltaTime());
@@ -149,6 +149,7 @@ public class CreateRoom extends SimpleView implements EventHandler {
         ), mgr);
         colorPicker.update(input.mouse().position(), input.mouse().leftPressed());
         loadButton.update(input.mouse().position(), input.mouse().leftPressed());
+        goBack.update(input.mouse().position(), input.mouse().leftPressed());
         numberPicker.fitInto(new Rectangle(
                 scene.position.x() + 0.1f * scene.width(),
                 scene.position.y() + scene.height * 0.4f,
