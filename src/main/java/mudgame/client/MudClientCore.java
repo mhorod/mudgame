@@ -30,7 +30,8 @@ public class MudClientCore implements MudClientCoreView {
                 state.playerID(),
                 state.terrain(),
                 state.entityBoard(),
-                state.fogOfWar()
+                state.fogOfWar(),
+                state.turnManager()
         );
         spawnManager = new PlayerSpawnManager(
                 state.playerID(),
@@ -42,7 +43,8 @@ public class MudClientCore implements MudClientCoreView {
         );
         playerAttackManager = new PlayerAttackManager(
                 state.playerID(),
-                state.entityBoard()
+                state.entityBoard(),
+                state.turnManager()
         );
     }
 

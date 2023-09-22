@@ -5,6 +5,7 @@ import core.model.EntityID;
 import org.assertj.core.api.AbstractAssert;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,7 +51,13 @@ public class EntityBoardAssert extends AbstractAssert<EntityBoardAssert, EntityB
         isNotNull();
         List<Entity> actualEntities = actual.allEntities();
         List<Entity> expectedEntities = expected.allEntities();
-        assertThat(actualEntities).isEqualTo(expectedEntities);
+
+        assertThat(actualEntities.size()).isEqualTo(expectedEntities.size());
+        assertThat(IntStream.range(0, actualEntities.size()))
+                .allSatisfy(
+                        i -> assertThatEntitiesMatch(actualEntities.get(i), expectedEntities.get(i))
+                );
+
         assertThat(actualEntities)
                 .allMatch(
                         e -> actual.entityPosition(e.id()).equals(expected.entityPosition(e.id())));
@@ -58,5 +65,13 @@ public class EntityBoardAssert extends AbstractAssert<EntityBoardAssert, EntityB
         assertThat(actual.occupiedPositions()).isEqualTo(expected.occupiedPositions());
         assertThat(actual).isEqualTo(expected);
         return this;
+    }
+
+    private void assertThatEntitiesMatch(Entity first, Entity second) {
+        assertThat(first.id()).isEqualTo(second.id());
+        assertThat(first.owner()).isEqualTo(second.owner());
+        assertThat(first.type()).isEqualTo(second.type());
+        assertThat(first.getHealth()).isEqualTo(second.getHealth());
+        assertThat(first.getProduction()).isEqualTo(second.getProduction());
     }
 }
