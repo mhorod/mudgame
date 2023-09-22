@@ -59,7 +59,7 @@ public class RoomSelect extends SimpleView implements EventHandler {
     public void update(Input input, TextureBank bank, TextManager mgr, StateManager stateManager) {
         var maybeGameClient = client.getGameClient();
         if (maybeGameClient.isPresent()) {
-            changeView(new GameView(maybeGameClient.get()));
+            changeView(new GameView(client));
             return;
         }
 

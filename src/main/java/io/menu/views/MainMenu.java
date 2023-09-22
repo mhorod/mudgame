@@ -1,5 +1,6 @@
 package io.menu.views;
 
+import io.game.LocalGameView;
 import io.menu.Rectangle;
 import io.menu.components.ButtonBlock;
 import io.menu.components.Label;
@@ -41,9 +42,7 @@ public class MainMenu extends SimpleView implements EventHandler {
                         new Label("EXIT")
                 ),
                 List.of(
-//                        () -> changeView(new RoomSelect()),
-                        () -> {
-                        },
+                        () -> changeView(new LocalGameView()),
                         () -> client.connect(new SocketConnectionBuilder("localhost", 6789)),
                         () -> client.connect(new SocketConnectionBuilder("13.69.185.38", 6789)),
                         () -> System.exit(0)
