@@ -63,7 +63,7 @@ public class MainMenu extends SimpleView implements EventHandler {
     @Override
     public void update(Input input, TextureBank bank, TextManager mgr, StateManager stateManager) {
         if (client.getNetworkStatus() == NetworkStatus.OK) {
-            changeView(new RoomSelect(client.getServerClient().orElseThrow()));
+            changeView(new NamePicker(client.getServerClient().orElseThrow()));
             return;
         }
 
