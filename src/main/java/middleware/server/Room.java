@@ -99,6 +99,7 @@ public final class Room {
 
         checkRemoval();
         sendUpdatedInfo();
+        user.sendCurrentRoom();
     }
 
     public RoomID getRoomID() {

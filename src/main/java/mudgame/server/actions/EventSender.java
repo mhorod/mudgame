@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import mudgame.controls.events.Event;
 import mudgame.server.EventOccurrence;
 import mudgame.server.EventOccurrenceObserver;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.List;
 
@@ -22,12 +23,12 @@ public final class EventSender {
 
     public void send(EventOccurrence eventOccurrence) {
         log.debug("Sending event occurrence {}", eventOccurrence);
-        eventOccurrenceObserver.receive(eventOccurrence);
+        eventOccurrenceObserver.receive(SerializationUtils.clone(eventOccurrence));
     }
 
     public void send(Event event, PlayerID player) {
         log.debug("Sending event {} to player {}", event, player);
-        eventOccurrenceObserver.receive(event, player);
+        eventOccurrenceObserver.receive(SerializationUtils.clone(event), player);
     }
 
     public void sendToEveryone(Event event) {
