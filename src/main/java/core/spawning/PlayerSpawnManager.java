@@ -10,6 +10,7 @@ import core.model.PlayerID;
 import core.model.Position;
 import core.resources.PlayerResourcesView;
 import core.terrain.TerrainView;
+import core.turns.TurnView;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
@@ -24,9 +25,12 @@ public class PlayerSpawnManager implements Serializable {
     private final ClaimedAreaView claimedArea;
     private final PlayerResourcesView resources;
     private final TerrainView terrain;
+    private final TurnView turnView;
 
     public List<Position> allowedSpawnPositions(EntityType type) {
-        if (!canAfford(type))
+        if (!turnView.currentPlayer().equals(player))
+            return List.of();
+        else if (!canAfford(type))
             return List.of();
         return fow.visiblePositions()
                 .stream()

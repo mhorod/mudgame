@@ -39,7 +39,8 @@ public record ServerGameState(
                 fogOfWar,
                 claimedArea,
                 resourceManager,
-                terrain
+                terrain,
+                turnManager
         );
     }
 
