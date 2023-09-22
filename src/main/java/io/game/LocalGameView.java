@@ -12,6 +12,7 @@ import io.game.ui.HUD;
 import io.game.ui.HUDMetaListener;
 import io.game.world.Map;
 import io.game.world.MapObserver;
+import io.game.world.MapView;
 import io.game.world.controller.WorldController;
 import io.menu.views.GameOverView;
 import io.menu.views.MainMenu;

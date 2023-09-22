@@ -62,7 +62,7 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
             return;
         }
 
-        var window = new Rectangle(0, 0, 1, input.window().height() / input.window().width());
+        var window = new Rectangle(0.025f, 0.025f, 0.95f, input.window().height() / input.window().width() - 0.05f);
         selectedColor.fitInto(new Rectangle(
                 window.position.x(),
                 window.position.y() + window.height * 0.4f,

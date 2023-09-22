@@ -12,7 +12,6 @@ import io.menu.components.RoomInfoView;
 import io.menu.scroll.ScrollBox;
 import io.menu.views.create_room.CreateRoom;
 import io.menu.views.room_view.RoomView;
-import io.model.ScreenPosition;
 import io.model.engine.Canvas;
 import io.model.engine.StateManager;
 import io.model.engine.TextManager;
@@ -77,15 +76,13 @@ public class RoomSelect extends SimpleView implements EventHandler {
         buttons = new ButtonBlock(0.01f, contents, handlers);
         scrollBox.setContents(buttons);
 
-        var window = new Rectangle(input.window().height() / input.window().width());
-        window.position = new ScreenPosition(0, 0);
-        window.height = input.window().height() / input.window().width();
+        var window = new Rectangle(0.025f, 0.025f, 0.95f, input.window().height() / input.window().width() - 0.05f);
 
         var scene = new Rectangle(
-                0.2f,
-                0.025f,
+                window.position.x() + 0.2f,
+                window.position.y(),
                 window.width() - 0.225f,
-                window.height - 0.05f
+                window.height
         );
 
         goBack.fitInto(new Rectangle(

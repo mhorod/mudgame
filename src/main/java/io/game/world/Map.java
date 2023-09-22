@@ -9,7 +9,6 @@ import core.terrain.model.TerrainType;
 import io.animation.Animation;
 import io.animation.Finishable;
 import io.game.Camera;
-import io.game.MapView;
 import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
 import io.game.world.entity.AnimatedEntity;

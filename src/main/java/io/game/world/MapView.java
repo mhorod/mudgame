@@ -1,7 +1,6 @@
-package io.game;
+package io.game.world;
 
-import io.game.world.MapObserver;
-import io.game.world.WorldEntity;
+import io.game.Camera;
 import io.game.world.entity.Entity;
 import io.game.world.tile.Tile;
 import io.model.Drawable;
