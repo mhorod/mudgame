@@ -14,7 +14,7 @@ public class SetZ extends EntityAnimation {
     }
 
     @Override
-    public boolean finished() {
+    public boolean _finished() {
         return true;
     }
 

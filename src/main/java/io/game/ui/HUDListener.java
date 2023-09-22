@@ -6,4 +6,5 @@ public interface HUDListener {
     void onEntityTypeSelected(EntityType type);
 
     void onEndTurn();
+
 }

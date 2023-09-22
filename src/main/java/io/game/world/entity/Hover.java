@@ -20,7 +20,7 @@ public class Hover extends EntityAnimation {
     }
 
     @Override
-    public boolean finished() {
+    public boolean _finished() {
         return false;
     }
 

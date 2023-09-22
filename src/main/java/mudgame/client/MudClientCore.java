@@ -3,6 +3,7 @@ package mudgame.client;
 import core.claiming.ClaimedAreaView;
 import core.entities.EntityBoardView;
 import core.fogofwar.PlayerFogOfWarView;
+import core.gameover.GameOverCondition;
 import core.model.PlayerID;
 import core.pathfinder.Pathfinder;
 import core.pathfinder.PlayerPathfinder;
@@ -101,5 +102,10 @@ public class MudClientCore implements MudClientCoreView {
     @Override
     public PlayerResourcesView playerResources() {
         return state.resourceManager();
+    }
+
+    @Override
+    public GameOverCondition gameOverCondition() {
+        return state.gameOverCondition();
     }
 }

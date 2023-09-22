@@ -20,6 +20,7 @@ public abstract class WorldState implements WorldBehavior {
     }
 
     protected boolean hasAnyMoves(EntityID entity) {
+        if (!state.entities().containsEntity(entity)) return false;
         return !state.pathfinder().reachablePositions(entity).getPositions().isEmpty()
                 || !state.attackManager().attackableEntities(entity).isEmpty();
     }

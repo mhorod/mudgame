@@ -7,11 +7,7 @@ import io.menu.buttons.ButtonMedium;
 import io.menu.components.Image;
 import io.menu.components.Label;
 import io.menu.views.RoomSelect;
-import io.model.engine.Canvas;
-import io.model.engine.Color;
-import io.model.engine.StateManager;
-import io.model.engine.TextManager;
-import io.model.engine.TextureBank;
+import io.model.engine.*;
 import io.model.input.Input;
 import io.model.input.events.Click;
 import io.model.input.events.EventHandler;
@@ -62,7 +58,7 @@ public class OwnerRoomView extends SimpleView implements EventHandler {
 
         var maybeGameClient = client.getGameClient();
         if (maybeGameClient.isPresent()) {
-            changeView(new GameView(maybeGameClient.get()));
+            changeView(new GameView(client));
             return;
         }
 

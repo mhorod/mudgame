@@ -52,7 +52,7 @@ public class RoomView extends SimpleView implements EventHandler {
 
         var maybeGameClient = client.getGameClient();
         if (maybeGameClient.isPresent()) {
-            changeView(new GameView(maybeGameClient.get()));
+            changeView(new GameView(client));
             return;
         }
 

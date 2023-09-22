@@ -14,7 +14,7 @@ public class Exist extends EntityAnimation {
     }
 
     @Override
-    public boolean finished() {
+    public boolean _finished() {
         return totalTime > time;
     }
 

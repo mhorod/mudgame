@@ -14,7 +14,6 @@ import io.game.WorldPosition;
 import io.game.world.arrow.Arrow;
 import io.game.world.entity.AnimatedEntity;
 import io.game.world.entity.Entity;
-import io.game.world.entity.EntityAnimation;
 import io.game.world.event_animations.*;
 import io.game.world.tile.AnimatedTile;
 import io.game.world.tile.AttackMarker;
@@ -27,14 +26,13 @@ import java.util.*;
 
 public class Map implements Animation {
     HashMap<EntityID, AnimatedEntity> entityAnimations = new HashMap<>();
-    ArrayList<EntityAnimation> otherAnimations = new ArrayList<>();
     private final TerrainView terrain;
     private final EntityBoardView entities;
     private final ClaimedAreaView claims;
     private final ArrayList<Position> path = new ArrayList<>();
     private Set<Position> highlightedTiles = null;
     private Set<Position> attackMarkers = null;
-    HashMap<Position, AnimatedTile> tmpTiles = new HashMap<>();
+    HashMap<Position, AnimatedTile> animatedTiles = new HashMap<>();
     private Animation mapAnimation;
 
     public Map(TerrainView terrain, EntityBoardView entities, ClaimedAreaView claims) {
@@ -76,15 +74,15 @@ public class Map implements Animation {
     }
 
     public Set<Position> getAnimatedTiles() {
-        return tmpTiles.keySet();
+        return animatedTiles.keySet();
     }
 
     public AnimatedTile tileFromPosition(Position pos) {
-        if (tmpTiles.containsKey(pos))
-            return tmpTiles.get(pos);
+        if (animatedTiles.containsKey(pos))
+            return animatedTiles.get(pos);
         var color = claims.owner(pos).map(Color::fromPlayerId).orElse(Color.WHITE);
         var tile = new AnimatedTile(pos, terrain.terrainAt(pos), entities.entitiesAt(pos), color, false);
-        tmpTiles.put(pos, tile);
+        animatedTiles.put(pos, tile);
         return tile;
     }
 
@@ -100,7 +98,6 @@ public class Map implements Animation {
         entities.addAll(entityAnimations.values().stream().flatMap(
                 animation -> animation.getEntity().withShadow().stream()
         ).toList());
-        entities.addAll(otherAnimations.stream().map(EntityAnimation::getEntity).toList());
         return new MapView(entities, camera, textureBank);
     }
 
@@ -118,20 +115,18 @@ public class Map implements Animation {
 
     @Override
     public void update(float deltaTime) {
-        otherAnimations.forEach(animation -> animation.update(deltaTime));
         entityAnimations.values().forEach(animation -> animation.update(deltaTime));
         if (mapAnimation != null) {
             mapAnimation.update(deltaTime);
             if (mapAnimation.finished())
                 mapAnimation = null;
         }
-        tmpTiles.values().forEach(animation -> animation.update(deltaTime));
+        animatedTiles.values().forEach(animation -> animation.update(deltaTime));
 
-        otherAnimations.removeIf(Animation::finished);
-        tmpTiles.entrySet().stream()
+        animatedTiles.entrySet().stream()
                 .filter((entry) -> entry.getValue().finished())
                 .toList()
-                .forEach(entry -> tmpTiles.remove(entry.getKey()));
+                .forEach(entry -> animatedTiles.remove(entry.getKey()));
         entityAnimations.entrySet().stream()
                 .filter((entry) -> entry.getValue().finished())
                 .toList()

@@ -1,5 +1,7 @@
 package io.game;
 
+import ai.Bot;
+import ai.RandomWalker;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
@@ -24,14 +26,16 @@ import io.model.input.events.Scroll;
 import io.views.SimpleView;
 import lombok.extern.slf4j.Slf4j;
 import middleware.clients.GameClient;
-import middleware.clients.ServerClient;
+import middleware.local.LocalServer;
 import mudgame.controls.events.*;
+import mudgame.server.state.ClassicServerStateSupplier;
 import mudgame.server.state.ServerState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @Slf4j
-public class GameView extends SimpleView implements HUDMetaListener {
+public class LocalGameView extends SimpleView {
     private final AnimationController<Animation> animations = new AnimationController<>();
     private final Map map;
     private MapView mapView;
@@ -48,12 +52,15 @@ public class GameView extends SimpleView implements HUDMetaListener {
 
     private final GameClient me;
     private Finishable eventAnimation;
-    private ServerState serverState;
-    private final ServerClient client;
+    private final ArrayList<Bot> bots = new ArrayList<>();
+    private final ServerState serverState;
 
-    public GameView(ServerClient client) {
-        this.client = client;
-        me = client.getGameClient().get();
+    public LocalGameView() {
+        serverState = new ClassicServerStateSupplier().get(4);
+        var server = new LocalServer(serverState);
+        me = server.getClient(0);
+        for (int i = 1; i < server.playerCount(); i++)
+            bots.add(new RandomWalker(server.getClient(i)));
         map = new Map(me.getCore().terrain(), me.getCore().entityBoard(), me.getCore().claimedArea());
         hud = new HUD(me.getCore().turnView(), me.getCore().playerResources());
         animations.addAnimation(cameraController);
@@ -114,16 +121,10 @@ public class GameView extends SimpleView implements HUDMetaListener {
 
     @Override
     public void update(Input input, TextureBank bank, TextManager mgr, StateManager stateManager) {
+        for (var bot : bots)
+            bot.update();
         processEvents();
         worldController.update();
-        var maybeState = client.getDownloadedState();
-
-        maybeState.ifPresent(state -> {
-            if (serverState != state) {
-                serverState = state;
-                stateManager.saveState(state);
-            }
-        });
 
         if (me.getCore().gameOverCondition().isGameOver()) {
             var winners = new HashMap<PlayerID, String>();
@@ -135,7 +136,17 @@ public class GameView extends SimpleView implements HUDMetaListener {
             input.events().forEach(event -> event.accept(new EventHandler() {
                 @Override
                 public void onClick(Click click) {
-                    if (!hud.click(click.position(), worldController, GameView.this))
+                    if (!hud.click(click.position(), worldController, new HUDMetaListener() {
+                        @Override
+                        public void onQuit() {
+                            changeView(new MainMenu());
+                        }
+
+                        @Override
+                        public void onSave() {
+                            stateManager.saveState(serverState);
+                        }
+                    }))
                         mapView.objectAt(click.position(), new MapObserver() {
                             @Override
                             public void onEntity(EntityID id) {
@@ -171,16 +182,5 @@ public class GameView extends SimpleView implements HUDMetaListener {
         animations.update(input.deltaTime());
         camera.setAspectRatio(input.window().height() / input.window().width());
         mapView = map.getView(bank, camera);
-    }
-
-
-    @Override
-    public void onQuit() {
-        changeView(new MainMenu());
-    }
-
-    @Override
-    public void onSave() {
-        client.downloadState();
     }
 }

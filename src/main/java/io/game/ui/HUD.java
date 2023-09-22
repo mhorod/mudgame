@@ -10,6 +10,7 @@ import io.menu.UIComponent;
 import io.menu.buttons.Button;
 import io.menu.buttons.ButtonSmall;
 import io.menu.components.Image;
+import io.menu.components.Label;
 import io.menu.containers.HBox;
 import io.model.ScreenPosition;
 import io.model.engine.Canvas;
@@ -28,6 +29,8 @@ public class HUD {
 
 
     Button nextTurn = new ButtonSmall(new Image(Texture.BASE, Color.BLUE));
+    Button quit = new ButtonSmall(new Label("QUIT"));
+    Button save = new ButtonSmall(new Label("SAVE"));
     boolean nextTurnEnabled = true;
 
     List<Button> buttons = List.of(pawn, warrior, marshWiggle, base, tower);
@@ -56,7 +59,11 @@ public class HUD {
         nextTurn = new ButtonSmall(new Image(Texture.BASE, Color.fromPlayerId(turnView.currentPlayer())));
         nextTurn.setPressed(!nextTurnEnabled);
         nextTurn.fitInto(new Rectangle(0.84f, 0.01f, 0.15f, 0.15f), mgr);
+        quit.fitInto(new Rectangle(0.01f, 0.01f, 0.15f, 0.15f), mgr);
+        save.fitInto(new Rectangle(0.01f, 0.17f, 0.15f, 0.15f), mgr);
         nextTurn.update(mouse, pressed);
+        quit.update(mouse, pressed);
+        save.update(mouse, pressed);
         resourceInfo.fitInto(new Rectangle(0, aspectRatio - 0.15f, 0.1f / resourceInfo.getAspectRatio(mgr), 0.1f), mgr);
         if (entityInfo != null)
             entityInfo.fitInto(new Rectangle(0, aspectRatio - 0.15f, 1, 0.15f), mgr);
@@ -65,6 +72,8 @@ public class HUD {
     public void draw(Canvas canvas) {
         content.draw(canvas);
         nextTurn.draw(canvas);
+        quit.draw(canvas);
+        save.draw(canvas);
         resourceInfo.draw(canvas);
         if (entityInfo != null)
             entityInfo.draw(canvas);
@@ -83,7 +92,7 @@ public class HUD {
         nextTurnEnabled = enabled;
     }
 
-    public boolean click(ScreenPosition position, HUDListener listener) {
+    public boolean click(ScreenPosition position, HUDListener listener, HUDMetaListener metaListener) {
         if (pawn.contains(position))
             listener.onEntityTypeSelected(EntityType.PAWN);
         else if (warrior.contains(position))
@@ -96,6 +105,10 @@ public class HUD {
             listener.onEntityTypeSelected(EntityType.TOWER);
         else if (nextTurn.contains(position))
             listener.onEndTurn();
+        else if (quit.contains(position))
+            metaListener.onQuit();
+        else if (save.contains(position))
+            metaListener.onSave();
         else return false;
         return true;
     }
