@@ -49,14 +49,15 @@ final class MoveProcessor {
 
     private void sendMovesToOther(PlayerID player, EntityID entityID, List<SingleMove> moves) {
         List<SingleMove> masked = masked(player, moves);
-        if (masked.isEmpty()) {
+        List<SingleMove> stripped = stripEnds(masked);
+        if (stripped.isEmpty()) {
             ClaimChanges claimChanges = claimChanges(player, moves);
             if (!claimChanges.claimChanges().isEmpty())
                 sender.send(claimChanges, player);
         } else {
-            prepare(player, entityID, masked);
-            sender.send(new MoveEntityAlongPath(entityID, masked), player);
-            cleanup(player, entityID, masked);
+            prepare(player, entityID, masked, stripped);
+            sender.send(new MoveEntityAlongPath(entityID, stripped), player);
+            cleanup(player, entityID, masked, stripped);
         }
     }
 
@@ -69,20 +70,47 @@ final class MoveProcessor {
         return new ClaimChanges(changes);
     }
 
-    private void prepare(PlayerID player, EntityID entityID, List<SingleMove> masked) {
-        Position start = masked.get(0).destinationNullable();
-        if (!state.playerSees(player, start))
+    private void prepare(
+            PlayerID player, EntityID entityID, List<SingleMove> masked, List<SingleMove> stripped
+    ) {
+        Position start = stripped.get(0).destinationNullable();
+        List<ClaimChange> claimChanges = masked.stream()
+                .takeWhile(SingleMove::isHidden)
+                .map(SingleMove::claimChange)
+                .filter(c -> !c.isEmpty())
+                .toList();
+
+        if (!state.playerSees(player, start)) {
+            if (!claimChanges.isEmpty())
+                sender.send(new ClaimChanges(claimChanges), player);
             sender.send(new PlaceEntity(state.findEntityByID(entityID), start), player);
+        }
     }
 
-    private void cleanup(PlayerID player, EntityID entityID, List<SingleMove> masked) {
-        Position end = masked.get(masked.size() - 1).destinationNullable();
-        if (!state.playerSees(player, end))
+    private void cleanup(
+            PlayerID player, EntityID entityID, List<SingleMove> masked,
+            List<SingleMove> stripped
+    ) {
+        int endIndex = masked.size() - 1;
+        while (endIndex > 0 && masked.get(endIndex).isHidden())
+            endIndex--;
+
+        List<ClaimChange> claimChanges = masked.subList(endIndex + 1, masked.size())
+                .stream().map(SingleMove::claimChange)
+                .filter(c -> !c.isEmpty())
+                .toList();
+
+        Position end = stripped.get(stripped.size() - 1).destinationNullable();
+
+        if (!state.playerSees(player, end)) {
+            if (!claimChanges.isEmpty())
+                sender.send(new ClaimChanges(claimChanges), player);
             sender.send(new RemoveEntity(entityID), player);
+        }
     }
 
     private List<SingleMove> masked(PlayerID player, List<SingleMove> moves) {
-        return stripEnds(maskedMoves(player, moves));
+        return maskedMoves(player, moves);
     }
 
     private List<SingleMove> maskedMoves(PlayerID player, List<SingleMove> moves) {
@@ -118,10 +146,19 @@ final class MoveProcessor {
 
 
     private List<SingleMove> stripEnds(List<SingleMove> result) {
-        return result.stream()
-                .dropWhile(SingleMove::isHidden)
-                .takeWhile(SingleMove::isShown)
-                .toList();
+        int begin = 0;
+        while (begin < result.size() && result.get(begin).isHidden())
+            begin++;
+
+        int end = result.size() - 1;
+        while (end > 0 && result.get(end).isHidden())
+            end--;
+
+        end++;
+        if (end <= begin)
+            return List.of();
+
+        return result.subList(begin, end);
     }
 
     private List<SingleMove> getMoves(EntityID entityID, Position destination) {

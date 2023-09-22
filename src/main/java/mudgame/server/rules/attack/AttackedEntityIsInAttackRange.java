@@ -24,6 +24,8 @@ public class AttackedEntityIsInAttackRange implements ActionRule {
     }
 
     private boolean attackedEntityIsInRange(EntityID attackerID, EntityID attackedID) {
+        if (!entityBoard.containsEntity(attackerID) || !entityBoard.containsEntity(attackedID))
+            return false;
         Entity attacker = entityBoard.findEntityByID(attackerID);
         if (attacker == null || attacker.getAttack().isEmpty())
             return false;

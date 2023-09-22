@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 @Slf4j
 public class Replays {
@@ -30,6 +31,7 @@ public class Replays {
         PlayerID myPlayer = clientCore.myPlayerID();
 
         for (Position pos : clientCore.fogOfWar().visiblePositions()) {
+            if (!serverCore.state().terrain().contains(pos)) continue;
             Optional<PlayerID> ownerByServer = serverCore.state().claimedArea().owner(pos);
             Optional<PlayerID> ownerByClient = clientCore.claimedArea().owner(pos);
 

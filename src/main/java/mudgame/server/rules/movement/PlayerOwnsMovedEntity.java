@@ -21,6 +21,9 @@ public final class PlayerOwnsMovedEntity implements ActionRule {
     }
 
     private boolean ownsEntity(PlayerID player, EntityID entityID) {
-        return boardView.findEntityByID(entityID).owner().equals(player);
+        if (!boardView.containsEntity(entityID))
+            return false;
+        else
+            return boardView.findEntityByID(entityID).owner().equals(player);
     }
 }

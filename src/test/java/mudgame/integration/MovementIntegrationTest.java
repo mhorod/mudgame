@@ -1,6 +1,7 @@
 package mudgame.integration;
 
 import core.entities.model.Entity;
+import mudgame.controls.events.ClaimChanges;
 import testutils.integration.utils.Scenario;
 import testutils.integration.utils.ScenarioResult;
 import mudgame.controls.events.MoveEntityAlongPath;
@@ -116,7 +117,10 @@ class MovementIntegrationTest {
                 .doesNotSeeEntities(pawn1);
 
         assertThatClient(result, PLAYER_1)
-                .receivedEventTypes(MoveEntityAlongPath.class, RemoveEntity.class)
+                .receivedEventTypes(
+                        MoveEntityAlongPath.class,
+                        RemoveEntity.class
+                )
                 .doesNotSeeEntities(pawn0);
     }
 
@@ -208,7 +212,7 @@ class MovementIntegrationTest {
         // then
         assertIntegrity(result);
         assertThatClient(result, PLAYER_1)
-                .receivedEventTypes(PlaceEntity.class, MoveEntityAlongPath.class)
+                .receivedEventTypes(ClaimChanges.class, PlaceEntity.class, MoveEntityAlongPath.class)
                 .seesClaim(PLAYER_0, pos(3, 3));
     }
 
@@ -277,5 +281,53 @@ class MovementIntegrationTest {
                         MoveEntityAlongPath.class,
                         MoveEntityAlongPath.class
                 );
+    }
+
+    @Test
+    void player_sees_all_claim_changes_when_appearing_entity_movement_is_partially_visible()
+    {
+        // given
+        Entity marshWiggle = marshWiggle(PLAYER_0);
+        Scenario scenario = two_players()
+                .with(RectangleTerrain.land(10, 10))
+                .with(pawn(PLAYER_1), pos(2, 0))
+                .with(pawn(PLAYER_1), pos(2, 6))
+                .with(pawn(PLAYER_1), pos(7, 3))
+                .with(pawn(PLAYER_0), pos(0, 3))
+                .with(pawn(PLAYER_0), pos(6, 3))
+                .with(marshWiggle, pos(1, 3))
+                .build();
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, move(marshWiggle, pos(5, 3)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+    }
+
+    @Test
+    void player_sees_all_claim_changes_when_disappearing_entity_movement_is_partially_visible()
+    {
+        // given
+        Entity marshWiggle = marshWiggle(PLAYER_0);
+        Scenario scenario = two_players()
+                .with(RectangleTerrain.land(10, 10))
+                .with(pawn(PLAYER_1), pos(2, 0))
+                .with(pawn(PLAYER_1), pos(2, 6))
+                .with(pawn(PLAYER_1), pos(7, 3))
+                .with(pawn(PLAYER_0), pos(0, 3))
+                .with(pawn(PLAYER_0), pos(6, 3))
+                .with(marshWiggle, pos(5, 3))
+                .build();
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, move(marshWiggle, pos(1, 3)))
+                .finish();
+
+        // then
+        assertIntegrity(result);
     }
 }
