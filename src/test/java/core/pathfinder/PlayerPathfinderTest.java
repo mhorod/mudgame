@@ -6,6 +6,7 @@ import core.fogofwar.PlayerFogOfWar;
 import core.model.PlayerID;
 import core.model.Position;
 import core.terrain.model.Terrain;
+import core.turns.TurnManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +22,7 @@ class PlayerPathfinderTest extends PathfinderTestBase {
     Terrain terrain;
     PlayerPathfinder pathfinder;
     PlayerFogOfWar fow;
+    TurnManager turnManager;
 
     @BeforeEach
     void init() {
@@ -29,7 +31,14 @@ class PlayerPathfinderTest extends PathfinderTestBase {
         fow = mock(PlayerFogOfWar.class);
         when(fow.isVisible(any())).thenReturn(true);
         when(fow.playerID()).thenReturn(new PlayerID(0));
-        pathfinder = new PlayerPathfinder(new PlayerID(0), terrain, entityBoard, fow);
+        turnManager = new TurnManager(2);
+        pathfinder = new PlayerPathfinder(
+                new PlayerID(0),
+                terrain,
+                entityBoard,
+                fow,
+                turnManager
+        );
     }
 
     @Test

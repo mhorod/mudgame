@@ -6,6 +6,7 @@ import core.entities.model.components.Attack;
 import core.model.EntityID;
 import core.model.PlayerID;
 import core.model.Position;
+import core.turns.TurnView;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -14,12 +15,15 @@ import java.util.List;
 public class PlayerAttackManager {
     private final PlayerID playerID;
     private final EntityBoardView entityBoard;
+    private final TurnView turnView;
 
     public List<EntityID> attackableEntities(EntityID attackerID) {
         Entity attacker = entityBoard.findEntityByID(attackerID);
         if (!attacker.owner().equals(playerID))
             return List.of();
-        if (attacker.getAttack().isEmpty())
+        else if (attacker.getAttack().isEmpty())
+            return List.of();
+        else if (!turnView.currentPlayer().equals(playerID))
             return List.of();
 
         int range = attacker.getAttack().map(Attack::range).orElse(0);
