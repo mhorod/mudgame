@@ -57,7 +57,7 @@ public class HUD {
         buttons.forEach(button -> button.update(mouse, pressed));
 
         nextTurn = new ButtonSmall(new Image(Texture.BASE, Color.fromPlayerId(turnView.currentPlayer())));
-        nextTurn.setPressed(!nextTurnEnabled);
+        nextTurn.setPressed(!nextTurnEnabled || !turnView.isMyTurn());
         nextTurn.fitInto(new Rectangle(0.84f, 0.01f, 0.15f, 0.15f), mgr);
         quit.fitInto(new Rectangle(0.01f, 0.01f, 0.15f, 0.15f), mgr);
         save.fitInto(new Rectangle(0.01f, 0.17f, 0.15f, 0.15f), mgr);
