@@ -58,7 +58,7 @@ public class RoomView extends SimpleView implements EventHandler {
 
         selectedColor = new Image(Texture.BASE, client.myPlayerID().map(Color::fromPlayerId).orElse(Color.WHITE));
 
-        var window = new Rectangle(0, 0, 1, input.window().height() / input.window().width());
+        var window = new Rectangle(0.025f, 0.025f, 0.95f, input.window().height() / input.window().width() - 0.05f);
         common.fitInto(window, mgr);
 
         selectedColor.fitInto(new Rectangle(

@@ -10,6 +10,7 @@ import io.game.ui.HUD;
 import io.game.ui.HUDMetaListener;
 import io.game.world.Map;
 import io.game.world.MapObserver;
+import io.game.world.MapView;
 import io.game.world.controller.WorldController;
 import io.menu.views.GameOverView;
 import io.menu.views.RoomSelect;
@@ -127,7 +128,7 @@ public class GameView extends SimpleView implements HUDMetaListener {
 
         if (me.getCore().gameOverCondition().isGameOver()) {
             var winners = new HashMap<PlayerID, String>();
-            me.getCore().gameOverCondition().winners().ifPresent(l -> l.forEach(w -> winners.put(w, null)));
+            me.getCore().gameOverCondition().winners().ifPresent(l -> l.forEach(w -> winners.put(w, client.currentRoom().get().players().get(w))));
             changeView(new GameOverView(winners));
         }
 
