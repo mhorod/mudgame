@@ -6,6 +6,7 @@ import core.spawning.SpawnManager;
 import mudgame.controls.actions.AttackEntityAction;
 import mudgame.controls.actions.MoveEntity;
 import mudgame.server.rules.attack.AttackedEntityIsInAttackRange;
+import mudgame.server.rules.attack.AttackerEntityHasAttacksInCurrentTurn;
 import mudgame.server.rules.attack.AttackerSeesAttackedEntity;
 import mudgame.server.rules.attack.PlayerCannotAttackOwnEntities;
 import mudgame.server.rules.attack.PlayerOwnsAttackerEntity;
@@ -55,7 +56,8 @@ public class DefaultRules implements RuleProvider {
                                                        gameState.fogOfWar()),
                         new PlayerOwnsAttackerEntity(gameState.entityBoard()),
                         new PlayerCannotAttackOwnEntities(gameState.entityBoard()),
-                        new AttackedEntityIsInAttackRange(gameState.entityBoard())
+                        new AttackedEntityIsInAttackRange(gameState.entityBoard()),
+                        new AttackerEntityHasAttacksInCurrentTurn(gameState.entityBoard())
                 ).forActions(AttackEntityAction.class)
         );
     }

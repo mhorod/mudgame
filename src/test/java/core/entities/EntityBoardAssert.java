@@ -73,5 +73,6 @@ public class EntityBoardAssert extends AbstractAssert<EntityBoardAssert, EntityB
         assertThat(first.type()).isEqualTo(second.type());
         assertThat(first.getHealth()).isEqualTo(second.getHealth());
         assertThat(first.getProduction()).isEqualTo(second.getProduction());
+        assertThat(first.getAttack()).isEqualTo(second.getAttack());
     }
 }

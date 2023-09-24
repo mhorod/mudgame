@@ -1,6 +1,7 @@
 package mudgame.server.actions;
 
 import core.entities.model.Entity;
+import core.entities.model.components.Attack;
 import core.entities.model.components.Movement;
 import core.resources.Resources;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +11,6 @@ import mudgame.controls.actions.CompleteTurn;
 import mudgame.controls.events.NextTurn;
 import mudgame.controls.events.ProduceResources;
 import mudgame.server.internal.InteractiveState;
-
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,14 +29,16 @@ final class CompleteTurnProcessor {
         sender.sendToEveryone(event);
 
         Resources resources = state.produceResources(state.currentPlayer());
-        state.playerEntities(state.currentPlayer()).stream()
-                .map(Entity::getMovement)
-                .flatMap(Optional::stream)
-                .forEach(Movement::newTurn);
+        state.playerEntities(state.currentPlayer()).forEach(this::newTurn);
+
         log.debug("Produced resources for player: {}, {}", state.currentPlayer(), resources);
         if (!resources.isEmpty())
             sender.send(new ProduceResources(resources), state.currentPlayer());
     }
 
+    private void newTurn(Entity e) {
+        e.getAttack().ifPresent(Attack::newTurn);
+        e.getMovement().ifPresent(Movement::newTurn);
+    }
 
 }

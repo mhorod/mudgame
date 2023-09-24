@@ -2,8 +2,10 @@ package mudgame.client.events;
 
 import mudgame.client.ClientGameState;
 import mudgame.controls.events.AttackEntityEvent;
+import mudgame.controls.events.AttackPosition;
 import mudgame.controls.events.ChargeResources;
 import mudgame.controls.events.ClaimChanges;
+import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.Event;
 import mudgame.controls.events.GameOver;
 import mudgame.controls.events.KillEntity;
@@ -44,6 +46,10 @@ public final class EventProcessor {
             gameOver(e);
         else if (event instanceof AttackEntityEvent e)
             entityEventProcessor.attackEntity(e);
+        else if (event instanceof DamageEntity e)
+            entityEventProcessor.damageEntity(e);
+        else if (event instanceof AttackPosition e)
+            entityEventProcessor.attackPosition(e);
         else if (event instanceof KillEntity e)
             entityEventProcessor.killEntity(e);
         else if (event instanceof ProduceResources e)

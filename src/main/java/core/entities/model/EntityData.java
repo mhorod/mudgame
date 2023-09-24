@@ -74,7 +74,7 @@ public record EntityData(
                 List.of(
                         new Vision(2),
                         new Movement(5),
-                        new Attack(3, 1),
+                        new Attack(3, 1, 1),
                         new Health(12),
                         Cost.of(Map.of(MUD, 2))
                 )

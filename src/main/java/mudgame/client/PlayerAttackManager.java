@@ -25,6 +25,8 @@ public class PlayerAttackManager {
             return List.of();
         else if (!turnView.currentPlayer().equals(playerID))
             return List.of();
+        else if (attacker.getAttack().map(Attack::attacksLeft).orElse(0) == 0)
+            return List.of();
 
         int range = attacker.getAttack().map(Attack::range).orElse(0);
         return entityBoard.allEntities().stream()
