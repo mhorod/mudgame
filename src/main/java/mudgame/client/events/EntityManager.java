@@ -2,6 +2,7 @@ package mudgame.client.events;
 
 import core.entities.EntityBoard;
 import core.entities.model.Entity;
+import core.entities.model.components.Attack;
 import core.fogofwar.PlayerFogOfWar;
 import core.model.EntityID;
 import core.model.PlayerID;
@@ -36,7 +37,16 @@ class EntityManager {
         }
     }
 
-    public void damageEntity(EntityID entityID, int damage) {
-        entityBoard.findEntityByID(entityID).damage(damage);
+    public void attackEntity(EntityID attackerID, EntityID attackedID, int damage) {
+        entityBoard.findEntityByID(attackerID).getAttack().ifPresent(Attack::attack);
+        entityBoard.findEntityByID(attackedID).damage(damage);
+    }
+
+    public void attacks(EntityID attackerID) {
+        entityBoard.findEntityByID(attackerID).getAttack().ifPresent(Attack::attack);
+    }
+
+    public void damageEntity(EntityID attackedID, int damage) {
+        entityBoard.findEntityByID(attackedID).damage(damage);
     }
 }

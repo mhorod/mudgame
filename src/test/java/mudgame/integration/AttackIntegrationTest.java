@@ -3,26 +3,26 @@ package mudgame.integration;
 import core.entities.model.Entity;
 import core.entities.model.EntityData;
 import core.model.EntityID;
-import testutils.integration.utils.Scenario;
 import mudgame.controls.events.AttackEntityEvent;
 import mudgame.controls.events.AttackPosition;
 import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.ProduceResources;
-import testutils.integration.utils.RectangleTerrain;
-import testutils.integration.utils.ScenarioResult;
 import org.junit.jupiter.api.Test;
+import testutils.integration.utils.RectangleTerrain;
+import testutils.integration.utils.Scenario;
+import testutils.integration.utils.ScenarioResult;
 
 import java.util.List;
 
 import static core.entities.model.EntityType.PAWN;
-import static testutils.integration.assertions.ClientScenarioResultAssert.assertThatClient;
-import static testutils.integration.assertions.IntegrationAssertions.assertIntegrity;
-import static testutils.integration.assertions.IntegrationAssertions.assertNoEvents;
 import static testutils.Actions.attack;
 import static testutils.Entities.*;
 import static testutils.Players.*;
 import static testutils.Positions.pos;
+import static testutils.integration.assertions.ClientScenarioResultAssert.assertThatClient;
+import static testutils.integration.assertions.IntegrationAssertions.assertIntegrity;
+import static testutils.integration.assertions.IntegrationAssertions.assertNoEvents;
 import static testutils.integration.scenarios.Scenarios.*;
 
 class AttackIntegrationTest {
@@ -337,5 +337,30 @@ class AttackIntegrationTest {
         // then
         assertIntegrity(result);
         assertNoEvents(result);
+    }
+
+    @Test
+    void warrior_can_attack_only_once_per_turn() {
+        // given
+        Entity warrior = warrior(PLAYER_0);
+        Entity pawn = pawn(PLAYER_1);
+
+        Scenario scenario = two_players()
+                .with(warrior, pos(0, 0))
+                .with(pawn, pos(0, 1))
+                .build();
+
+        // when
+        ScenarioResult result = scenario
+                .act(PLAYER_0, attack(warrior, pawn))
+                .act(PLAYER_0, attack(warrior, pawn))
+                .finish();
+
+        // then
+        assertIntegrity(result);
+        assertThatClient(result, PLAYER_0)
+                .receivedEventTypes(AttackEntityEvent.class);
+        assertThatClient(result, PLAYER_1)
+                .receivedEventTypes(AttackEntityEvent.class);
     }
 }

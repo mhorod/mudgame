@@ -6,6 +6,8 @@ import core.model.Position;
 import lombok.extern.slf4j.Slf4j;
 import mudgame.client.ClientGameState;
 import mudgame.controls.events.AttackEntityEvent;
+import mudgame.controls.events.AttackPosition;
+import mudgame.controls.events.DamageEntity;
 import mudgame.controls.events.KillEntity;
 import mudgame.controls.events.MoveEntityAlongPath;
 import mudgame.controls.events.MoveEntityAlongPath.SingleMove;
@@ -89,12 +91,20 @@ final class EntityEventProcessor {
     }
 
     public void attackEntity(AttackEntityEvent e) {
-        entityManager.damageEntity(e.attacked(), e.damage());
+        entityManager.attackEntity(e.attacker(), e.attacked(), e.damage());
     }
 
     public void killEntity(KillEntity e) {
         entityManager.removeEntity(e.entityID());
         applyVisibilityChange(e.visibilityChange());
         claimedArea.apply(e.claimChange());
+    }
+
+    public void damageEntity(DamageEntity e) {
+        entityManager.damageEntity(e.attacked(), e.damage());
+    }
+
+    public void attackPosition(AttackPosition e) {
+        entityManager.attacks(e.attacker());
     }
 }

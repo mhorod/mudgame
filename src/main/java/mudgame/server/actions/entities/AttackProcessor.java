@@ -51,6 +51,7 @@ class AttackProcessor {
     void attack(Entity attacker, Entity attacked) {
         if (!canAttack(attacker, attacked))
             return;
+        attacker.getAttack().ifPresent(Attack::attack);
         int damage = attacker.getAttack().map(Attack::damage).orElse(0);
         int healthLeft = attacked.damage(damage).orElse(0);
         sendAttack(attacker, attacked, damage);
